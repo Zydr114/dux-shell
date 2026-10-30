@@ -27,3 +27,7 @@ Use one lightweight pure logic helper for material inheritance, numeric validati
 Implement geometry, tree data/UI and material controls in bounded parallel tasks; review and integrate centrally. Add regressions only for changed pure logic and supported service functions. Run the full existing QML suite, shell entrypoint lint, changed-file parsing and diff checks. Use the already running desktop for finite visual checks, separating transient reload warnings from settled errors; do not start a second shell or compositor for tests.
 
 Preserve the user's current configuration and unrelated work. Restore temporary visual-check settings, retain backup/evidence outside Git, document actual acceptance and remaining limits, commit coherent implementation steps, and push this feature branch to origin.
+
+## Delivery status — 2026-10-31
+
+Implemented and centrally reviewed: common physical-pixel outer geometry, tree settings and atomic group moves, independent per-widget/group material controls, and standard plugin-pill forwarding. Validation and remaining interaction/platform boundaries are recorded in [capsule-groups.md](capsule-groups.md). Temporary desktop scenarios were restored to the exact starting bar configuration. No periodic work or protocol changes were introduced.

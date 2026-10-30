@@ -1,19 +1,44 @@
 # Bar capsule groups
 
-In **Settings → Bar widgets**, use the group button beside a built-in widget to create or edit its group. Add adjacent widgets with **Add previous/next**, move the complete group, or ungroup it. A group belongs to one section; moving a member out of its contiguous run splits the group into independent definitions. Duplicate widget types remain independent instances. Spacer, separator, Island and plugin entries have no group creation button.
+In **Settings → Bar widgets**, each section shows a one-level tree: ordinary widgets and group rows, with indented members below each group. Click a group row to open its settings directly underneath it. The chevron collapses members; the plus button selects an existing ungrouped widget in that section to add. **Add group**, or **Group** in the add-widget menu, creates a group from a selected existing widget. A group requires at least one member.
 
-The outer capsule uses a low surface tone and a subtle outline. Its children retain their own pill or segment surfaces, hover states and actions. Each group has independent tone, padding, spacing, blur and overflow settings. An empty group has no background, spacing or padding in the layout.
+Top-level drag handles move a complete group, including across sections. Member handles reorder within the group; **Remove from group** places the member after its former group. Removing the last member removes the empty definition. Group and member rows also participate in keyboard navigation and ordering. Duplicate widget types retain their own settings because operations use occurrence indexes. Unknown and plugin entries remain preserved; the creation picker currently offers supported built-in widgets only.
 
-## Configuration
+## Uniform outer size
 
-Member entries remain in the existing widget arrays; `groupId` refers to `barConfig.widgetGroups`:
+Ordinary capsule surfaces and group shells use the same outer cross-axis thickness, based on the former default group size. A single-icon ordinary capsule has at least that much primary space so its fill remains round. Content design size is separate from surface size: enlarging an ordinary shell does not enlarge all its icons or text.
+
+Before physical-pixel rounding, the geometry is:
+
+```
+T = min(bar thickness, content basis + 2 × default group inset + 2 × effective outline)
+ordinary fill = T − 2 × effective outline
+group child fill = T − 2 × cross inset − 2 × effective outline
+```
+
+Effective outlines reserve a minimum content face before growing; very thin bars reduce them. Cross insets reserve the group border when possible and are constrained by the remaining inner face. A large group padding therefore reduces children inside the fixed shell. Requested padding still applies along the bar. Geometry is calculated on the screen's physical-pixel grid to keep ordinary and grouped bounds consistent at fractional scales.
+
+Group primary size includes visible children, their outlines, internal gaps and both end insets. Flexible media/window-title sizes and the overflow trigger use matching budgets. Hidden children contribute no gaps; an empty group contributes no shell. Horizontal and vertical layouts share these rules, including section input bounds. Dock surfaces retain their separate sizing. Standard `PluginComponent` pills receive ordinary surface sizing and material parameters; custom plugin rendering must support the corresponding properties itself.
+
+## Independent opacity and blur
+
+The widget and group editors expose **Opacity** with an inheritance/override switch and a 0–100% slider, plus a separate blur choice. A widget inherits bar widget opacity; a group shell inherits bar surface opacity. Members can override their own fill opacity, while the group shell supplies their backdrop blur.
+
+Blur is `inherit`, `on` or `off`. It does not force opacity to one when disabled or unavailable. Zero opacity with blur on permits an untinted blurred capsule; opaque fills do not register a blur region. The existing background visibility setting still controls whether an ordinary surface is shown.
+
+A local blur switch controls that surface's request. It cannot reverse blur from an underlying bar/frame surface. Overflow retains its existing popup backdrop policy. The bar's own blur setting remains under **Bar appearance → Surface → Background blur**.
+
+## Configuration compatibility
+
+Members remain in the existing flat widget arrays. `groupId` refers to `barConfig.widgetGroups`; no nested or empty-container schema is introduced:
 
 ```json
 {
-  "blur": "on",
+  "blur": "off",
   "leftWidgets": [
+    { "id": "clock", "enabled": true, "blur": "on", "backgroundOpacity": 0.25 },
     { "id": "cpuUsage", "enabled": true, "groupId": "performance" },
-    { "id": "memUsage", "enabled": true, "groupId": "performance" }
+    { "id": "memUsage", "enabled": true, "groupId": "performance", "backgroundOpacity": 0.8 }
   ],
   "widgetGroups": {
     "performance": {
@@ -22,45 +47,34 @@ Member entries remain in the existing widget arrays; `groupId` refers to `barCon
       "padding": 4,
       "spacing": 3,
       "tone": "surface",
-      "blur": "inherit",
+      "blur": "on",
+      "backgroundOpacity": 0.35,
       "overflowMode": "auto"
     }
   }
 }
 ```
 
-- `style`: `pills` or `segments`, independent of the bar's widget style.
+- `backgroundOpacity`: absent or `null` inherits; a finite number is constrained to 0–1.
+- `blur`: unknown values inherit. Group members use group blur while grouped and retain their own choice for when moved out.
+- `style`: `pills` or `segments`, independent of bar style.
 - `tone`: `surface` or `primary`.
-- `padding` and `spacing`: logical pixels, constrained to Theme spacing limits and snapped to the screen scale.
-- `blur`: `inherit`, `on` or `off`. A group inherits the bar setting; the bar inherits the global setting. The bar setting is available under **Bar appearance → Surface → Background blur**.
-- `overflowMode`: `auto`, `bar` or `always`. The complete group is one overflow unit; members cannot be split across the bar and its overflow popup.
+- `padding` and `spacing`: logical pixels, bounded by Theme tokens and snapped to screen scale.
+- `overflowMode`: `auto`, `bar` or `always`; a group moves into overflow as one unit.
 
-Unknown blur values inherit. Invalid group references fall back to ordinary widgets. The runtime requires a widget's `groupContext` property before grouping it; unsupported plugin widgets retain their ordinary presentation.
+Invalid group references fall back to ordinary presentation. Separate runs of the same group are normalized into independent definitions. Cross-section moves update both arrays atomically and retain the moved group's settings.
 
-## Size constraints
+## Lifetime and validation
 
-The primary size of the outer capsule is the sum of visible child hit sizes (including their outlines), internal gaps and padding at both ends. Flexible media and window-title widgets include their outlines in both natural and minimum sizes.
+Blur uses the compositor's `ext-background-effect-v1` support and the existing window region registry. Each group registers one rounded region, with no duplicate child regions. Hidden, opaque and destroyed surfaces unregister. A local request can trigger the existing one-shot capability probe even when global/bar blur is off. Geometry refreshes reach the window registry, and null geometry during Island teardown is guarded.
 
-Across the bar, the child surface is bounded by the available bar thickness minus both outline strokes. Cross padding is then reduced to fit the remaining space. Thus:
+No periodic timer, daemon, dependency or socket change was added. Existing event-driven layout and blur rebuilds are reused. Group surfaces retain their instances while the count is stable. Tree editors load only when selected; inherited DReorderList autoscroll runs only during an active drag. This source audit does not measure compositor GPU cost.
 
-```
-child surface + 2 × child outline + 2 × cross padding ≤ bar thickness
-```
+Acceptance on **2026-10-31**:
 
-The requested padding still applies along the bar. Increasing it never forces a thicker bar or shrinks every widget simply to preserve the requested cross padding. The section's input bounds include the outer capsule. Horizontal and vertical bars use the same rules.
+- `make test-qml`: logic suite plus 31 Qt and 38 lock checks passed. Focused regressions cover physical-pixel thickness, constrained padding/outlines, atomic overflow, tree block transfers, duplicate instances, last-member removal, unknown-entry preservation and independent material inheritance.
+- `make lint-qml`: both shell entrypoints passed. All 22 changed QML files parsed with `qmlformat`; `git diff --check` passed. These entrypoint/parse checks are not a clean per-file dynamic QML lint result.
+- Screenshots from the already running niri session cover mixed ordinary/grouped capsules, a thin vertical bar with large outlines/padding, bottom segments and an overflow trigger, standard Quick Capture pill sizing, the settings tree, opacity with blur on/off, and untinted blur. The compositor probe reported protocol support.
+- The original bar configurations and other settings were restored exactly after temporary scenarios. Final settled logs contain no new capsule/tree binding-loop or script errors; unrelated plugin, icon and Island settings warnings remain. The existing shell hot-reloaded the source; no second shell or compositor was started.
 
-## Backdrop blur and lifetime
-
-Blur uses the compositor's `ext-background-effect-v1` support and the existing window blur-region registry. The group registers one rounded region; its children do not register duplicate regions. Opaque, hidden and destroyed groups unregister. A group uses an opaque surface when blur is disabled or unsupported. A group with blur off can therefore sit over a bar with blur on without a transparent blurred interior.
-
-The compositor capability probe runs once on demand, including when only a local override requests blur. Frame chrome delegates blur only when the frame actually has global blur enabled. Overflow popups use their existing window background effect.
-
-No persistent timer, polling process or background service is added. Layout changes and widget visibility drive updates. Group surfaces are reused while the group count stays the same; the existing blur registry refreshes their regions when geometry changes. This is event-driven work, and compositor blur cost still depends on the covered area.
-
-## Validation on 2026-10-30–31
-
-`make test-qml`, `make lint-qml` (the two shell entrypoints), and parse checks for all 40 changed QML/JS files passed. The new logic coverage includes empty/hidden members, atomic overflow, flexible widths and outlines, fractional bounds, disconnected group runs, duplicate widget instances, malformed group definitions and blur overrides. Direct lint of individual QML files reports dynamic QObject member and scope warnings and exits nonzero; it is not a clean lint result.
-
-Screenshots from the already running niri session cover all four bar edges, ordinary and Island bars, a center group, large padding/outlines/icons/fonts, segment styling, hidden members, an atomic overflow trigger, the settings list and blur on/off with global blur disabled. The compositor reports `ext-background-effect-v1` support. Settled configuration changes produced no new group binding-loop or script errors; unrelated plugin and missing-icon warnings remain.
-
-The final desktop configuration uses CPU+memory and tray+notifications+Control Center groups on the original top bar, with bar-local blur enabled. Full group-editor click/drag flows, the opened overflow popup, active media playback, other compositors and GPU performance were not visually or performance validated in this pass. Popup backdrops continue to follow the existing popup/global blur policy.
+Evidence and configuration backups are local to `/tmp/dms-redesign-20261031/`. Full mouse/keyboard drag flows, the opened group editor/add picker/overflow popup, active media playback, other compositors and performance were not interactively validated. The earlier implementation's finite acceptance remains in the Git history preceding this redesign.
