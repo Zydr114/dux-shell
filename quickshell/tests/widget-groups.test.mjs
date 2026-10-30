@@ -8,10 +8,53 @@ const groups = vm.createContext({});
 vm.runInContext(source, groups);
 const plain = value => JSON.parse(JSON.stringify(value));
 
+test("tree operations preserve duplicate instances and move groups as blocks", () => {
+    const entries = [{ id: "clock", marker: 1 }, { id: "clock", marker: 2, groupId: "a" }, { id: "music", groupId: "a" }, { id: "clock", marker: 3 }];
+    const nodes = groups.tree(entries);
+    assert.deepEqual(plain(nodes), [{ groupId: "", first: 0, end: 1 }, { groupId: "a", first: 1, end: 3 }, { groupId: "", first: 3, end: 4 }]);
+    assert.deepEqual(plain(groups.reorder(entries, nodes, [1, 2, 0])).map(x => x.marker ?? x.id), [2, "music", 3, 1]);
+    const moved = groups.transfer(entries, ["battery"], nodes[1], groups.tree(["battery"]), 1);
+    assert.deepEqual(plain(moved.source).map(x => x.marker), [1, 3]);
+    assert.deepEqual(plain(moved.destination), ["battery", entries[1], entries[2]]);
+});
+
+test("adding and removing any member preserves contiguous group order", () => {
+    const entries = [{ id: "clock", marker: 1 }, { id: "clock", groupId: "a", marker: 2 }, { id: "clock", groupId: "a", marker: 3 }, { id: "clock", marker: 4 }];
+    const added = plain(groups.addMember(entries, 0, "a"));
+    assert.deepEqual(added.map(x => x.marker), [2, 3, 1, 4]);
+    assert.deepEqual(added.map(x => x.groupId ?? ""), ["a", "a", "a", ""]);
+    const removed = plain(groups.removeMember(added, 1));
+    assert.deepEqual(removed.map(x => x.marker), [2, 1, 3, 4]);
+    assert.deepEqual(removed.map(x => x.groupId ?? ""), ["a", "a", "", ""]);
+    assert.deepEqual(plain(groups.addMember(entries, 3, "a")).map(x => x.marker), [1, 2, 3, 4]);
+});
+
 test("ordinary widget changes do not add group metadata or change other sections", () => {
     const config = { leftWidgets: ["clock"], centerWidgets: ["music"], rightWidgets: ["battery"] };
     const updates = { leftWidgets: [{ id: "clock", enabled: false }] };
     assert.deepEqual(plain(groups.normalize(config, updates)), updates);
+});
+
+test("cross-section group transfers retain settings and unknown neighboring entries", () => {
+    const config = {
+        widgetGroups: { a: { name: "A", backgroundOpacity: 0.25, blur: "off" } },
+        leftWidgets: [{ id: "clock", groupId: "a", marker: 1 }, { id: "clock", groupId: "a", marker: 2 }, { id: "unknown:variant", opaque: { keep: true } }],
+        centerWidgets: [],
+        rightWidgets: ["battery"]
+    };
+    const moved = groups.transfer(config.leftWidgets, config.rightWidgets, groups.tree(config.leftWidgets)[0], groups.tree(config.rightWidgets), 0);
+    const result = plain(groups.normalize(config, { leftWidgets: moved.source, rightWidgets: moved.destination }));
+    assert.deepEqual(result.widgetGroups, config.widgetGroups);
+    assert.deepEqual(result.leftWidgets, [config.leftWidgets[2]]);
+    assert.deepEqual(result.rightWidgets, [...config.leftWidgets.slice(0, 2), "battery"]);
+});
+
+test("removing the last member dissolves only its empty definition", () => {
+    const config = { widgetGroups: { a: {}, b: { blur: "on" } }, leftWidgets: [{ id: "clock", groupId: "a" }, { id: "clock", groupId: "b" }], rightWidgets: [] };
+    const next = groups.removeMember(config.leftWidgets, 0);
+    const result = plain(groups.normalize(config, { leftWidgets: next }));
+    assert.deepEqual(result.leftWidgets, [{ id: "clock" }, { id: "clock", groupId: "b" }]);
+    assert.deepEqual(result.widgetGroups, { b: { blur: "on" } });
 });
 
 test("splits reserve distinct sequence ids even when many occur in one operation", () => {

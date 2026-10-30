@@ -39,6 +39,55 @@ function nextId(groups) {
     return "group-" + n;
 }
 
+function tree(entries) {
+    const result = [];
+    for (let i = 0; i < entries.length;) {
+        const groupId = groupOf(entries[i]);
+        let end = i + 1;
+        if (groupId)
+            while (end < entries.length && groupOf(entries[end]) === groupId)
+                end++;
+        result.push({ groupId: groupId, first: i, end: end });
+        i = end;
+    }
+    return result;
+}
+
+function reorder(entries, nodes, order) {
+    return order.reduce((out, index) => out.concat(entries.slice(nodes[index].first, nodes[index].end)), []);
+}
+
+function transfer(source, destination, sourceNode, destinationNodes, targetIndex) {
+    const src = source.slice();
+    const dst = destination.slice();
+    const block = src.splice(sourceNode.first, sourceNode.end - sourceNode.first);
+    const position = targetIndex < destinationNodes.length ? destinationNodes[targetIndex].first : dst.length;
+    dst.splice(position, 0, ...block);
+    return { source: src, destination: dst, position: position };
+}
+
+function addMember(entries, index, groupId) {
+    const nodes = tree(entries);
+    const group = nodes.find(node => node.groupId === groupId && groupId);
+    if (!group || index < 0 || index >= entries.length || groupOf(entries[index]) || !eligible(entries[index]))
+        return entries;
+    const next = entries.slice();
+    const member = withGroup(next.splice(index, 1)[0], groupId);
+    next.splice(group.end - (index < group.first ? 1 : 0), 0, member);
+    return next;
+}
+
+function removeMember(entries, index) {
+    const groupId = groupOf(entries[index]);
+    const group = tree(entries).find(node => node.groupId === groupId && groupId);
+    if (!group)
+        return entries;
+    const next = entries.slice();
+    const member = withGroup(next.splice(index, 1)[0], "");
+    next.splice(group.end - 1, 0, member);
+    return next;
+}
+
 function normalize(config, updates) {
     const keys = ["leftWidgets", "centerWidgets", "rightWidgets"];
     if (!config.widgetGroups && keys.every(key => !(updates[key] || config[key] || []).some(hasGroupProperty)))

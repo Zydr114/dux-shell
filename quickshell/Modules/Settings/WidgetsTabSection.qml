@@ -6,6 +6,7 @@ import qs.DCommon.Widgets
 import qs.Services
 import qs.Modules.Settings.Widgets
 import "../DBar/OverflowLayout.js" as OverflowLayout
+import "WidgetGroups.js" as Groups
 
 Column {
     id: root
@@ -19,6 +20,10 @@ Column {
     property string sectionId: ""
     property string barId: ""
     property bool overflowSettingsExpanded: false
+    property var collapsedGroups: ({})
+    property string selectedGroup: ""
+    readonly property var entries: barConfig?.[sectionId + "Widgets"] ?? []
+    readonly property var treeNodes: Groups.tree(entries)
     readonly property var barConfig: SettingsData.getBarConfig(barId)
     readonly property bool autoOverflow: barConfig?.[sectionId + "OverflowMode"] !== "bar"
     readonly property int overflowPosition: barConfig?.[sectionId + "OverflowPosition"] ?? OverflowLayout.defaultPosition(sectionId, items.length)
@@ -51,6 +56,7 @@ Column {
     signal removeWidget(string sectionId, int widgetIndex)
     signal spacerSizeChanged(string sectionId, int widgetIndex, int newSize)
     signal configureWidget(string sectionId, int widgetIndex)
+    signal pickGroupMember(string sectionId, string groupId)
 
     signal dragStarted(string sectionId, string itemId)
 
@@ -58,6 +64,48 @@ Column {
     property string highlightedId: ""
     property string highlightedSection: ""
     property int highlightedIndex: -1
+
+    function saveEntries(next) {
+        SettingsData.updateBarConfig(barId, Groups.normalize(barConfig, { [sectionId + "Widgets"]: next }));
+    }
+
+    function canGroup(index) {
+        return index >= 0 && index < entries.length && !Groups.groupOf(entries[index]) && Groups.eligible(entries[index]) && BarWidgetCatalog.get(Groups.idOf(entries[index])) !== null;
+    }
+
+    function createGroup(index) {
+        if (!canGroup(index))
+            return;
+        const groups = Object.assign({}, barConfig?.widgetGroups ?? {});
+        const id = Groups.nextId(groups);
+        groups[id] = { name: I18n.tr("Group"), style: "pills", padding: Theme.spacingXS, spacing: Theme.spacingXS, tone: "surface", blur: "inherit", overflowMode: "auto" };
+        const next = entries.slice();
+        next[index] = Groups.withGroup(next[index], id);
+        SettingsData.updateBarConfig(barId, Groups.normalize(Object.assign({}, barConfig, { widgetGroups: groups }), { [sectionId + "Widgets"]: next }));
+        selectedGroup = id;
+    }
+
+    function addMember(index, groupId) {
+        if (!canGroup(index))
+            return;
+        if (!groupId) {
+            createGroup(index);
+            return;
+        }
+        saveEntries(Groups.addMember(entries, index, groupId));
+    }
+
+    function removeMember(index) {
+        saveEntries(Groups.removeMember(entries, index));
+    }
+
+    function toggleGroup(id) {
+        collapsedGroups = Object.assign({}, collapsedGroups, { [id]: !collapsedGroups[id] });
+    }
+
+    function editGroup(id) {
+        selectedGroup = selectedGroup === id ? "" : id;
+    }
 
     width: parent.width
     height: implicitHeight
@@ -130,132 +178,120 @@ Column {
 
     SettingsReorderList {
         id: reorderArea
-
-        model: root.items
+        model: root.treeNodes
         group: root.reorderGroup
         groupKey: root.sectionId
         dropArea: root
-        onReordered: indices => root.itemOrderChanged(root.sectionId, indices)
-        onDragStarted: (index, position) => root.dragStarted(root.sectionId, root.items[index].id)
+        onReordered: indices => root.saveEntries(Groups.reorder(root.entries, root.treeNodes, indices))
+        onDragStarted: (index, position) => root.dragStarted(root.sectionId, root.items[root.treeNodes[index].first]?.id ?? "")
 
-        delegate: SettingsReorderRow {
-            id: widgetRow
-
+        delegate: Column {
+            id: nodeRow
             required property var modelData
+            required property int index
+            readonly property bool isGroup: modelData.groupId !== ""
+            width: reorderArea.width
+            spacing: Theme.spacingXS
+            opacity: reorderArea.draggingIndex === index && reorderArea.crossSectionActive ? 0 : 1
 
-            readonly property bool configurable: BarWidgetCatalog.configurable(modelData)
-
-            reorderList: reorderArea
-            highlighted: !dragging && root.highlightedIndex === index && root.highlightedSection === root.sectionId
-            opacity: dragging && reorderArea.crossSectionActive ? 0 : 1
-            title: modelData.text
-            iconName: modelData.icon
-            iconColor: modelData.enabled ? Theme.primary : Theme.onSurfaceVariant
-            titleColor: modelData.enabled ? Theme.onSurface : Theme.onSurfaceVariant
-            subtitle: {
-                if (modelData.id !== "gpuTemp")
-                    return modelData.description ?? "";
-                const selectedIndex = modelData.selectedGpuIndex ?? 0;
-                const gpu = DgopService.availableGpus?.[selectedIndex];
-                if (!gpu)
-                    return I18n.tr("No GPU detected", "empty state when no graphics card is found");
-                return gpu.driver?.toUpperCase() ?? "";
+            function focusHandle(reason) {
+                if (isGroup)
+                    groupRow.focusHandle(reason);
+                else
+                    widgetRow.focusHandle(reason);
             }
-            clickable: configurable
-            onClicked: root.configureWidget(root.sectionId, index)
 
-            Item {
-                width: Theme.iconButtonSize
-                height: Theme.iconButtonSize
-                visible: !!widgetRow.modelData.warning
-                anchors.verticalCenter: parent.verticalCenter
+            WidgetTreeRow {
+                id: widgetRow
+                visible: !nodeRow.isGroup
+                width: parent.width
+                height: visible ? implicitHeight : 0
+                index: nodeRow.index
+                reorderList: reorderArea
+                modelData: root.items[nodeRow.modelData.first] ?? ({})
+                widgetIndex: nodeRow.modelData.first
+                section: root
+            }
 
-                DIcon {
-                    name: "warning"
-                    size: Theme.iconSizeMedium
-                    color: Theme.error
-                    anchors.centerIn: parent
+            SettingsReorderRow {
+                id: groupRow
+                readonly property string treeGroup: nodeRow.modelData.groupId
+                readonly property int widgetIndex: nodeRow.modelData.first
+                visible: nodeRow.isGroup
+                width: parent.width
+                height: visible ? implicitHeight : 0
+                index: nodeRow.index
+                reorderList: reorderArea
+                title: root.barConfig?.widgetGroups?.[nodeRow.modelData.groupId]?.name ?? I18n.tr("Group")
+                iconName: "group_work"
+                highlighted: !dragging && root.highlightedSection === root.sectionId && root.highlightedId === "@group:" + nodeRow.modelData.groupId
+                clickable: true
+                onClicked: root.editGroup(nodeRow.modelData.groupId)
+                DActionButton {
+                    iconName: root.collapsedGroups[nodeRow.modelData.groupId] ? "expand_more" : "expand_less"
+                    tooltipText: root.collapsedGroups[nodeRow.modelData.groupId] ? I18n.tr("Expand") : I18n.tr("Collapse")
+                    Accessible.name: tooltipText
+                    onClicked: root.toggleGroup(nodeRow.modelData.groupId)
                 }
-
-                MouseArea {
-                    id: warningArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                }
-
-                DTooltipHost {
-                    text: widgetRow.modelData.warning
-                    target: parent
-                    hoverArea: warningArea
+                DActionButton {
+                    iconName: "add"
+                    tooltipText: I18n.tr("Add widget")
+                    Accessible.name: tooltipText
+                    onClicked: root.pickGroupMember(root.sectionId, nodeRow.modelData.groupId)
                 }
             }
 
-            DIcon {
-                name: "chevron_right"
-                size: Theme.iconSize
-                color: Theme.onSurfaceVariant
-                rotation: I18n.isRtl ? 180 : 0
-                visible: widgetRow.configurable
-                anchors.verticalCenter: parent.verticalCenter
+            Loader {
+                width: parent.width
+                active: nodeRow.isGroup && root.selectedGroup === nodeRow.modelData.groupId
+                sourceComponent: Component {
+                    WidgetGroupsEditor {
+                        width: nodeRow.width
+                        barId: root.barId
+                        sectionId: root.sectionId
+                        selectedGroup: nodeRow.modelData.groupId
+                        items: root.items
+                    }
+                }
             }
 
-            SettingsDivider {
-                vertical: true
-                visible: widgetRow.configurable
-            }
-
-            DNumberStepper {
-                visible: widgetRow.modelData.id === "spacer"
-                anchors.verticalCenter: parent.verticalCenter
-                text: (widgetRow.modelData.size || 20).toString()
-                decrementEnabled: (widgetRow.modelData.size || 20) > 5
-                incrementEnabled: (widgetRow.modelData.size || 20) < 5000
-                onDecrement: () => root.spacerSizeChanged(root.sectionId, widgetRow.index, Math.max(5, (widgetRow.modelData.size || 20) - 5))
-                onIncrement: () => root.spacerSizeChanged(root.sectionId, widgetRow.index, Math.min(5000, (widgetRow.modelData.size || 20) + 5))
-            }
-
-            DToggle {
-                hideText: true
-                visible: widgetRow.modelData.id !== "spacer"
-                checked: widgetRow.modelData.enabled
-                anchors.verticalCenter: parent.verticalCenter
-                onToggled: value => root.itemEnabledChanged(root.sectionId, widgetRow.index, value)
-            }
-
-            DActionButton {
-                anchors.verticalCenter: parent.verticalCenter
-                iconName: widgetRow.modelData.groupId ? "layers" : "group_work"
-                tooltipText: widgetRow.modelData.groupId ? I18n.tr("Edit group") : I18n.tr("Create group")
-                Accessible.name: tooltipText
-                visible: groupEditor.canGroup(widgetRow.index)
-                onClicked: groupEditor.selectOrCreate(widgetRow.index)
-            }
-
-            DActionButton {
-                iconName: "close"
-                iconColor: Theme.error
-                Accessible.name: I18n.tr("Remove")
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked: root.removeWidget(root.sectionId, widgetRow.index)
+            SettingsReorderList {
+                id: memberList
+                visible: nodeRow.isGroup && !root.collapsedGroups[nodeRow.modelData.groupId]
+                x: Theme.spacingL
+                width: parent.width - Theme.spacingL
+                height: visible ? implicitHeight : 0
+                model: nodeRow.isGroup ? root.items.slice(nodeRow.modelData.first, nodeRow.modelData.end) : []
+                onReordered: indices => {
+                    const next = root.entries.slice();
+                    const members = next.slice(nodeRow.modelData.first, nodeRow.modelData.end);
+                    next.splice(nodeRow.modelData.first, members.length, ...indices.map(i => members[i]));
+                    root.saveEntries(next);
+                }
+                delegate: WidgetTreeRow {
+                    reorderList: memberList
+                    widgetIndex: nodeRow.modelData.first + index
+                    section: root
+                    member: true
+                }
             }
         }
     }
 
-    WidgetGroupsEditor {
-        id: groupEditor
-
-        width: parent.width
-        barId: root.barId
-        sectionId: root.sectionId
-        items: root.items
-    }
-
-    DButton {
+    Row {
         anchors.horizontalCenter: parent.horizontalCenter
-        text: I18n.tr("Add widget")
-        iconName: "add"
-        backgroundColor: Theme.secondaryContainer
-        textColor: Theme.onSecondaryContainer
-        onClicked: root.addWidget(root.sectionId)
+        spacing: Theme.spacingS
+        DButton {
+            text: I18n.tr("Add widget")
+            iconName: "add"
+            backgroundColor: Theme.secondaryContainer
+            textColor: Theme.onSecondaryContainer
+            onClicked: root.addWidget(root.sectionId)
+        }
+        DButton {
+            text: I18n.tr("Add group")
+            iconName: "group_add"
+            onClicked: root.pickGroupMember(root.sectionId, "")
+        }
     }
 }

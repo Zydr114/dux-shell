@@ -7,6 +7,7 @@ import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/settings/DockConfig.js" as DockConfig
 import "../DBar/OverflowLayout.js" as OverflowLayout
+import "../../Common/SurfaceStyle.js" as SurfaceStyle
 
 Item {
     id: root
@@ -35,6 +36,15 @@ Item {
     readonly property bool sectionAutoOverflow: SettingsData.getBarConfig(barId)?.[section + "OverflowMode"] !== "bar"
     readonly property bool hasPill: !dockHosted && !["spacer", "separator", "island"].includes(widgetType)
     readonly property bool barBackground: !(SettingsData.barConfigs.find(config => config.id === barId)?.noBackground ?? false)
+    readonly property bool widgetBackground: entry?.background ?? barBackground
+    readonly property real backgroundAlpha: SurfaceStyle.opacity(entry?.backgroundOpacity, SettingsData.barWidgetTransparency(SettingsData.getBarConfig(barId)))
+    readonly property bool grouped: {
+        const groups = SettingsData.getBarConfig(barId)?.widgetGroups;
+        const id = entry?.groupId;
+        if (!hasPill || !groups || typeof id !== "string" || !Object.prototype.hasOwnProperty.call(groups, id))
+            return false;
+        return groups[id] !== null && typeof groups[id] === "object" && !Array.isArray(groups[id]);
+    }
     readonly property var store: ({
             "get": key => root.value(key),
             "set": (key, value) => root.set(key, value),
@@ -176,6 +186,38 @@ Item {
                 text: I18n.tr("Background")
                 checked: root.entry?.background ?? root.barBackground
                 onToggled: checked => root.set("background", checked === root.barBackground ? undefined : checked)
+            }
+
+            SettingsToggleSliderRow {
+                visible: root.hasPill
+                enabled: root.widgetBackground
+                tags: ["widget", "opacity", "transparency", "capsule", "group"]
+                text: I18n.tr("Opacity")
+                description: checked ? I18n.tr("Override", "verb, toggle to override the global setting for this item") : I18n.tr("Inherit")
+                checked: root.entry?.backgroundOpacity != null
+                value: Math.round(root.backgroundAlpha * 100)
+                minimum: 0
+                maximum: 100
+                unit: "%"
+                onToggled: checked => root.set("backgroundOpacity", checked ? root.backgroundAlpha : null)
+                onSliderDragFinished: finalValue => root.set("backgroundOpacity", finalValue / 100)
+            }
+
+            SettingsDropdownRow {
+                visible: root.hasPill && !root.grouped
+                enabled: root.widgetBackground
+                tags: ["widget", "background", "blur", "capsule"]
+                text: I18n.tr("Background blur")
+                description: I18n.tr("Controls this capsule. Bar and frame backgrounds keep their own blur; overflow uses its popup settings.")
+                options: [I18n.tr("Default"), I18n.tr("On"), I18n.tr("Off")]
+                currentValue: root.entry?.blur === "on" ? options[1] : root.entry?.blur === "off" ? options[2] : options[0]
+                onValueChanged: value => root.set("blur", value === options[1] ? "on" : value === options[2] ? "off" : "inherit")
+            }
+
+            SettingsRow {
+                visible: root.hasPill && root.grouped
+                title: I18n.tr("Background blur")
+                subtitle: I18n.tr("The group controls blur for its members. Overflow uses its popup settings.")
             }
         }
 

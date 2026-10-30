@@ -70,7 +70,7 @@ Item {
         id: dragGroup
 
         coordinateItem: widgetsTab
-        onTransferred: (source, sourceIndex, target, targetIndex) => widgetsTab.moveWidget(source.groupKey, target.groupKey, targetIndex, sourceIndex)
+        onTransferred: (source, sourceIndex, target, targetIndex) => widgetsTab.moveTreeNode(source.groupKey, sourceIndex, target.groupKey, targetIndex)
     }
 
     readonly property var widgetAvailability: {
@@ -155,7 +155,7 @@ Item {
             } else {
                 var idx = -1;
                 for (var i = 0; i < flat.length; i++) {
-                    if (flat[i].section === highlightedSection && flat[i].index === highlightedIndex) {
+                    if (flat[i].section === highlightedSection && flat[i].index === highlightedIndex && flat[i].id === highlightedId) {
                         idx = i;
                         break;
                     }
@@ -352,6 +352,22 @@ Item {
         return sectionId === "left" ? leftSection : sectionId === "center" ? centerSection : sectionId === "right" ? rightSection : null;
     }
 
+    function moveTreeNode(fromSection, sourceIndex, toSection, targetIndex) {
+        if (dankIslandOwnsSelectedBarCenter && (fromSection === "center" || toSection === "center"))
+            return;
+        const source = getWidgetsForSection(fromSection);
+        const destination = getWidgetsForSection(toSection);
+        const nodes = WidgetGroups.tree(source);
+        const targetNodes = WidgetGroups.tree(destination);
+        if (sourceIndex < 0 || sourceIndex >= nodes.length || targetIndex < 0 || targetIndex > targetNodes.length)
+            return;
+        const result = WidgetGroups.transfer(source, destination, nodes[sourceIndex], targetNodes, targetIndex);
+        SettingsData.updateBarConfig(selectedBarId, WidgetGroups.normalize(selectedBarConfig, {
+            [barKey(fromSection)]: result.source,
+            [barKey(toSection)]: result.destination
+        }));
+    }
+
     function moveWidget(fromSection, toSection, toIndex, sourceIndex) {
         if (dankIslandOwnsSelectedBarCenter && (fromSection === "center" || toSection === "center"))
             return;
@@ -370,6 +386,8 @@ Item {
         if (fromIdx < 0 || fromIdx >= src.length)
             return;
         var moved = src.splice(fromIdx, 1)[0];
+        if (WidgetGroups.groupOf(moved))
+            moved = WidgetGroups.withGroup(moved, "");
         var dst = getWidgetsForSection(toSection).slice();
         dst.splice(Math.max(0, Math.min(toIndex, dst.length)), 0, moved);
         var updates = {};
@@ -381,14 +399,14 @@ Item {
     // A row reached with Tab has focus but no cursor, so the cursor starts from it
     function focusedWidgetRow() {
         for (var item = Window.activeFocusItem; item; item = item.parent) {
-            if (item.reorderList === undefined || !item.modelData?.id)
+            if (item.reorderList === undefined || item.widgetIndex === undefined)
                 continue;
             for (var section = item.parent; section; section = section.parent) {
                 if (section.sectionId !== undefined)
                     return {
                         "section": section.sectionId,
-                        "id": item.modelData.id,
-                        "index": item.index
+                        "id": item.treeGroup ? "@group:" + item.treeGroup : item.modelData?.id ?? "",
+                        "index": item.widgetIndex
                     };
             }
             return null;
@@ -399,26 +417,49 @@ Item {
     function flatList() {
         var out = [];
         ["left", "center", "right"].forEach(s => {
-            getWidgetsForSection(s).forEach((w, index) => {
-                out.push({
-                    "section": s,
-                    "id": (typeof w === "string" ? w : w.id),
-                    "index": index
-                });
-            });
+            const entries = getWidgetsForSection(s);
+            const section = sectionItem(s);
+            for (const node of WidgetGroups.tree(entries)) {
+                if (node.groupId) {
+                    out.push({ "section": s, "id": "@group:" + node.groupId, "index": node.first });
+                    if (section?.collapsedGroups[node.groupId])
+                        continue;
+                }
+                for (let index = node.first; index < node.end; index++) {
+                    const entry = entries[index];
+                    out.push({ "section": s, "id": WidgetGroups.idOf(entry), "index": index });
+                }
+            }
         });
         return out;
     }
 
     function moveWithinSection(sectionId, pos, delta) {
         var entries = getWidgetsForSection(sectionId).slice();
-        var next = pos + delta;
-        if (pos < 0 || pos >= entries.length || next < 0 || next >= entries.length)
+        const nodes = WidgetGroups.tree(entries);
+        const nodeIndex = nodes.findIndex(node => pos >= node.first && pos < node.end);
+        if (nodeIndex < 0)
             return;
-        const moved = entries.splice(pos, 1)[0];
-        entries.splice(next, 0, moved);
-        setWidgetsForSection(sectionId, entries);
-        highlightedIndex = next;
+        const node = nodes[nodeIndex];
+        if (node.groupId && !highlightedId.startsWith("@group:")) {
+            const next = pos + delta;
+            if (next < node.first || next >= node.end)
+                return;
+            const moved = entries.splice(pos, 1)[0];
+            entries.splice(next, 0, moved);
+            setWidgetsForSection(sectionId, entries);
+            highlightedIndex = next;
+            return;
+        }
+        const target = nodeIndex + delta;
+        if (target < 0 || target >= nodes.length)
+            return;
+        const order = nodes.map((_, index) => index);
+        order.splice(nodeIndex, 1);
+        order.splice(target, 0, nodeIndex);
+        setWidgetsForSection(sectionId, WidgetGroups.reorder(entries, nodes, order));
+        highlightedIndex = delta < 0 ? nodes[target].first : nodes[target].end - (node.end - node.first);
+        return;
     }
 
     function moveAcrossSections(sectionId, index, delta) {
@@ -431,13 +472,21 @@ Item {
             return;
         var to = order[ti];
         const destinationIndex = getWidgetsForSection(to).length;
+        if (highlightedId.startsWith("@group:")) {
+            const nodes = WidgetGroups.tree(getWidgetsForSection(sectionId));
+            const sourceIndex = nodes.findIndex(node => node.first === index);
+            moveTreeNode(sectionId, sourceIndex, to, WidgetGroups.tree(getWidgetsForSection(to)).length);
+            highlightedSection = to;
+            highlightedIndex = destinationIndex;
+            return;
+        }
         moveWidget(sectionId, to, destinationIndex, index);
         highlightedSection = to;
         highlightedIndex = destinationIndex;
     }
 
     function toggleHighlighted() {
-        if (highlightedId === "" || highlightedSection === "")
+        if (highlightedId === "" || highlightedId.startsWith("@group:") || highlightedSection === "")
             return;
         var w = getWidgetsForSection(highlightedSection)[highlightedIndex];
         if (w === undefined)
@@ -447,6 +496,10 @@ Item {
     }
 
     function configureHighlighted() {
+        if (highlightedId.startsWith("@group:")) {
+            sectionItem(highlightedSection)?.editGroup(highlightedId.slice(7));
+            return;
+        }
         const index = highlightedIndex;
         if (index < 0)
             return;
@@ -551,6 +604,8 @@ Item {
             onWidgetSelected: (widgetId, targetSection) => {
                 widgetsTab.addWidgetToSection(widgetId, targetSection);
             }
+            onGroupSelected: targetSection => Qt.callLater(() => widgetsTab.showGroupMemberPopup(targetSection, ""))
+            onMemberSelected: (targetSection, groupId, index) => widgetsTab.sectionItem(targetSection)?.addMember(index, groupId)
         }
     }
 
@@ -559,8 +614,22 @@ Item {
         if (!widgetSelectionPopupLoader.item)
             return;
         widgetSelectionPopupLoader.item.targetSection = sectionId;
-        widgetSelectionPopupLoader.item.widgets = widgetsTab.getWidgetsForPopup();
+        widgetSelectionPopupLoader.item.selectingMember = false;
+        widgetSelectionPopupLoader.item.widgets = [{ id: "", groupEntry: true, text: I18n.tr("Group"), description: "", icon: "group_work" }].concat(widgetsTab.getWidgetsForPopup());
         widgetSelectionPopupLoader.item.show();
+    }
+
+    function showGroupMemberPopup(sectionId, groupId) {
+        widgetSelectionPopupLoader.active = true;
+        const popup = widgetSelectionPopupLoader.item;
+        if (!popup)
+            return;
+        popup.targetSection = sectionId;
+        popup.targetGroup = groupId;
+        popup.selectingMember = true;
+        const section = sectionItem(sectionId);
+        popup.widgets = getItemsForSection(sectionId).map((item, index) => Object.assign({}, item, { sourceIndex: index })).filter(item => section?.canGroup(item.sourceIndex));
+        popup.show();
     }
 
     SettingsPage {
@@ -666,6 +735,7 @@ Item {
                 onAddWidget: sectionId => {
                     showWidgetSelectionPopup(sectionId);
                 }
+                onPickGroupMember: (sectionId, groupId) => widgetsTab.showGroupMemberPopup(sectionId, groupId)
                 onRemoveWidget: (sectionId, index) => {
                     widgetsTab.removeWidgetFromSection(sectionId, index);
                 }
@@ -759,6 +829,7 @@ Item {
                 onAddWidget: sectionId => {
                     showWidgetSelectionPopup(sectionId);
                 }
+                onPickGroupMember: (sectionId, groupId) => widgetsTab.showGroupMemberPopup(sectionId, groupId)
                 onRemoveWidget: (sectionId, index) => {
                     widgetsTab.removeWidgetFromSection(sectionId, index);
                 }
@@ -794,6 +865,7 @@ Item {
                 onAddWidget: sectionId => {
                     showWidgetSelectionPopup(sectionId);
                 }
+                onPickGroupMember: (sectionId, groupId) => widgetsTab.showGroupMemberPopup(sectionId, groupId)
                 onRemoveWidget: (sectionId, index) => {
                     widgetsTab.removeWidgetFromSection(sectionId, index);
                 }

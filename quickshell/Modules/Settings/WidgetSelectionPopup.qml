@@ -6,12 +6,16 @@ WidgetPickerWindow {
     id: root
 
     property string targetSection: ""
+    property string targetGroup: ""
+    property bool selectingMember: false
     readonly property bool blurActive: Theme.blurLayersActive
     readonly property bool floatingForegroundLayers: Theme.floatingWindowForegroundLayers
     readonly property bool transparentBlurLayers: Theme.blurLayersActive && !floatingForegroundLayers
     readonly property real rowAlpha: blurActive ? Math.min(Theme.floatingWindowTransparency, transparentBlurLayers ? 0.12 : 0.52) : 0.30
 
     signal widgetSelected(string widgetId, string targetSection)
+    signal groupSelected(string targetSection)
+    signal memberSelected(string targetSection, string groupId, int index)
 
     function translateSection(section) {
         switch (section.toLowerCase()) {
@@ -28,14 +32,19 @@ WidgetPickerWindow {
 
     objectName: "widgetSelectionPopup"
     title: I18n.tr("Add widget")
-    headerTitle: I18n.tr("Add widget to %1", "widget picker header, %1 is the bar section name").arg(translateSection(targetSection))
-    intro: I18n.tr("Select a widget to add. You can add multiple instances of the same widget if needed.")
+    headerTitle: selectingMember ? I18n.tr("Select widget") : I18n.tr("Add widget to %1", "widget picker header, %1 is the bar section name").arg(translateSection(targetSection))
+    intro: selectingMember ? "" : I18n.tr("Select a widget to add. You can add multiple instances of the same widget if needed.")
     widgetDelegate: rowDelegate
 
     onWidgetChosen: widget => {
         if (widget.disabled)
             return;
-        widgetSelected(widget.id, targetSection);
+        if (widget.groupEntry)
+            groupSelected(targetSection);
+        else if (selectingMember)
+            memberSelected(targetSection, targetGroup, widget.sourceIndex);
+        else
+            widgetSelected(widget.id, targetSection);
         hide();
     }
 
@@ -44,6 +53,8 @@ WidgetPickerWindow {
             return;
         widgets = [];
         targetSection = "";
+        targetGroup = "";
+        selectingMember = false;
     }
 
     Component {
