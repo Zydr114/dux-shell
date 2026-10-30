@@ -39,6 +39,8 @@ test("a local blur mode inherits the supplied bar state independently of global 
     assert.equal(blur.enabledFor("off", true), false);
     blur.available = false;
     assert.equal(blur.enabledFor("on", true), false);
+    blur.available = undefined;
+    assert.equal(blur.enabledFor("on", true), false);
 });
 
 test("compositor support gates effective blur without changing the requested override", () => {

@@ -51,7 +51,7 @@ Singleton {
     }
 
     function enabledFor(mode, inherited) {
-        return available && requestedFor(mode, inherited);
+        return available === true && requestedFor(mode, inherited);
     }
 
     function hoverColor(baseColor, hoverAlpha) {
