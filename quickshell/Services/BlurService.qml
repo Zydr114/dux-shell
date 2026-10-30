@@ -7,6 +7,7 @@ import Quickshell.Io
 import qs.Common
 import qs.Services
 import "../Common/BlurStrength.js" as BlurStrength
+import "../Common/SurfaceStyle.js" as SurfaceStyle
 
 Singleton {
     id: root
@@ -45,12 +46,12 @@ Singleton {
     }
     readonly property int borderWidth: (SettingsData.blurBorderEnabled ?? false) ? 1 : 0
 
-    function requestedFor(mode) {
-        return mode === "on" || (mode !== "off" && SettingsData.blurEnabled === true);
+    function requestedFor(mode, inherited) {
+        return SurfaceStyle.blurRequested(mode, inherited === undefined ? SettingsData.blurEnabled : inherited);
     }
 
-    function enabledFor(mode) {
-        return available && requestedFor(mode);
+    function enabledFor(mode, inherited) {
+        return available && requestedFor(mode, inherited);
     }
 
     function hoverColor(baseColor, hoverAlpha) {

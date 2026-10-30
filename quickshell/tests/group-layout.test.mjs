@@ -12,27 +12,88 @@ const solve = (left, center = [], right = [], options = {}, previous = {}) => ov
     length: 400, spacing: 4, triggerSize: 30, restoreMargin: 8, ...options
 }, previous);
 
-test("cross metrics keep content, outline and padding inside the available bar thickness", () => {
+test("outer metrics retain the default group envelope and reserve content before excessive outline", () => {
     const cases = [
-        { input: [28, 48, 1, 4], expected: [28, 1, 4, 38] },
-        { input: [60, 32, 2, 8], expected: [28, 2, 0, 32] },
-        { input: [16, 48, 2, 100], expected: [16, 2, 14, 48] },
-        { input: [28, 32, 100, 8], expected: [0, 16, 0, 32] },
-        { input: [17.5, 24.5, 0.75, 2.25], expected: [17.5, 0.75, 2.25, 23.5] },
-        { input: [17.5, 24.5, 0.75, 3], expected: [17.5, 0.75, 2.75, 24.5] },
-        { input: [-5, 32, -1, -2], expected: [0, 0, 0, 0] },
-        { input: [NaN, 32, Infinity, 4], expected: [0, 0, 4, 8] },
-        { input: [28, 0, 1, 4], expected: [0, 0, 0, 0] },
-        { input: [28, Infinity, 1, 4], expected: [0, 0, 0, 0] },
-        { input: [28, NaN, 1, 4], expected: [0, 0, 0, 0] }
+        { input: [30, 48, 0, 4, 16], expected: [38, 38, 0] },
+        { input: [30, 48, 2, 4, 16], expected: [42, 38, 2] },
+        { input: [30, 32, 2, 4, 16], expected: [32, 28, 2] },
+        { input: [30, 32, 100, 4, 16], expected: [32, 16, 8] },
+        { input: [30, 12, 100, 4, 16], expected: [12, 12, 0] },
+        { input: [17.5, 24.5, 0.75, 2.25, 16], expected: [23.5, 22, 0.75] },
+        { input: [-5, 32, -1, -2, 16], expected: [0, 0, 0] },
+        { input: [30, Infinity, 1, 4, 16], expected: [0, 0, 0] }
+    ];
+    for (const { input, expected } of cases) {
+        const result = groups.outerMetrics(...input);
+        assert.deepEqual(plain(result), { thickness: expected[0], surfaceThickness: expected[1], outline: expected[2] });
+        assert.equal(result.surfaceThickness + result.outline * 2, result.thickness);
+        assert.ok(result.thickness <= groups.nonnegative(input[1]));
+    }
+});
+
+test("group insets consume a fixed outer envelope and preserve the minimum inner face", () => {
+    const cases = [
+        { input: [42, 2, 4, 16, 1], expected: [30, 2, 4, 42] },
+        { input: [42, 2, 100, 16, 1], expected: [16, 2, 11, 42] },
+        { input: [42, 2, 0, 16, 1], expected: [36, 2, 1, 42] },
+        { input: [12, 0, 8, 16, 1], expected: [10, 0, 1, 12] },
+        { input: [0, 2, 8, 16, 1], expected: [0, 0, 0, 0] },
+        { input: [24.5, 0.75, 2.25, 16, 1], expected: [18.5, 0.75, 2.25, 24.5] },
+        { input: [NaN, Infinity, -5, 16, 1], expected: [0, 0, 0, 0] }
     ];
     for (const { input, expected } of cases) {
         const result = groups.crossMetrics(...input);
-        assert.deepEqual(plain(result), { widgetThickness: expected[0], outline: expected[1], padding: expected[2], thickness: expected[3] });
-        assert.equal(result.widgetThickness + 2 * result.outline + 2 * result.padding, result.thickness);
-        assert.ok(result.thickness <= groups.nonnegative(input[1]));
+        assert.deepEqual(plain(result), { widgetThickness: expected[0], outline: expected[1], crossInset: expected[2], thickness: expected[3] });
+        assert.equal(result.widgetThickness + 2 * result.outline + 2 * result.crossInset, result.thickness);
         assert.ok(Object.values(result).every(value => Number.isFinite(value) && value >= 0));
     }
+});
+
+test("large group padding changes the inner face and along budget without enlarging the outer face", () => {
+    const outer = groups.outerMetrics(30, 48, 2, 4, 16);
+    const ordinary = groups.crossMetrics(outer.thickness, outer.outline, 4, 16, 1);
+    const padded = groups.crossMetrics(outer.thickness, outer.outline, 24, 16, 1);
+    const unit = groups.pack([grouped(40, { groupPadding: 24 })])[0];
+    assert.equal(ordinary.thickness, 42);
+    assert.equal(padded.thickness, ordinary.thickness);
+    assert.equal(padded.widgetThickness, 16);
+    assert.equal(padded.crossInset, 11);
+    assert.equal(unit.size, 88);
+    const result = overflow.section([widget(40)], [0], 8, outer.surfaceThickness, 0);
+    assert.equal(result.totalSize, 38);
+    assert.equal(result.sizes[0], outer.surfaceThickness);
+});
+
+test("fractional DPR keeps ordinary and grouped envelopes on the same bounded physical grid", () => {
+    const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-8, `${actual} != ${expected}`);
+    for (const dpr of [1.8, 1.37]) {
+        for (const barThickness of [48, 32.3, 10.3, 1.2, 0]) {
+            for (const outline of [0, 0.75, 2, 100]) {
+                const outer = groups.outerMetrics(30, barThickness, outline, 4, 16, dpr);
+                const snappedFill = Math.round(outer.surfaceThickness * dpr) / dpr;
+                close(snappedFill + outer.outline * 2, outer.thickness);
+                assert.ok(outer.thickness <= barThickness + 1e-8);
+                close(outer.thickness * dpr, Math.round(outer.thickness * dpr));
+                for (const padding of [0, 4, 24]) {
+                    const inner = groups.crossMetrics(outer.thickness, outer.outline, padding, 16, 1, dpr);
+                    const snappedInner = Math.round(inner.widgetThickness * dpr) / dpr;
+                    close(inner.thickness, outer.thickness);
+                    close(inner.outline, outer.outline);
+                    close(snappedInner + inner.outline * 2 + inner.crossInset * 2, outer.thickness);
+                    for (const value of Object.values(inner))
+                        close(value * dpr, Math.round(value * dpr));
+                    assert.ok(snappedInner + inner.outline * 2 <= outer.thickness + 1e-8);
+                    assert.ok(Object.values(inner).every(value => Number.isFinite(value) && value >= 0));
+                }
+            }
+        }
+    }
+    const outer = groups.outerMetrics(30, 48, 2, 4, 16, 1.8);
+    close(outer.thickness * 1.8, 76);
+    close(outer.surfaceThickness * 1.8, 68);
+    close(outer.outline * 1.8, 4);
+    const thin = groups.crossMetrics(10.3, 2, 24, 16, 1, 1.37);
+    assert.ok(thin.thickness <= 10.3);
 });
 
 test("groups measure only live occurrences and do not join across another configured unit", () => {

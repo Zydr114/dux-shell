@@ -78,6 +78,8 @@ Item {
             occurrenceOrder: root.occurrenceOrder
             groupContext: root.groupContext
             widgetThickness: root.groupConfig ? root.sectionContext.groupMetrics(root.groupConfig).widgetThickness : root.sectionContext.widgetThickness
+            surfaceThickness: root.groupConfig ? root.sectionContext.groupMetrics(root.groupConfig).widgetThickness : root.sectionContext.surfaceThickness
+            surfaceOutlineThickness: root.sectionContext.outlineThickness
             isFirst: !root.inOverflow && root.sectionContext.inlineOrder[0] === root.occurrenceOrder
             isLast: !root.inOverflow && root.sectionContext.inlineOrder[root.sectionContext.inlineOrder.length - 1] === root.occurrenceOrder
             sectionSpacing: root.inOverflow || root.groupContext ? 0 : root.sectionContext.widgetSpacing

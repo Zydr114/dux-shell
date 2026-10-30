@@ -16,7 +16,7 @@ BarSection {
     onYChanged: refreshBlur()
 
     implicitHeight: isVertical ? contentSize : contentThickness
-    implicitWidth: isVertical ? Math.max(widgetThickness, groupCrossThickness) : contentSize
+    implicitWidth: isVertical ? Math.max(outerThickness, groupCrossThickness) : contentSize
 
     onSegmentedChanged: rolesTimer.restart()
 

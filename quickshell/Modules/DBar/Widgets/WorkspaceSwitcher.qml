@@ -257,7 +257,7 @@ BasePill {
         spacing: root.segmented ? BarMetrics.segmentGap : Theme.spacingS
         vertical: root.isVertical
         readonly property real crossSize: root.isVertical ? implicitWidth : implicitHeight
-        scale: root.grouped && crossSize > root.widgetThickness ? root.widgetThickness / crossSize : 1
+        scale: (root.grouped || root.surfaceThickness >= 0) && crossSize > root.effectiveSurfaceThickness ? root.effectiveSurfaceThickness / crossSize : 1
 
         // mango reports active_tags=0 while the overview is open; surface it as a pill
         Item {

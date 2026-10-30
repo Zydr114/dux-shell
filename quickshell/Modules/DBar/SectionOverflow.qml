@@ -22,7 +22,7 @@ Item {
     readonly property var layoutEntries: entries.map(entry => ({
                 size: entry.itemHeight,
                 groupId: entry.groupId ?? "",
-                groupPadding: root.metric(entry.groupConfig?.padding, Theme.spacingXS, Theme.spacingXL),
+                groupPadding: root.sectionContext.groupAlongPadding(entry.groupConfig),
                 groupSpacing: root.metric(entry.groupConfig?.spacing, Theme.spacingXS, Theme.spacingM)
             }))
     readonly property var layout: OverflowLayout.section(layoutEntries, [], Theme.spacingS, 0, layoutEntries.length)
@@ -86,6 +86,8 @@ Item {
         section: root.sectionContext.section
         parentScreen: root.sectionContext.parentScreen
         widgetThickness: root.sectionContext.widgetThickness
+        surfaceThickness: root.sectionContext.surfaceThickness
+        surfaceOutlineThickness: root.sectionContext.outlineThickness
         barThickness: root.sectionContext.barThickness
         barSpacing: root.sectionContext.barSpacing
         barConfig: root.sectionContext.barConfig
@@ -117,7 +119,7 @@ Item {
         }
         content: Component {
             Item {
-                implicitWidth: Math.max(0, root.button.widgetThickness - root.button.horizontalPadding * 2)
+                implicitWidth: Math.max(0, root.button.effectiveSurfaceThickness - root.button.horizontalPadding * 2)
                 implicitHeight: implicitWidth
                 DIcon {
                     anchors.centerIn: parent

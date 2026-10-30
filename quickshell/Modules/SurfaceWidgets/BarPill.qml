@@ -4,6 +4,7 @@ import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.DBar
+import "../../Common/SurfaceStyle.js" as SurfaceStyle
 
 Item {
     id: root
@@ -14,6 +15,9 @@ Item {
     property var popoutTarget: null
     property var parentScreen: null
     property real widgetThickness: 30
+    property real surfaceThickness: -1
+    property real surfaceOutlineThickness: -1
+    readonly property real effectiveSurfaceThickness: surfaceThickness >= 0 ? surfaceThickness : widgetThickness
     property real barThickness: 48
     property real barSpacing: 4
     property var barConfig: null
@@ -21,7 +25,11 @@ Item {
     readonly property bool grouped: groupContext !== null
     property bool widgetBackground: !(barConfig?.noBackground ?? false)
     property bool noBackground: !widgetBackground
+    property var backgroundOpacity: null
+    property string blurMode: "inherit"
     property var blurBarWindow: null
+    readonly property real backgroundAlpha: SurfaceStyle.opacity(backgroundOpacity, SettingsData.barWidgetTransparency(barConfig))
+    readonly property bool surfaceBlurEnabled: BlurService.enabledFor(blurMode, blurBarWindow?.backgroundBlurEnabled ?? BlurService.enabled)
     property alias content: contentLoader.sourceComponent
     property bool isVerticalOrientation: axis?.isVertical ?? false
     property bool isFirst: false
@@ -44,10 +52,12 @@ Item {
     readonly property real dpr: parentScreen ? CompositorService.getScreenScale(parentScreen) : 1
     readonly property real horizontalPadding: Theme.snap((barConfig?.widgetPadding ?? 8) * (widgetThickness / 30), dpr)
     readonly property real contentThickness: widgetThickness - horizontalPadding * 2
-    readonly property real visualWidth: Theme.snap(isVerticalOrientation ? widgetThickness : (contentLoader.item ? (contentLoader.item.implicitWidth + horizontalPadding * 2) : 0), dpr)
-    readonly property real visualHeight: Theme.snap(isVerticalOrientation ? (contentLoader.item ? (contentLoader.item.implicitHeight + horizontalPadding * 2) : 0) : widgetThickness, dpr)
+    readonly property real visualPrimaryMinimum: surfaceThickness >= 0 ? effectiveSurfaceThickness : 0
+    readonly property real visualWidth: Theme.snap(isVerticalOrientation ? effectiveSurfaceThickness : Math.max(visualPrimaryMinimum, contentLoader.item ? (contentLoader.item.implicitWidth + horizontalPadding * 2) : 0), dpr)
+    readonly property real visualHeight: Theme.snap(isVerticalOrientation ? Math.max(visualPrimaryMinimum, contentLoader.item ? (contentLoader.item.implicitHeight + horizontalPadding * 2) : 0) : effectiveSurfaceThickness, dpr)
     readonly property alias visualContent: visualContent
     readonly property alias contentItem: contentLoader.item
+    readonly property real contentFitScale: contentLoader.scale
     readonly property real gapExtension: sectionSpacing
     readonly property real leftMargin: !isVerticalOrientation ? (isFirst ? gapExtension : gapExtension / 2) : 0
     readonly property real rightMargin: !isVerticalOrientation ? (isLast ? gapExtension : gapExtension / 2) : 0
@@ -66,15 +76,15 @@ Item {
     readonly property bool startJoined: isVerticalOrientation || !mirrored ? leadingJoined : trailingJoined
     readonly property bool endJoined: isVerticalOrientation || !mirrored ? trailingJoined : leadingJoined
     readonly property string effectivePillStyle: grouped ? groupContext.style : BarMetrics.widgetStyle(barConfig)
-    readonly property real outerRadius: noBackground && !grouped ? 0 : BarMetrics.pillRadius(widgetThickness, effectivePillStyle)
+    readonly property real outerRadius: noBackground && !grouped ? 0 : BarMetrics.pillRadius(effectiveSurfaceThickness, effectivePillStyle)
     readonly property real innerRadius: noBackground && !grouped ? 0 : BarMetrics.segmentInnerRadius
     property var pressSource: null
     readonly property bool pressed: mouseArea.pressed || (pressSource?.pressed ?? false)
     property real pressProgress: pressed && enableBackgroundHover ? 1 : 0
     readonly property real blurRadius: segmentRole === "solo" ? outerRadius : innerRadius
     readonly property bool radiusMotion: !SettingsData.reduceMotion && !Theme.springMotionDisabled
-    readonly property real outlineThickness: grouped ? groupContext.outlineThickness : (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? Theme.outlineWidth) : 0
-    readonly property real hitThickness: grouped ? widgetThickness + outlineThickness * 2 : barThickness
+    readonly property real outlineThickness: grouped ? groupContext.outlineThickness : surfaceOutlineThickness >= 0 ? surfaceOutlineThickness : (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? Theme.outlineWidth) : 0
+    readonly property real hitThickness: grouped ? effectiveSurfaceThickness + outlineThickness * 2 : barThickness
     readonly property real pillWidth: isVerticalOrientation ? hitThickness : visualWidth + (grouped ? outlineThickness * 2 : 0)
     readonly property real pillHeight: isVerticalOrientation ? visualHeight + (grouped ? outlineThickness * 2 : 0) : hitThickness
     readonly property color outlineColor: {
@@ -94,8 +104,9 @@ Item {
         if (noBackground)
             return "transparent";
         if (grouped)
-            return Theme.withAlpha(groupContext.tone === "primary" ? Theme.primaryContainer : Theme.surfaceContainerHigh, SettingsData.barWidgetTransparency(barConfig));
-        return BarMetrics.widgetFill(barConfig);
+            return Theme.withAlpha(groupContext.tone === "primary" ? Theme.primaryContainer : Theme.surfaceContainerHigh, backgroundAlpha);
+        const base = BarMetrics.widgetFill(barConfig);
+        return backgroundOpacity == null ? base : Theme.withAlpha(base, backgroundAlpha);
     }
     property color fillColor: defaultFillColor
     readonly property bool shadowEnabled: !grouped && barConfig?.island === true && !SettingsData.islandSetting(barConfig, "islandSatelliteBackground") && !noBackground && fillColor.a > 0 && Theme.elevationEnabled && SettingsData.barElevationEnabled
@@ -124,7 +135,7 @@ Item {
     function cornerRadius(joined) {
         if (noBackground && !grouped)
             return 0;
-        return BarMetrics.cornerRadius(widgetThickness, effectivePillStyle, joined, pressProgress);
+        return BarMetrics.cornerRadius(effectiveSurfaceThickness, effectivePillStyle, joined, pressProgress);
     }
 
     function triggerRipple(sourceItem, mouseX, mouseY) {
@@ -330,7 +341,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
             readonly property real crossSize: !item ? 0 : root.isVerticalOrientation ? Math.max(item.width, item.implicitWidth) : Math.max(item.height, item.implicitHeight)
-            scale: root.grouped && crossSize > root.widgetThickness ? root.widgetThickness / crossSize : 1
+            scale: (root.grouped || root.surfaceThickness >= 0) && crossSize > root.effectiveSurfaceThickness ? root.effectiveSurfaceThickness / crossSize : 1
         }
     }
 
@@ -352,7 +363,7 @@ Item {
     }
 
     property var _blurRegisteredWindow: null
-    readonly property var _blurTargetWindow: !root.grouped && (blurBarWindow?.backgroundBlurEnabled ?? BlurService.enabled) && !!blurBarWindow?.registerBlurWidget && !root.noBackground && root.fillColor.a > 0 && root.fillColor.a < 1 && root.visible && root.width > 0 && root.height > 0 ? blurBarWindow : null
+    readonly property var _blurTargetWindow: !root.grouped && SurfaceStyle.needsBlur(root.surfaceBlurEnabled, root.fillColor.a) && !!blurBarWindow?.registerBlurWidget && !root.noBackground && root.visible && root.width > 0 && root.height > 0 ? blurBarWindow : null
 
     on_BlurTargetWindowChanged: _updateBlurRegistration()
 

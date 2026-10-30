@@ -4,6 +4,7 @@ import qs.Common
 import qs.Modules.DIsland
 import qs.Services
 import qs.Widgets
+import "../../Common/SurfaceStyle.js" as SurfaceStyle
 
 Item {
     id: barWindow
@@ -271,7 +272,7 @@ Item {
     property var blurRegion: null
     property var _blurWidgetItems: []
     readonly property bool backgroundBlurEnabled: BlurService.enabledFor(barConfig?.blur)
-    readonly property bool scopedBlurRequested: BlurService.requestedFor(barConfig?.blur) || Object.values(barConfig?.widgetGroups ?? {}).some(group => group?.blur === "on")
+    readonly property bool scopedBlurRequested: SurfaceStyle.barBlurRequested(barConfig, SettingsData.blurEnabled)
     readonly property bool blurEnabled: BlurService.available && scopedBlurRequested
 
     onScopedBlurRequestedChanged: {
@@ -388,18 +389,18 @@ Item {
             readonly property real sx: topBarMouseArea.x + islandLoader.x + topBarSlide.x
             readonly property real sy: topBarMouseArea.y + islandLoader.y + topBarSlide.y
 
-            x: sx + corner.x
-            y: sy + corner.y
-            width: corner.width
-            height: corner.height
+            x: sx + (corner?.x ?? 0)
+            y: sy + (corner?.y ?? 0)
+            width: corner?.width ?? 0
+            height: corner?.height ?? 0
 
             Region {
                 intersection: Intersection.Subtract
                 shape: RegionShape.Ellipse
-                x: joinRegion.x + joinRegion.corner.discRect.x
-                y: joinRegion.y + joinRegion.corner.discRect.y
-                width: joinRegion.corner.discRect.width
-                height: joinRegion.corner.discRect.height
+                x: joinRegion.x + (joinRegion.corner?.discRect.x ?? 0)
+                y: joinRegion.y + (joinRegion.corner?.discRect.y ?? 0)
+                width: joinRegion.corner?.discRect.width ?? 0
+                height: joinRegion.corner?.discRect.height ?? 0
             }
         }
     }

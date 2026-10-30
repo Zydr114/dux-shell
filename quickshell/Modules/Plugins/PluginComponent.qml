@@ -20,9 +20,14 @@ Item {
     property string section: "center"
     property var parentScreen: null
     property real widgetThickness: 30
+    property real surfaceThickness: -1
+    property real surfaceOutlineThickness: -1
     property real barThickness: 48
     property real barSpacing: 4
     property var barConfig: null
+    property bool widgetBackground: !(barConfig?.noBackground ?? false)
+    property var backgroundOpacity: null
+    property string blurMode: "inherit"
     property var blurBarWindow: null
     property string pluginId: ""
     property var pluginService: null
@@ -209,9 +214,14 @@ Item {
         popoutTarget: hasPopout ? pluginPopout : null
         parentScreen: root.parentScreen
         widgetThickness: root.widgetThickness
+        surfaceThickness: root.surfaceThickness
+        surfaceOutlineThickness: root.surfaceOutlineThickness
         barThickness: root.barThickness
         barSpacing: root.barSpacing
         barConfig: root.barConfig
+        widgetBackground: root.widgetBackground
+        backgroundOpacity: root.backgroundOpacity
+        blurMode: root.blurMode
         blurBarWindow: root.blurBarWindow
         content: root.horizontalBarPill
         isFirst: root.isFirst
@@ -255,9 +265,14 @@ Item {
         popoutTarget: hasPopout ? pluginPopout : null
         parentScreen: root.parentScreen
         widgetThickness: root.widgetThickness
+        surfaceThickness: root.surfaceThickness
+        surfaceOutlineThickness: root.surfaceOutlineThickness
         barThickness: root.barThickness
         barSpacing: root.barSpacing
         barConfig: root.barConfig
+        widgetBackground: root.widgetBackground
+        backgroundOpacity: root.backgroundOpacity
+        blurMode: root.blurMode
         blurBarWindow: root.blurBarWindow
         content: root.verticalBarPill
         isVerticalOrientation: true

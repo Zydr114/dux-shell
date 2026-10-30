@@ -30,8 +30,8 @@ BasePill {
     readonly property bool adaptiveWidthEnabled: SettingsData.widgetOption("music", widgetData, "mediaAdaptiveWidthEnabled")
     property real allottedPrimarySize: 0
     readonly property real primaryOutlineExtent: grouped ? outlineThickness * 2 : 0
-    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap((contentItem?.naturalContentWidth ?? 0) + horizontalPadding * 2, dpr) + primaryOutlineExtent
-    readonly property real minimumPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap((contentItem?.fixedContentWidth ?? 0) + horizontalPadding * 2, dpr) + primaryOutlineExtent
+    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap(Math.max(visualPrimaryMinimum, (contentItem?.naturalContentWidth ?? 0) + horizontalPadding * 2), dpr) + primaryOutlineExtent
+    readonly property real minimumPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap(Math.max(visualPrimaryMinimum, (contentItem?.fixedContentWidth ?? 0) + horizontalPadding * 2), dpr) + primaryOutlineExtent
     readonly property bool lyricsEnabled: SettingsData.widgetOption("music", widgetData, "mediaShowLyrics") && LyricsService.allowed
     readonly property bool coverArtEnabled: SettingsData.widgetOption("music", widgetData, "mediaShowCoverArt")
     readonly property string coverArtUrl: coverArtEnabled && activePlayer && TrackArtService.artReadyFor(activePlayer) ? TrackArtService.resolvedArtUrl : ""

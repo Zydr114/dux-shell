@@ -82,7 +82,7 @@ Item {
     readonly property bool overflowOpen: overflowItem?.open ?? false
     property real overflowButtonPosition: 0
     property bool overflowWanted: false
-    readonly property real overflowTriggerSize: widgetThickness
+    readonly property real overflowTriggerSize: overflowButton ? (isVertical ? overflowButton.height : overflowButton.width) : surfaceThickness
     readonly property bool overflowBackground: {
         root.entryRevision;
         let barePills = 0;
@@ -125,6 +125,7 @@ Item {
     onBarThicknessChanged: requestOverflowLayout()
     onWidgetThicknessChanged: requestOverflowLayout()
     onOutlineThicknessChanged: requestOverflowLayout()
+    onOuterThicknessChanged: requestOverflowLayout()
 
     function groupFor(index) {
         root.entryRevision;
@@ -141,12 +142,12 @@ Item {
         return Theme.px(Math.max(0, Math.min(maximum, Number.isFinite(number) ? number : fallback)), dpr);
     }
 
-    function groupPadding(group) {
-        return groupMetric(group?.padding, Theme.spacingXS, Theme.spacingXL);
+    function groupAlongPadding(group) {
+        return Math.max(Theme.outlineWidth, groupMetric(group?.padding, Theme.spacingXS, Theme.spacingXL));
     }
 
     function groupMetrics(group) {
-        return GroupLayout.crossMetrics(widgetThickness, barThickness, outlineThickness, groupPadding(group));
+        return GroupLayout.crossMetrics(outerThickness, outlineThickness, groupAlongPadding(group), Math.min(widgetThickness, Theme.iconSizeSmall), Theme.outlineWidth, dpr);
     }
 
     function groupLayoutData(index) {
@@ -155,7 +156,7 @@ Item {
             return {};
         return {
             groupId: groupIdAt(index),
-            groupPadding: groupPadding(group),
+            groupPadding: groupAlongPadding(group),
             groupSpacing: groupMetric(group.spacing, Theme.spacingXS, Theme.spacingM),
             groupMode: group.overflowMode
         };
@@ -234,7 +235,10 @@ Item {
 
     readonly property bool isVertical: overrideAxisLayout ? forceVerticalLayout : (axis?.isVertical ?? false)
     readonly property bool segmented: widgetStyle === "segments" && !noBackground
-    readonly property real outlineThickness: (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? Theme.outlineWidth) : 0
+    readonly property var outerMetrics: GroupLayout.outerMetrics(widgetThickness, barThickness, (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? Theme.outlineWidth) : 0, Theme.spacingXS, Theme.iconSizeSmall, dpr)
+    readonly property real outerThickness: outerMetrics.thickness
+    readonly property real surfaceThickness: outerMetrics.surfaceThickness
+    readonly property real outlineThickness: outerMetrics.outline
     readonly property real widgetSpacing: (segmented ? BarMetrics.segmentGap : noBackground ? BarMetrics.bareGap : BarMetrics.pillGap) + outlineThickness * 2
 
     function refreshBlur() {

@@ -40,10 +40,14 @@ Loader {
     property string section: "center"
     property var parentScreen: null
     property real widgetThickness: 30
+    property real surfaceThickness: -1
+    property real surfaceOutlineThickness: -1
     property real barThickness: 48
     property real barSpacing: 4
     property var barConfig: null
     property var groupContext: null
+    readonly property var backgroundOpacity: widgetData?.backgroundOpacity ?? null
+    readonly property string blurMode: widgetData?.blur ?? "inherit"
     property var blurBarWindow: null
     property real sectionAvailablePrimarySize: 0
     property bool isFirst: false
@@ -86,7 +90,7 @@ Loader {
     }
 
     Instantiator {
-        model: ["parentScreen", "section", "widgetThickness", "barThickness", "barSpacing", "barConfig", "groupContext", "blurBarWindow", "axis", "widgetData", "isFirst", "isLast", "sectionSpacing", "sectionAvailablePrimarySize", "isLeftBarEdge", "isRightBarEdge", "isTopBarEdge", "isBottomBarEdge", "crossEdgeExtension", "segmentRole", "surfaceContext", "hostContext", "allottedPrimarySize"]
+        model: ["parentScreen", "section", "widgetThickness", "surfaceThickness", "surfaceOutlineThickness", "barThickness", "barSpacing", "barConfig", "groupContext", "backgroundOpacity", "blurMode", "blurBarWindow", "axis", "widgetData", "isFirst", "isLast", "sectionSpacing", "sectionAvailablePrimarySize", "isLeftBarEdge", "isRightBarEdge", "isTopBarEdge", "isBottomBarEdge", "crossEdgeExtension", "segmentRole", "surfaceContext", "hostContext", "allottedPrimarySize"]
         delegate: Binding {
             required property string modelData
             target: root.item

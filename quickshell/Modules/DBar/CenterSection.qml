@@ -105,8 +105,8 @@ BarSection {
     width: parent.width
     anchors.centerIn: parent
 
-    implicitWidth: isVertical ? Math.max(widgetThickness, groupCrossThickness) : totalSize
-    implicitHeight: isVertical ? totalSize : Math.max(widgetThickness, groupCrossThickness)
+    implicitWidth: isVertical ? Math.max(outerThickness, groupCrossThickness) : totalSize
+    implicitHeight: isVertical ? totalSize : Math.max(outerThickness, groupCrossThickness)
 
     Timer {
         id: layoutTimer

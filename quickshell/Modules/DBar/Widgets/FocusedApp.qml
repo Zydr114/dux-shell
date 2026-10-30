@@ -31,8 +31,8 @@ BasePill {
     property real allottedPrimarySize: 0
     readonly property real primaryOutlineExtent: grouped ? outlineThickness * 2 : 0
     property real availableWidth: allottedPrimarySize > 0 ? allottedPrimarySize : maxWidth + primaryOutlineExtent
-    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !hasWindowsOnCurrentWorkspace ? 0 : Theme.snap(Math.min(contentItem?.naturalWidth ?? 0, maxWidth - horizontalPadding * 2) + horizontalPadding * 2, dpr) + primaryOutlineExtent
-    readonly property real minimumPrimarySize: isVerticalOrientation ? height : Math.min(naturalPrimarySize, Theme.snap((contentItem?.minimumWidth ?? 0) + horizontalPadding * 2, dpr) + primaryOutlineExtent)
+    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !hasWindowsOnCurrentWorkspace ? 0 : Theme.snap(Math.max(visualPrimaryMinimum, Math.min(contentItem?.naturalWidth ?? 0, maxWidth - horizontalPadding * 2) + horizontalPadding * 2), dpr) + primaryOutlineExtent
+    readonly property real minimumPrimarySize: isVerticalOrientation ? height : Math.min(naturalPrimarySize, Theme.snap(Math.max(visualPrimaryMinimum, (contentItem?.minimumWidth ?? 0) + horizontalPadding * 2), dpr) + primaryOutlineExtent)
     readonly property real effectiveHorizontalWidth: Math.max(0, Math.min(maxWidth + primaryOutlineExtent, availableWidth))
     readonly property real effectiveHorizontalInnerWidth: Math.max(0, effectiveHorizontalWidth - horizontalPadding * 2 - primaryOutlineExtent)
     property var activeWindow: null

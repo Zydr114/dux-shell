@@ -22,14 +22,13 @@ BasePill {
     content: Component {
         Item {
             id: contentRoot
-            readonly property real contentScale: root.grouped && implicitHeight > root.widgetThickness ? root.widgetThickness / implicitHeight : 1
             implicitWidth: root.isVerticalOrientation ? (root.grouped ? Math.max(root.contentThickness, layout.implicitWidth) : root.contentThickness) : layout.implicitWidth
             implicitHeight: root.isVerticalOrientation ? layout.implicitHeight : (root.grouped ? Math.max(root.contentThickness, layout.implicitHeight) : root.contentThickness)
 
             Binding {
                 target: root
                 property: "splitOffset"
-                value: !clock.split ? 0 : root.grouped ? root.visualWidth / 2 + (layout.x + clock.x + clock.splitOffset - contentRoot.width / 2) * contentRoot.contentScale : root.horizontalPadding + layout.x + clock.x + clock.splitOffset
+                value: !clock.split ? 0 : root.grouped || root.surfaceThickness >= 0 ? root.visualWidth / 2 + (layout.x + clock.x + clock.splitOffset - contentRoot.width / 2) * root.contentFitScale : root.horizontalPadding + layout.x + clock.x + clock.splitOffset
             }
 
             FontMetrics {

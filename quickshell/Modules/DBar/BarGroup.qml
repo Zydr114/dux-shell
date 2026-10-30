@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
+import "../../Common/SurfaceStyle.js" as SurfaceStyle
 
 Rectangle {
     id: root
@@ -17,7 +18,8 @@ Rectangle {
     property real crossPosition: 0
     property real crossSize: 0
     readonly property real blurRadius: radius
-    readonly property bool blurEnabled: BlurService.available && (groupConfig?.blur === "on" || (groupConfig?.blur !== "off" && (blurBarWindow?.backgroundBlurEnabled ?? BlurService.enabled)))
+    readonly property bool blurEnabled: BlurService.enabledFor(groupConfig?.blur, blurBarWindow?.backgroundBlurEnabled ?? BlurService.enabled)
+    readonly property real backgroundAlpha: SurfaceStyle.opacity(groupConfig?.backgroundOpacity, SettingsData.barTransparency(barConfig))
     readonly property color surfaceColor: groupConfig?.tone === "primary" ? Theme.blend(Theme.surfaceContainerLow, Theme.primaryContainer, Theme.stateLayerDrag) : Theme.surfaceContainerLow
 
     x: isVertical ? crossPosition : alongPosition
@@ -26,12 +28,12 @@ Rectangle {
     height: isVertical ? alongSize : crossSize
     visible: width > 0 && height > 0
     radius: Math.min(width, height) / 2
-    color: Theme.withAlpha(surfaceColor, blurEnabled ? SettingsData.barTransparency(barConfig) : 1)
+    color: Theme.withAlpha(surfaceColor, backgroundAlpha)
     border.width: Theme.outlineWidth
     border.color: Theme.outlineLight
 
     property var registeredWindow: null
-    readonly property var targetWindow: blurEnabled && color.a > 0 && color.a < 1 && visible && !!blurBarWindow?.registerBlurWidget ? blurBarWindow : null
+    readonly property var targetWindow: SurfaceStyle.needsBlur(blurEnabled, color.a) && visible && !!blurBarWindow?.registerBlurWidget ? blurBarWindow : null
 
     function updateRegistration() {
         if (registeredWindow === targetWindow)

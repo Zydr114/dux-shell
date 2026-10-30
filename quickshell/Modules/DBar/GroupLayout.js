@@ -4,16 +4,40 @@ function nonnegative(value) {
     return typeof value === "number" && isFinite(value) ? Math.max(0, value) : 0;
 }
 
-function crossMetrics(widgetThickness, barThickness, outline, padding) {
-    const available = nonnegative(barThickness);
-    const stroke = Math.min(nonnegative(outline), available / 2);
-    const inner = Math.min(nonnegative(widgetThickness), Math.max(0, available - stroke * 2));
-    const inset = Math.min(nonnegative(padding), Math.max(0, (available - inner - stroke * 2) / 2));
+function outerMetrics(widgetThickness, barThickness, outline, padding, minimumThickness, dpr) {
+    const scale = nonnegative(dpr);
+    const divisor = scale || 1;
+    const available = scale ? Math.floor(nonnegative(barThickness) * scale + 1e-9) : nonnegative(barThickness);
+    const base = scale ? Math.round(nonnegative(widgetThickness) * scale) : nonnegative(widgetThickness);
+    const minimum = scale ? Math.ceil(nonnegative(minimumThickness) * scale - 1e-9) : nonnegative(minimumThickness);
+    const floor = Math.min(base, minimum, available);
+    const requestedStroke = scale ? Math.round(nonnegative(outline) * scale) : nonnegative(outline);
+    const maximumStroke = scale ? Math.floor((available - floor) / 2) : (available - floor) / 2;
+    const stroke = Math.min(requestedStroke, maximumStroke);
+    const inset = scale ? Math.round(nonnegative(padding) * scale) : nonnegative(padding);
+    const thickness = Math.min(available, base + stroke * 2 + inset * 2);
+    return { thickness: thickness / divisor, surfaceThickness: Math.max(0, thickness - stroke * 2) / divisor, outline: stroke / divisor };
+}
+
+function crossMetrics(outerThickness, outline, padding, minimumThickness, border, dpr) {
+    const scale = nonnegative(dpr);
+    const divisor = scale || 1;
+    const thickness = scale ? Math.floor(nonnegative(outerThickness) * scale + 1e-9) : nonnegative(outerThickness);
+    const requestedStroke = scale ? Math.round(nonnegative(outline) * scale) : nonnegative(outline);
+    const stroke = Math.min(requestedStroke, scale ? Math.floor(thickness / 2) : thickness / 2);
+    const available = Math.max(0, thickness - stroke * 2);
+    const requestedBorder = scale ? Math.ceil(nonnegative(border) * scale - 1e-9) : nonnegative(border);
+    const borderInset = Math.min(requestedBorder, scale ? Math.floor(available / 2) : available / 2);
+    const minimum = scale ? Math.ceil(nonnegative(minimumThickness) * scale - 1e-9) : nonnegative(minimumThickness);
+    const floor = Math.min(minimum, available - borderInset * 2);
+    const maximumInset = scale ? Math.floor((available - floor) / 2) : (available - floor) / 2;
+    const requestedInset = scale ? Math.round(nonnegative(padding) * scale) : nonnegative(padding);
+    const inset = Math.min(Math.max(requestedInset, borderInset), maximumInset);
     return {
-        widgetThickness: inner,
-        outline: stroke,
-        padding: inset,
-        thickness: inner + stroke * 2 + inset * 2
+        widgetThickness: (available - inset * 2) / divisor,
+        outline: stroke / divisor,
+        crossInset: inset / divisor,
+        thickness: thickness / divisor
     };
 }
 
