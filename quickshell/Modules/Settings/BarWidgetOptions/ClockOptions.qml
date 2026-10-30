@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.Modules.Settings.Widgets
 
 Column {
@@ -41,9 +42,12 @@ Column {
 
         SettingsNavRow {
             iconName: "schedule"
-            title: I18n.tr("Time & weather")
+            title: I18n.tr("Clock style")
             hint: I18n.tr("Clock format, calendar, weather location")
-            onClicked: keyboard => root.page.parentModal?.navigateTo("time_weather", keyboard)
+            onClicked: keyboard => {
+                SettingsSearchService.navigateToSection("clockStyle");
+                root.page.parentModal?.navigateTo("time_weather", keyboard);
+            }
         }
     }
 }

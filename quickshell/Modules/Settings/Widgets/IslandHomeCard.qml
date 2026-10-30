@@ -1,7 +1,8 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.DCommon.Widgets
 
 SettingsCard {
     id: root
@@ -38,7 +39,7 @@ SettingsCard {
         width: parent.width
         readonly property bool isSettingsRow: true
         readonly property bool transparentSlot: true
-        height: item?.implicitHeight ?? 0
+        height: (item as Item)?.implicitHeight ?? 0
         visible: root.hosted
         active: root.hosted && !!root.store.config
         sourceComponent: IslandHomeLayoutEditor {
@@ -58,6 +59,20 @@ SettingsCard {
         value: root.store.setting("islandHomeClockDisplay")
         fallbackValue: "both"
         onValueSelected: value => root.store.apply("islandHomeClockDisplay", value)
+    }
+
+    SettingsNavRow {
+        settingKey: root.keyPrefix + "ClockTypography"
+        tags: ["clock", "font", "digits", "color", "rotation"]
+        iconName: "schedule"
+        title: I18n.tr("Clock style")
+        hint: I18n.tr("Time & weather")
+        onClicked: keyboard => {
+            if (!root.parentModal)
+                return;
+            SettingsSearchService.navigateToSection("clockStyle");
+            root.parentModal.navigateTo("time_weather", keyboard);
+        }
     }
 
     SettingsButtonGroupRow {

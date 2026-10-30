@@ -121,6 +121,17 @@ mode, date order, seconds, and vertical layouts continue to use the existing set
 The clock uses `SystemClock` at minute or second precision, pauses when hidden or
 disabled, and suppresses rolling transitions when animations are disabled.
 
+Configure it in **Settings → Time & weather → Clock style**, or follow the clock
+style link in the bar clock or island's home settings. The shared `clockStyle`
+setting stores the date visibility, base font size (16–28, following DMS/bar text
+scaling), and six variable font axes. Horizontal clocks also allow independent
+colors, X/Y offsets, and rotation for each hour/minute/second digit, separator,
+and period character. Vertical clocks share font and date preferences while
+keeping their upright layout. The preview uses a fixed sample time without
+polling. Sliders preview changes while dragging and save on release; individual
+sliders, the selected character, or the whole style can be reset. Custom colors
+accept Qt's `#RRGGBB` and `#AARRGGBB` formats; theme colors keep following DMS.
+
 **Application Themes**
 
 Templates in `scripts/templates/` generate themes for:

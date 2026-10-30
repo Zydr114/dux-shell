@@ -15,6 +15,7 @@ import qs.DCommon.Common as DCommon
 import qs.Services
 import "StockThemes.js" as StockThemes
 import "GSettings.js" as GSettings
+import "settings/ClockStyle.js" as ClockStyle
 
 Singleton {
     id: root
@@ -1196,22 +1197,19 @@ Singleton {
     property string displayFontFamily: typeof SettingsData !== "undefined" ? resolvedDisplayFontFamily(SettingsData.displayFontFamily) : DCommon.Fonts.display
 
     readonly property string clockFontFamily: DCommon.Fonts.sans
-    readonly property var clockFontAxes: ({
-        "wght": 900,
-        "wdth": 85,
-        "opsz": 18,
-        "GRAD": 0,
-        "ROND": 25,
-        "slnt": 0
-    })
-    readonly property var clockDigitRotations: [-3, 3, -2, 2]
-    readonly property var clockDigitOffsets: [-spacingXXS, spacingXXS / 2, -spacingXXS / 2, spacingXXS / 2]
+    readonly property var clockFontAxes: SettingsData.clockStyle.axes
     readonly property real clockDigitSpring: 3.5
     readonly property real clockDigitDamping: 0.75
     readonly property color clockAlternateColor: isLightMode ? primary : inversePrimary
 
     function clockTextSize(baseSize) {
-        return Math.round(baseSize * (fontSizeXLarge + spacingXXS) / fontSizeMedium);
+        return Math.round(baseSize * (fontSizeXLarge + spacingXXS) / fontSizeMedium * SettingsData.clockStyle.fontSize / ClockStyle.FONT_SIZE.def);
+    }
+
+    function clockDigitColor(style) {
+        if (style?.colorRole === "custom")
+            return style.customColor;
+        return style?.colorRole === "inversePrimary" ? clockAlternateColor : primary;
     }
 
     readonly property var fontChoices: [

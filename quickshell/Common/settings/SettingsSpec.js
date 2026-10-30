@@ -2,6 +2,7 @@
 .import "../../DCommon/Common/settings/SharedSettingsSpec.js" as Shared
 .import "../../DCommon/Common/settings/SpecUtil.js" as Util
 .import "DockConfig.js" as DockConfig
+.import "ClockStyle.js" as ClockStyle
 
 function lockWidgetDefaults() {
     return Shared.lockWidgetDefaults();
@@ -742,6 +743,10 @@ var LOCAL_SPEC = {
     },
     clockDateFormat: {
         def: ""
+    },
+    clockStyle: {
+        def: ClockStyle.normalize(null),
+        coerce: ClockStyle.normalize
     },
     greeterAutoLogin: {
         def: false,

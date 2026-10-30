@@ -2762,6 +2762,39 @@
     "parentLabel": "Date, time & region"
   },
   {
+    "section": "clockStyle",
+    "label": "Clock style",
+    "tabIndex": 1,
+    "category": "Time & weather",
+    "keywords": [
+      "climate",
+      "clock",
+      "color",
+      "date",
+      "date,",
+      "digits",
+      "font",
+      "forecast",
+      "grade",
+      "offset",
+      "optical",
+      "region",
+      "rotation",
+      "roundness",
+      "size",
+      "slant",
+      "style",
+      "temperature",
+      "time",
+      "watch",
+      "weather",
+      "weight",
+      "width"
+    ],
+    "parentLabel": "Date, time & region",
+    "icon": "schedule"
+  },
+  {
     "section": "dateFormat",
     "label": "Date",
     "tabIndex": 1,
@@ -4994,6 +5027,31 @@
       "topbar"
     ],
     "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
+  },
+  {
+    "section": "islandClockTypography",
+    "label": "Clock style",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "clock",
+      "color",
+      "digits",
+      "font",
+      "panel",
+      "rotation",
+      "statusbar",
+      "style",
+      "taskbar",
+      "time",
+      "topbar",
+      "watch"
+    ],
+    "parentLabel": "Bar",
+    "icon": "schedule",
     "conditionKey": "islandEnabled"
   },
   {
@@ -9813,6 +9871,14 @@
     "optionFile": "IslandOptions.qml"
   },
   {
+    "section": "barWidgetOption:ClockOptions.qml:4",
+    "label": "Clock style",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "ClockOptions.qml"
+  },
+  {
     "section": "barWidgetOption:IslandOptions.qml:2",
     "label": "Clock style",
     "tabIndex": 22,
@@ -10691,14 +10757,6 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "IslandOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:ClockOptions.qml:4",
-    "label": "Time & weather",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "ClockOptions.qml"
   },
   {
     "section": "barWidgetOption:SystemTrayOptions.qml:7",

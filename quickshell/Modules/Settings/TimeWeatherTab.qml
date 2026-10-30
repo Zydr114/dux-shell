@@ -94,6 +94,8 @@ Item {
             }
         }
 
+        ClockStyleSettings {}
+
         SettingsCard {
             tab: "time"
             tags: ["date", "format", "calendar"]

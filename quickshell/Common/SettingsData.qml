@@ -18,6 +18,7 @@ import "settings/SettingsStore.js" as Store
 import "../DCommon/Common/settings/SpecUtil.js" as SpecUtil
 import "settings/BarWidgetDefaults.js" as WidgetDefaults
 import "settings/DockConfig.js" as DockConfig
+import "settings/ClockStyle.js" as ClockStyle
 
 Singleton {
     id: root
@@ -289,6 +290,7 @@ Singleton {
     readonly property bool use24HourClock: clockFormat === "24h" ? true : (clockFormat === "12h" ? false : localeUses24Hour)
     property bool showSeconds: Spec.SPEC.showSeconds.def
     property bool padHours12Hour: Spec.SPEC.padHours12Hour.def
+    property var clockStyle: Spec.SPEC.clockStyle.def
     property bool useFahrenheit: Spec.SPEC.useFahrenheit.def
     property string windSpeedUnit: Spec.SPEC.windSpeedUnit.def
     property int animationDuration: Spec.SPEC.animationDuration.def
@@ -1745,6 +1747,8 @@ Singleton {
         }
         if (key === "radiusStrength")
             value = Shape.normalizeStrength(value);
+        if (key === "clockStyle")
+            value = ClockStyle.normalize(value);
         Spec.set(root, key, value, saveSettings, _hooks);
         if (key === "frameEnabled" && value)
             clearIslandBars();
@@ -1752,6 +1756,15 @@ Singleton {
 
     function hasSetting(key) {
         return key in Spec.SPEC;
+    }
+
+    function setClockStyleValue(path, value, persist) {
+        const next = ClockStyle.withValue(root.clockStyle, path, value);
+        if (!next)
+            return;
+        root.clockStyle = next;
+        if (persist !== false)
+            root.saveSettings();
     }
 
     function specDefault(key) {

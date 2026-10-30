@@ -26,8 +26,8 @@ Item {
     readonly property string dateText: date.toLocaleDateString(locale, SettingsData.getEffectiveDateFormat())
     readonly property var timeLines: vertical ? stackedTime() : [timeText]
     readonly property var dateLines: vertical ? stackedDate() : [dateText]
-    readonly property bool showTime: displayMode !== "date"
-    readonly property bool showDate: displayMode !== "time"
+    readonly property bool showTime: SettingsData.clockStyle.hideDate || displayMode !== "date"
+    readonly property bool showDate: !SettingsData.clockStyle.hideDate && displayMode !== "time"
     readonly property bool split: segmented && !vertical && showTime && showDate
     readonly property real splitOffset: split ? layout.x + separator.x + separator.width / 2 : 0
 
