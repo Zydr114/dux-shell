@@ -12,6 +12,7 @@ Item {
     property real radius: Theme.cornerRadius
     property real artOpacity: 0.7
     property real surfaceTint: 0.3
+    property real blurAmount: 0.8
     property real stableHeight: 0
     property string artUrl: TrackArtService.resolvedArtUrl
 
@@ -155,9 +156,9 @@ Item {
             width: layerImg.width
             height: layerImg.height
             source: layerImg
-            blurEnabled: root.onScreen
+            blurEnabled: root.onScreen && root.blurAmount > 0
             blurMax: 64
-            blur: 0.8
+            blur: Math.max(0, Math.min(1, root.blurAmount))
             saturation: -0.2
             brightness: -0.25
         }

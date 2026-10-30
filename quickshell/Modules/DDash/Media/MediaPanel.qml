@@ -26,6 +26,8 @@ DBottomSheet {
             return I18n.tr("Play on", "Audio output selection sheet title");
         case "players":
             return I18n.tr("Players", "Media player selection");
+        case "backdrop":
+            return I18n.tr("Album art backdrop");
         }
         return "";
     }
@@ -69,6 +71,8 @@ DBottomSheet {
                 return devicesPanel;
             case "players":
                 return playersPanel;
+            case "backdrop":
+                return backdropPanel;
             }
             return null;
         }
@@ -128,6 +132,34 @@ DBottomSheet {
                 text: I18n.tr("No output devices found")
                 color: Theme.onSurfaceVariant
                 wrapMode: Text.Wrap
+            }
+        }
+    }
+
+    Component {
+        id: backdropPanel
+
+        Column {
+            readonly property Item focusTarget: blurSlider
+            spacing: Theme.spacingM
+
+            StyledText {
+                width: parent.width
+                text: I18n.tr("Blur")
+                color: Theme.onSurfaceVariant
+                font.pixelSize: Theme.fontSizeMedium
+            }
+
+            DSlider {
+                id: blurSlider
+                width: parent.width
+                minimum: 0
+                maximum: 100
+                value: root.player.options?.popupBackdropBlur ?? 60
+                unit: "%"
+                alwaysShowValue: true
+                Accessible.name: I18n.tr("Blur")
+                onSliderValueChanged: newValue => DashRegistry.setOption(root.player.entryId, "popupBackdropBlur", newValue)
             }
         }
     }

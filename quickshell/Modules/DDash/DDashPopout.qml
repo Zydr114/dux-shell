@@ -36,6 +36,7 @@ DPopout {
     }
 
     property bool dashVisible: false
+    property bool mediaBarPopout: false
     property var triggerScreen: null
     property string currentTabId: DashRegistry.defaultTabId
     property string detailTabId: ""
@@ -189,6 +190,7 @@ DPopout {
     onPopoutClosed: {
         editMode = false;
         detailTabId = "";
+        mediaBarPopout = false;
     }
 
     function presentWhenReady() {

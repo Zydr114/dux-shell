@@ -19,6 +19,7 @@ Item {
     property var focusTargets: []
     property var panelButtons: []
     property bool inlineVolume: false
+    property real backdropBlur: 0.8
 
     readonly property var activePlayer: root.player.activePlayer
     readonly property var presentation: root.player.presentation
@@ -72,6 +73,7 @@ Item {
                 stableHeight: root.baseHeight
                 activePlayer: root.activePlayer
                 artUrl: root.artUrl
+                blurAmount: root.backdropBlur
             }
         }
 

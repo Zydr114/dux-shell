@@ -97,6 +97,9 @@ Item {
         if (spec.setTriggerScreen)
             popout.triggerScreen = surfaceContext.screen;
 
+        if ("mediaBarPopout" in popout)
+            popout.mediaBarPopout = spec.mediaBarPopout === true && surfaceContext.kind !== "dock";
+
         if (spec.widgetItem) {
             // A section the island sits in is not an anchor: the popout would open under the island.
             const centred = spec.useCenterSection && widgetSection === "center" && !(surfaceContext.host?.hostsIsland && SettingsData.islandWidgetSection(surfaceContext.config) === "center");
@@ -450,6 +453,7 @@ Item {
                     useCenterSection: true,
                     triggerSource: root._dashTriggerSource(section, "media"),
                     islandActivity: "media",
+                    mediaBarPopout: true,
                     prepare: popout => popout.requestTab("media"),
                     mode: "click",
                     setTriggerScreen: true
