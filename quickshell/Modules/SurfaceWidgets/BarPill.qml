@@ -29,7 +29,7 @@ Item {
     property string blurMode: "inherit"
     property var blurBarWindow: null
     readonly property real backgroundAlpha: SurfaceStyle.opacity(backgroundOpacity, SettingsData.barWidgetTransparency(barConfig))
-    readonly property bool surfaceBlurEnabled: BlurService.enabledFor(blurMode, blurBarWindow?.backgroundBlurEnabled ?? BlurService.enabled)
+    readonly property bool surfaceBlurEnabled: BlurService.enabledFor(blurMode, blurBarWindow?.backgroundBlurEnabled ?? BlurService.enabled) === true
     property alias content: contentLoader.sourceComponent
     property bool isVerticalOrientation: axis?.isVertical ?? false
     property bool isFirst: false

@@ -18,7 +18,7 @@ Rectangle {
     property real crossPosition: 0
     property real crossSize: 0
     readonly property real blurRadius: radius
-    readonly property bool blurEnabled: BlurService.enabledFor(groupConfig?.blur, blurBarWindow?.backgroundBlurEnabled ?? BlurService.enabled)
+    readonly property bool blurEnabled: BlurService.enabledFor(groupConfig?.blur, blurBarWindow?.backgroundBlurEnabled ?? BlurService.enabled) === true
     readonly property real backgroundAlpha: SurfaceStyle.opacity(groupConfig?.backgroundOpacity, SettingsData.barTransparency(barConfig))
     readonly property color surfaceColor: groupConfig?.tone === "primary" ? Theme.blend(Theme.surfaceContainerLow, Theme.primaryContainer, Theme.stateLayerDrag) : Theme.surfaceContainerLow
 
