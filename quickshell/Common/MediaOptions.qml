@@ -27,16 +27,23 @@ Singleton {
         {
             "value": "material",
             "text": "Material"
+        },
+        {
+            "value": "material-ii",
+            "text": "Material II"
         }
     ]
 
     readonly property var titleFontDefaults: ({
             bento: "Notable",
-            material: "ui"
+            material: "ui",
+            "material-ii": "ui"
         })
 
     readonly property var stored: SettingsData.dashOptions?.media ?? ({})
-    readonly property string defaultTitleFont: titleFontDefaults[stored.playerStyle ?? defaultPlayerStyle] ?? "ui"
+    readonly property string playerStyle: stored.playerStyle ?? defaultPlayerStyle
+    readonly property bool materialIi: playerStyle === "material-ii"
+    readonly property string defaultTitleFont: titleFontDefaults[playerStyle] ?? "ui"
     readonly property bool waveProgress: stored.waveProgress ?? defaults.waveProgress
     readonly property bool albumArtBackdrop: stored.albumArtBackdrop ?? defaults.albumArtBackdrop
     readonly property bool albumArtAccent: stored.albumArtAccent ?? defaults.albumArtAccent

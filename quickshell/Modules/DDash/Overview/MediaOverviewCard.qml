@@ -28,17 +28,20 @@ Card {
     readonly property color accent: MediaAccentService.accent
     readonly property bool showSeekbar: options.seekbar !== false && !tiny
     readonly property bool bento: options.playerStyle === "bento"
+    readonly property bool materialIi: options.playerStyle === "material-ii"
     readonly property bool inlineMetadata: compact && titleLabel.implicitHeight + artistLabel.implicitHeight + trackText.spacing > transport.y - Theme.spacingXS
-    readonly property var playbackFocusTargets: [playButton, previousButton, nextButton].concat(seekbar.canSeek ? [seekbar] : [])
+    readonly property var playbackFocusTargets: materialIi ? [materialIiPlayer.item?.focusTarget, materialIiPlayer.item?.previousFocusTarget] : [playButton, previousButton, nextButton].concat(seekbar.canSeek ? [seekbar] : [])
 
     entryId: "media"
     clickable: true
     pad: Theme.spacingM
+    restRadius: materialIi ? Theme.windowRadius : DashMetrics.cardRadius
+    border.width: materialIi ? 0 : Theme.layerOutlineWidth
 
     Keys.onShortcutOverride: event => {
         if (!root.interactive || event.key !== Qt.Key_F6)
             return;
-        const targets = root.playbackFocusTargets.filter(item => item.visible && item.enabled);
+        const targets = root.playbackFocusTargets.filter(item => item?.visible && item.enabled);
         const boundary = event.modifiers & Qt.ShiftModifier ? targets[0] : targets[targets.length - 1];
         event.accepted = targets.length > 0 && !FocusNavigation.containsFocus(boundary);
     }
@@ -46,12 +49,14 @@ Card {
     function handleKeyEvent(event) {
         if (!interactive || event.key !== Qt.Key_F6)
             return false;
+        if (materialIi)
+            return materialIiPlayer.item?.cycleFocus(!!(event.modifiers & Qt.ShiftModifier)) ?? false;
         return FocusNavigation.moveFocus(playbackFocusTargets, !!(event.modifiers & Qt.ShiftModifier));
     }
 
     Timer {
         interval: DashMetrics.mediaPositionPollInterval
-        running: root.live && root.visible && root.interactive && root.showSeekbar && root.playing && !root.isSeeking
+        running: !root.materialIi && root.live && root.visible && root.interactive && root.showSeekbar && root.playing && !root.isSeeking
         repeat: true
         onTriggered: MprisController.refreshPosition(root.activePlayer)
     }
@@ -59,11 +64,24 @@ Card {
     Loader {
         anchors.fill: parent
         anchors.margins: -root.pad
-        active: root.live && MediaOptions.albumArtBackdrop && !!root.activePlayer
+        active: !root.materialIi && root.live && MediaOptions.albumArtBackdrop && !!root.activePlayer
 
         sourceComponent: MediaArtBackdrop {
             radius: root.radius
             activePlayer: root.activePlayer
+        }
+    }
+
+    Loader {
+        id: materialIiPlayer
+        anchors.fill: parent
+        anchors.margins: -root.pad
+        active: root.materialIi && !!root.activePlayer
+        enabled: root.interactive
+
+        sourceComponent: MediaPlayerTab {
+            activePlayer: root.activePlayer
+            live: root.live && root.visible && root.interactive
         }
     }
 
@@ -90,7 +108,7 @@ Card {
     Item {
         id: content
         anchors.fill: parent
-        visible: !!root.activePlayer
+        visible: !root.materialIi && !!root.activePlayer
         enabled: root.interactive
 
         MediaArtSurface {

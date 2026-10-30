@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import qs.Common
+import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.DDash
@@ -14,10 +15,13 @@ MediaChromeBase {
 
     artSize: DashMetrics.mediaArtSizeDash * DashMetrics.mediaPopupScale
     baseHeight: DashMetrics.mediaPopupHeightFor(width)
-    padding: Theme.spacingM
+    padding: compact ? Theme.spacingS : Theme.spacingM
     borderWidth: 0
     backdropRadius: Theme.windowRadius
     backdropBlur: (root.player.options?.popupBackdropBlur ?? 60) / 100
+    readonly property bool compact: height < Theme.buttonHeightM * 2 + Theme.spacingM * 2
+    readonly property real transportWidth: previousButton.implicitWidth + playButton.implicitWidth + nextButton.implicitWidth + Theme.spacingXS * 2
+    readonly property bool showTimes: hasSeekbar && details.width >= transportWidth + Theme.buttonHeightS * 2 + Theme.spacingS * 2
     readonly property var transportFocusTargets: [previousButton, playButton, nextButton]
 
     backdropContent: MediaSpectrumBackdrop {
@@ -27,7 +31,7 @@ MediaChromeBase {
         spectrumColor: root.player.accent
     }
 
-    focusTargets: transportFocusTargets.concat(seekbar.canSeek ? [seekbar] : [], sourceGroup.focusTargets, [blurButton])
+    focusTargets: transportFocusTargets.concat(seekbar.visible && seekbar.canSeek ? [seekbar] : [], footer.visible ? sourceGroup.focusTargets.concat([blurButton]) : [])
     panelButtons: sourceGroup.panelButtons.concat([blurButton])
 
     Item {
@@ -36,7 +40,7 @@ MediaChromeBase {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: footer.top
-        anchors.bottomMargin: Theme.spacingM
+        anchors.bottomMargin: footer.visible ? Theme.spacingM : 0
 
         MediaArtView {
             id: art
@@ -65,12 +69,15 @@ MediaChromeBase {
                 visible: !root.player.lyricsOpen
 
                 StyledText {
+                    id: titleLabel
                     width: parent.width
                     text: root.title
                     fontToken: root.titleFontToken
                     color: Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeXLarge
+                    font.pixelSize: root.compact ? Theme.fontSizeLarge : (Theme.fontSizeXLarge + Theme.fontSizeXXLarge) / 2
                     font.weight: Theme.fontWeightMedium
+                    wrapMode: Text.NoWrap
+                    maximumLineCount: 1
                     elide: Text.ElideRight
                 }
 
@@ -78,8 +85,11 @@ MediaChromeBase {
                     width: parent.width
                     text: root.artist
                     color: Theme.onSurfaceVariant
-                    font.pixelSize: Theme.fontSizeMedium
+                    font.pixelSize: root.compact ? Theme.fontSizeSmall : Theme.fontSizeLarge
+                    wrapMode: Text.NoWrap
+                    maximumLineCount: 1
                     elide: Text.ElideRight
+                    visible: details.height >= titleLabel.implicitHeight + implicitHeight + transport.height + Theme.spacingS
                 }
             }
 
@@ -102,7 +112,7 @@ MediaChromeBase {
                 anchors.right: parent.right
                 anchors.bottom: transport.top
                 anchors.bottomMargin: Theme.spacingXS
-                visible: root.hasSeekbar
+                visible: root.hasSeekbar && details.height >= metadata.implicitHeight + height + transport.height + Theme.spacingM
                 player: root.player
             }
 
@@ -112,13 +122,14 @@ MediaChromeBase {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 spacing: Theme.spacingXS
+                height: Theme.buttonHeightS
                 Keys.onPressed: event => event.accepted = FocusNavigation.handleHorizontalKey(event, root.transportFocusTargets, I18n.isRtl)
 
                 NumericText {
                     text: Format.formatDuration(seekbar.value * (root.presentation?.length ?? 0))
                     color: Theme.onSurfaceVariant
-                    font.pixelSize: Theme.fontSizeSmall
-                    visible: root.hasSeekbar
+                    font.pixelSize: Theme.fontSizeMedium
+                    visible: root.showTimes
                 }
 
                 Item {
@@ -131,17 +142,24 @@ MediaChromeBase {
                     mediaAction: "previous"
                     keepNavigation: true
                     widthMode: "narrow"
-                    buttonSize: Theme.buttonHeightXS
+                    implicitWidth: iconSize + horizontalInset * 2
+                    variant: "tonal"
+                    containerColor: MediaAccentService.accentSecondaryContainer
+                    contentColor: MediaAccentService.onAccentSecondaryContainer
+                    visible: details.width >= root.transportWidth
                 }
 
                 MediaTransportButton {
                     id: playButton
                     player: root.player
                     mediaAction: "play"
-                    checkable: false
                     iconFilled: true
-                    widthMode: "narrow"
-                    buttonSize: Theme.buttonHeightXS
+                    widthMode: "wide"
+                    implicitWidth: iconSize + horizontalInset * 2
+                    variant: "filled"
+                    round: false
+                    containerColor: MediaAccentService.accentContainer
+                    contentColor: MediaAccentService.onAccentContainer
                 }
 
                 MediaTransportButton {
@@ -150,7 +168,11 @@ MediaChromeBase {
                     mediaAction: "next"
                     keepNavigation: true
                     widthMode: "narrow"
-                    buttonSize: Theme.buttonHeightXS
+                    implicitWidth: iconSize + horizontalInset * 2
+                    variant: "tonal"
+                    containerColor: MediaAccentService.accentSecondaryContainer
+                    contentColor: MediaAccentService.onAccentSecondaryContainer
+                    visible: previousButton.visible
                 }
 
                 Item {
@@ -160,8 +182,8 @@ MediaChromeBase {
                 NumericText {
                     text: Format.formatDuration(root.presentation?.length ?? 0)
                     color: Theme.onSurfaceVariant
-                    font.pixelSize: Theme.fontSizeSmall
-                    visible: root.hasSeekbar
+                    font.pixelSize: Theme.fontSizeMedium
+                    visible: root.showTimes
                 }
             }
         }
@@ -172,7 +194,8 @@ MediaChromeBase {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: sourceGroup.height
+        height: visible ? sourceGroup.height : 0
+        visible: !root.compact
 
         StyledText {
             anchors.left: parent.left
@@ -181,7 +204,8 @@ MediaChromeBase {
             anchors.verticalCenter: parent.verticalCenter
             text: root.presentation?.identity ?? ""
             color: Theme.onSurfaceVariant
-            font.pixelSize: Theme.fontSizeSmall
+            font.pixelSize: Theme.fontSizeMedium
+            wrapMode: Text.NoWrap
             elide: Text.ElideRight
         }
 
@@ -193,7 +217,9 @@ MediaChromeBase {
             DIconButton {
                 id: blurButton
                 readonly property string panelId: "backdrop"
-                variant: "outlined"
+                variant: "tonal"
+                containerColor: MediaAccentService.accentSecondaryContainer
+                contentColor: MediaAccentService.onAccentSecondaryContainer
                 iconName: "blur_on"
                 tooltipText: I18n.tr("Album art backdrop")
                 checkable: true
@@ -206,6 +232,7 @@ MediaChromeBase {
                 id: sourceGroup
                 player: root.player
                 presentation: root.presentation
+                buttonVariant: "tonal"
             }
         }
     }

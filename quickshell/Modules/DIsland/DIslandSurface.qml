@@ -73,6 +73,7 @@ Item {
         return root.surfaceBase;
     }
     readonly property bool popupStyled: root.controller.expanded
+    readonly property bool materialIi: popupStyled && root.controller.activeActivity === "media" && MediaOptions.materialIi
     readonly property real islandOpacity: Math.max(0, Math.min(1, root.transparency))
     readonly property color effectiveSurfaceColor: root.embedded ? root.bandColor : root.highContrast ? Theme.surfaceContainerHighest : Theme.withAlpha(root.surfaceColor, root.islandOpacity)
     readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
@@ -386,7 +387,7 @@ Item {
         height: root.currentVisualHeight
         // Embedded, the band already paints the in-band strip; overhangFill draws the rest, so a translucent band never double-alphas.
         color: root.embedded ? "transparent" : root.effectiveSurfaceColor
-        border.width: root.notificationAccentColor !== "transparent" ? 1.5 : root.embedded ? 0 : (root.highContrast ? 2 : (root.popupStyled && !root.notch ? BlurService.borderWidth : 0))
+        border.width: root.notificationAccentColor !== "transparent" ? 1.5 : root.embedded ? 0 : root.highContrast ? 2 : root.materialIi ? 0 : (root.popupStyled && !root.notch ? BlurService.borderWidth : 0)
         border.color: root.notificationAccentColor !== "transparent" ? root.notificationAccentColor : (root.highContrast ? Theme.outlineStrong : (root.popupStyled && !root.notch ? BlurService.borderColor : "transparent"))
 
         Behavior on color {

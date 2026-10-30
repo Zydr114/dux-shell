@@ -11,6 +11,7 @@ Row {
 
     required property var player
     required property var presentation
+    property string buttonVariant: "outlined"
 
     readonly property var focusTargets: [lyricsButton, volumeButton, devicesButton, playersButton]
     readonly property var panelButtons: [volumeButton, devicesButton, playersButton]
@@ -22,7 +23,7 @@ Row {
 
     DIconButton {
         id: lyricsButton
-        variant: "outlined"
+        variant: root.buttonVariant
         checkable: true
         checked: root.player.lyricsOpen
         containerColor: MediaAccentService.accentContainer
@@ -69,7 +70,7 @@ Row {
 
         readonly property bool active: root.player.panel === panelId
 
-        variant: "outlined"
+        variant: root.buttonVariant
         checkable: true
         checked: active
         containerColor: MediaAccentService.accentContainer

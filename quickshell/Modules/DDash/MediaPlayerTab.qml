@@ -14,7 +14,6 @@ Item {
     readonly property real stableLength: MprisController.activePlayerStableLength
     property var allPlayers: MprisController.availablePlayers
     property bool live: Window.window?.visible ?? false
-    property bool barPopout: false
     property bool audioRefHeld: false
     property string entryId: "media"
     readonly property var options: DashRegistry.resolvedOptions(entryId)
@@ -322,7 +321,7 @@ Item {
         id: mediaChrome
         anchors.fill: parent
         active: !root.idle
-        sourceComponent: root.barPopout ? materialIiChrome : root.playerStyle === "material" ? materialChrome : bentoChrome
+        sourceComponent: root.playerStyle === "material-ii" ? materialIiChrome : root.playerStyle === "material" ? materialChrome : bentoChrome
     }
 
     Loader {

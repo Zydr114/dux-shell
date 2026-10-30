@@ -67,8 +67,6 @@ FocusScope {
             target.entryId = root.entry?.id ?? "";
         if ("live" in target)
             target.live = Qt.binding(() => root.isCurrent && root.presented);
-        if ("barPopout" in target)
-            target.barPopout = Qt.binding(() => root.dashHost.mediaBarPopout && root.entry?.id === "media");
         if ("active" in target)
             target.active = Qt.binding(() => root.isCurrent && root.presented);
         if ("keyForwardTarget" in target)

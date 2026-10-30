@@ -24,6 +24,7 @@ FocusScope {
     readonly property real contentHeight: DashMetrics.panelHeightFor(entryId, tabHeight)
     readonly property bool handleHeader: !root.editMode
     readonly property real pillOverhang: editMode ? DashMetrics.islandPillOverhang : 0
+    readonly property bool materialIi: entryId === "media" && MediaOptions.materialIi && !editMode
     readonly property int panelColumns: DashMetrics.panelColumnsFor(entryId)
     readonly property int contentRows: DashMetrics.rowsForHeight(tabHeight)
     readonly property int panelRows: Math.max(DashMetrics.panelFloorRowsFor(entryId), contentRows)
@@ -189,9 +190,9 @@ FocusScope {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            leftMargin: DashMetrics.contentPadding
-            rightMargin: DashMetrics.contentPadding
-            bottomMargin: root.editMode ? DashMetrics.islandEditBottomInset : DashMetrics.contentPadding
+            leftMargin: root.materialIi ? 0 : DashMetrics.contentPadding
+            rightMargin: root.materialIi ? 0 : DashMetrics.contentPadding
+            bottomMargin: root.editMode ? DashMetrics.islandEditBottomInset : root.materialIi ? 0 : DashMetrics.contentPadding
         }
         contentHeight: tabLoader.y + tabLoader.height
         clip: contentHeight > height
