@@ -1,5 +1,6 @@
 .pragma library
 .import "CenterLayout.js" as CenterLayout
+.import "GroupLayout.js" as GroupLayout
 
 function pinned(widgetId) {
     return ["spacer", "separator", "island"].includes(widgetId);
@@ -30,40 +31,65 @@ function expanderIcon(edge, open) {
 }
 
 function section(entries, hidden, spacing, triggerSize, triggerIndex) {
+    const packed = GroupLayout.pack(entries);
     const sizes = [];
     const indices = [];
-    const hasOverflow = hidden.some(index => entries[index]?.size > 0);
-    const insertion = Math.max(0, Math.min(entries.length, triggerIndex));
-    for (let index = 0; index <= entries.length; index++) {
+    const units = [];
+    const hasOverflow = hidden.some(index => GroupLayout.nonnegative(entries[index]?.size) > 0);
+    const insertion = GroupLayout.insertion(packed, triggerIndex, entries.length);
+    for (let index = 0; index <= packed.length; index++) {
         if (index === insertion && hasOverflow) {
             sizes.push(triggerSize);
             indices.push(-1);
+            units.push({ groupId: "", sourceIndices: [], members: [], offsets: [], padding: 0, spacing: 0, size: triggerSize, min: triggerSize });
         }
-        if (index === entries.length)
+        if (index === packed.length)
             break;
-        sizes.push(entries[index]?.size > 0 && !hidden.includes(index) ? entries[index].size : null);
-        indices.push(index);
+        const unit = packed[index];
+        const visible = unit.size > 0 && !unit.members.some(member => hidden.includes(member));
+        sizes.push(visible ? unit.size : null);
+        indices.push(unit.sourceIndices[0]);
+        units.push(visible ? unit : Object.assign({}, unit, { members: [], offsets: [], size: 0, min: 0 }));
     }
     const layout = CenterLayout.resolve(sizes, 0, spacing, "geometric");
     const positions = entries.map(() => null);
+    const memberUnits = entries.map(() => null);
+    const memberOffsets = entries.map(() => null);
+    const inlineIndices = [];
     let buttonPosition = null;
     const start = -layout.totalSize / 2;
     for (let index = 0; index < indices.length; index++) {
         const position = layout.positions[index] === null ? null : layout.positions[index] - start;
-        if (indices[index] === -1)
+        units[index].position = position;
+        if (position === null)
+            continue;
+        if (indices[index] === -1) {
             buttonPosition = position;
-        else
-            positions[indices[index]] = position;
+            inlineIndices.push(-1);
+            continue;
+        }
+        const unit = units[index];
+        unit.members.forEach((member, memberIndex) => {
+            positions[member] = position + unit.offsets[memberIndex];
+            memberUnits[member] = index;
+            memberOffsets[member] = unit.offsets[memberIndex];
+            inlineIndices.push(member);
+        });
     }
-    const middle = Math.floor(entries.length / 2);
+    const middle = Math.floor(packed.length / 2);
+    const unitPosition = index => index + (hasOverflow && insertion <= index ? 1 : 0);
     const anchor = {
-        count: entries.length,
-        middle: indices.indexOf(middle),
-        previous: indices.indexOf(middle - 1)
+        count: packed.length,
+        middle: unitPosition(middle),
+        previous: middle > 0 ? unitPosition(middle - 1) : -1
     };
     return {
         sizes,
         indices,
+        units,
+        memberUnits,
+        memberOffsets,
+        inlineIndices,
         positions,
         buttonPosition,
         totalSize: layout.totalSize,
@@ -192,7 +218,7 @@ function shrinkToFit(sections, hidden, options) {
             } of candidates) {
                 const entry = sections[name][index];
                 const minimum = minimumOf(entry);
-                sizes[name][index] = Math.floor(minimum + (entry.size - minimum) * t);
+                sizes[name][index] = Math.max(minimum, Math.floor(minimum + (entry.size - minimum) * t));
             }
             return {
                 sizes,
@@ -223,7 +249,7 @@ function shrinkToFit(sections, hidden, options) {
     };
 }
 
-function resolve(sections, options, previous = {}) {
+function resolveUnits(sections, options, previous = {}) {
     const hidden = {};
     for (const name of names) {
         hidden[name] = [];
@@ -306,4 +332,36 @@ function resolve(sections, options, previous = {}) {
         hidden: result,
         sizes: fit.sizes
     }, fit.measured);
+}
+
+function resolve(sections, options, previous = {}) {
+    const packed = {};
+    const units = {};
+    const unitPrevious = {};
+    const positions = {};
+    for (const name of names) {
+        units[name] = GroupLayout.pack(sections[name]);
+        packed[name] = units[name].map(unit => ({ size: unit.size, min: unit.min, mode: unit.mode }));
+        unitPrevious[name] = [];
+        units[name].forEach((unit, index) => {
+            if (unit.members.some(member => (previous[name] ?? []).includes(member)))
+                unitPrevious[name].push(index);
+        });
+        positions[name] = GroupLayout.insertion(units[name], options.positions?.[name] ?? defaultPosition(name, sections[name].length), sections[name].length);
+    }
+    const resolved = resolveUnits(packed, Object.assign({}, options, { positions }), unitPrevious);
+    const hidden = {};
+    const sizes = {};
+    for (const name of names) {
+        hidden[name] = [];
+        sizes[name] = sections[name].map(() => 0);
+        units[name].forEach((unit, index) => {
+            if (resolved.hidden[name].includes(index))
+                hidden[name].push(...unit.members);
+            const allocation = GroupLayout.allocate(unit, resolved.sizes[name][index], sections[name]);
+            for (const member of unit.members)
+                sizes[name][member] = allocation[member];
+        });
+    }
+    return Object.assign({ hidden, sizes }, measure(sized(sections, sizes), hidden, options));
 }
