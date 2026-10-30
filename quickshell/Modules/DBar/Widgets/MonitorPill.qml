@@ -22,7 +22,7 @@ BasePill {
     property string sortKey: ""
     property bool tabularDigits: true
     readonly property bool minimumWidth: SettingsData.widgetOption(widgetType, widgetData, "minimumWidth")
-    readonly property real iconSize: Theme.barIconSize(barThickness, undefined, barConfig?.maximizeWidgetIcons, barConfig?.iconScale)
+    readonly property real iconSize: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(barThickness, undefined, barConfig?.maximizeWidgetIcons, barConfig?.iconScale))
     readonly property real textSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
     readonly property color levelColor: {
         if (level > dangerLevel)
@@ -42,7 +42,7 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: root.isVerticalOrientation ? root.contentThickness : row.implicitWidth
+            implicitWidth: root.isVerticalOrientation ? (root.grouped ? Math.max(root.contentThickness, column.implicitWidth) : root.contentThickness) : row.implicitWidth
             implicitHeight: root.isVerticalOrientation ? column.implicitHeight : row.implicitHeight
 
             Column {

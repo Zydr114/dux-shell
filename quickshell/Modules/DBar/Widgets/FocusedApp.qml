@@ -29,11 +29,12 @@ BasePill {
         }
     }
     property real allottedPrimarySize: 0
-    property int availableWidth: allottedPrimarySize > 0 ? allottedPrimarySize : maxWidth
-    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !hasWindowsOnCurrentWorkspace ? 0 : Theme.snap(Math.min(contentItem?.naturalWidth ?? 0, maxWidth - horizontalPadding * 2) + horizontalPadding * 2, dpr)
-    readonly property real minimumPrimarySize: isVerticalOrientation ? height : Math.min(naturalPrimarySize, Theme.snap((contentItem?.minimumWidth ?? 0) + horizontalPadding * 2, dpr))
-    readonly property real effectiveHorizontalWidth: Math.max(0, Math.min(maxWidth, availableWidth))
-    readonly property real effectiveHorizontalInnerWidth: Math.max(0, effectiveHorizontalWidth - horizontalPadding * 2)
+    readonly property real primaryOutlineExtent: grouped ? outlineThickness * 2 : 0
+    property real availableWidth: allottedPrimarySize > 0 ? allottedPrimarySize : maxWidth + primaryOutlineExtent
+    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !hasWindowsOnCurrentWorkspace ? 0 : Theme.snap(Math.min(contentItem?.naturalWidth ?? 0, maxWidth - horizontalPadding * 2) + horizontalPadding * 2, dpr) + primaryOutlineExtent
+    readonly property real minimumPrimarySize: isVerticalOrientation ? height : Math.min(naturalPrimarySize, Theme.snap((contentItem?.minimumWidth ?? 0) + horizontalPadding * 2, dpr) + primaryOutlineExtent)
+    readonly property real effectiveHorizontalWidth: Math.max(0, Math.min(maxWidth + primaryOutlineExtent, availableWidth))
+    readonly property real effectiveHorizontalInnerWidth: Math.max(0, effectiveHorizontalWidth - horizontalPadding * 2 - primaryOutlineExtent)
     property var activeWindow: null
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
@@ -111,8 +112,8 @@ BasePill {
         return CompositorService.windowOnActiveWorkspace(screenName, activeWindow, popoutVisible);
     }
 
-    width: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? barThickness : (effectiveHorizontalInnerWidth > 0 ? visualWidth : 0)) : 0
-    height: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? visualHeight : barThickness) : 0
+    width: hasWindowsOnCurrentWorkspace && (isVerticalOrientation || effectiveHorizontalInnerWidth > 0) ? pillWidth : 0
+    height: hasWindowsOnCurrentWorkspace ? pillHeight : 0
     visible: hasWindowsOnCurrentWorkspace && (isVerticalOrientation || effectiveHorizontalInnerWidth > 0)
 
     content: Component {
@@ -140,14 +141,14 @@ BasePill {
                 return Math.min(contentRow.implicitWidth, root.effectiveHorizontalInnerWidth);
             }
             width: root.isVerticalOrientation ? root.contentThickness : Math.min(implicitWidth, root.effectiveHorizontalInnerWidth)
-            implicitHeight: root.contentThickness
+            implicitHeight: root.grouped && !root.isVerticalOrientation ? Math.max(root.contentThickness, contentRow.implicitHeight) : root.contentThickness
             clip: false
 
             IconImage {
                 id: appIcon
                 anchors.centerIn: parent
-                width: 18
-                height: 18
+                width: root.grouped ? Math.min(18, root.widgetThickness) : 18
+                height: width
                 visible: root.isVerticalOrientation && activeWindow && status === Image.Ready
                 source: {
                     if (!activeWindow || !activeWindow.appId)
@@ -169,7 +170,7 @@ BasePill {
 
             DIcon {
                 anchors.centerIn: parent
-                size: 18
+                size: root.grouped ? Math.min(18, root.widgetThickness) : 18
                 name: "sports_esports"
                 color: root.contentColor
                 visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && Paths.isSteamApp(activeWindow.appId)
@@ -192,7 +193,7 @@ BasePill {
                 clip: true
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width
-                height: root.barThickness
+                height: root.grouped ? Math.max(root.hitThickness, contentRow.implicitHeight) : root.hitThickness
 
                 Row {
                     id: contentRow
@@ -201,7 +202,7 @@ BasePill {
                     spacing: Theme.spacingS
                     visible: !root.isVerticalOrientation
 
-                    readonly property real iconSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    readonly property real iconSize: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
 
                     IconImage {
                         id: horizontalAppIcon

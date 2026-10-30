@@ -32,7 +32,7 @@ BasePill {
     property real micAccumulator: 0
     property real volumeAccumulator: 0
     property real brightnessAccumulator: 0
-    readonly property real vIconSize: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+    readonly property real vIconSize: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
     property var _hRow: null
     property var _vCol: null
     property var _hAudio: null
@@ -293,7 +293,7 @@ BasePill {
     }
 
     function getControlCenterIconSize() {
-        return Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale);
+        return Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale));
     }
 
     function getEffectiveControlCenterGroupOrder() {
@@ -436,8 +436,8 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: root.isVerticalOrientation ? root.contentThickness : controlIndicators.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? controlColumn.implicitHeight : root.contentThickness
+            implicitWidth: root.isVerticalOrientation ? (root.grouped ? Math.max(root.contentThickness, controlColumn.implicitWidth) : root.contentThickness) : controlIndicators.implicitWidth
+            implicitHeight: root.isVerticalOrientation ? controlColumn.implicitHeight : (root.grouped ? Math.max(root.contentThickness, controlIndicators.implicitHeight) : root.contentThickness)
 
             Component.onCompleted: {
                 root._hRow = controlIndicators;
@@ -448,7 +448,7 @@ BasePill {
             Column {
                 id: controlColumn
                 visible: root.isVerticalOrientation
-                width: parent.width
+                width: root.grouped ? implicitWidth : parent.width
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: Theme.spacingXS
 
@@ -460,7 +460,8 @@ BasePill {
                         required property int index
                         property string interactionGroupId: modelData.id
 
-                        width: parent.width
+                        implicitWidth: Math.max(root.vIconSize, audioPercentV.visible ? audioPercentV.implicitWidth : 0, micPercentV.visible ? micPercentV.implicitWidth : 0, brightnessPercentV.visible ? brightnessPercentV.implicitWidth : 0)
+                        width: root.grouped ? implicitWidth : parent.width
                         height: {
                             switch (modelData.id) {
                             case "audio":
@@ -615,7 +616,8 @@ BasePill {
                 }
 
                 Item {
-                    width: parent.width
+                    implicitWidth: root.vIconSize
+                    width: root.grouped ? implicitWidth : parent.width
                     height: root.vIconSize
                     visible: root.hasNoVisibleIcons()
 
@@ -656,7 +658,7 @@ BasePill {
                             }
                         }
                         implicitWidth: width
-                        height: root.contentThickness
+                        height: root.grouped ? Math.max(root.contentThickness, modelData.id === "audio" ? audioContent.implicitHeight : modelData.id === "microphone" ? micContent.implicitHeight : modelData.id === "brightness" ? brightnessContent.implicitHeight : iconOnlyItem.height) : root.contentThickness
                         visible: modelData.visible
 
                         Component.onCompleted: {

@@ -162,8 +162,8 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: battery.isVerticalOrientation ? (battery.widgetThickness - battery.horizontalPadding * 2) : batteryContent.implicitWidth
-            implicitHeight: battery.isVerticalOrientation ? batteryColumn.implicitHeight : (battery.widgetThickness - battery.horizontalPadding * 2)
+            implicitWidth: battery.isVerticalOrientation ? (battery.grouped ? Math.max(battery.contentThickness, batteryColumn.implicitWidth) : battery.contentThickness) : batteryContent.implicitWidth
+            implicitHeight: battery.isVerticalOrientation ? batteryColumn.implicitHeight : (battery.grouped ? Math.max(battery.contentThickness, batteryContent.implicitHeight) : battery.contentThickness)
 
             Column {
                 id: batteryColumn
@@ -174,7 +174,7 @@ BasePill {
                 DIcon {
                     name: BatteryService.getBatteryIcon()
                     visible: !battery.pillStyle
-                    size: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
+                    size: Math.min(battery.grouped ? battery.widgetThickness : Infinity, Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale))
                     color: {
                         if (!BatteryService.batteryAvailable) {
                             return Theme.widgetIconColor;
@@ -209,7 +209,7 @@ BasePill {
                     levelColors: battery.levelColors
                     colorOverride: battery.critical ? battery.criticalForeground : "transparent"
                     maxDiameter: battery.widgetThickness - Theme.spacingXS
-                    thickness: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
+                    thickness: Math.min(battery.grouped ? battery.widgetThickness : Infinity, Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale))
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -232,7 +232,7 @@ BasePill {
                 DIcon {
                     name: BatteryService.getBatteryIcon()
                     visible: !battery.pillStyle
-                    size: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
+                    size: Math.min(battery.grouped ? battery.widgetThickness : Infinity, Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale))
                     color: {
                         if (!BatteryService.batteryAvailable) {
                             return Theme.widgetIconColor;
@@ -266,7 +266,7 @@ BasePill {
                     levelColors: battery.levelColors
                     colorOverride: battery.critical ? battery.criticalForeground : "transparent"
                     maxDiameter: battery.widgetThickness - Theme.spacingXS
-                    thickness: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
+                    thickness: Math.min(battery.grouped ? battery.widgetThickness : Infinity, Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale))
                     fontSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     anchors.verticalCenter: parent.verticalCenter
                 }

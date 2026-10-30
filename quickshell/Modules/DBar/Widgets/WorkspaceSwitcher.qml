@@ -27,7 +27,8 @@ BasePill {
     readonly property bool dotsStyle: indicatorStyle === "dots"
     readonly property real roundness: root.opt("workspaceIndicatorRoundness")
     readonly property bool compactIndicators: root.opt("workspaceIndicatorCompact")
-    readonly property bool segmented: !linesStyle && !cardsStyle && !dotsStyle && surfaceContext?.kind !== "dock" && BarMetrics.widgetStyle(barConfig) === "segments" && !noBackground
+    readonly property string workspacePillStyle: grouped ? groupContext.style : BarMetrics.widgetStyle(barConfig)
+    readonly property bool segmented: !linesStyle && !cardsStyle && !dotsStyle && surfaceContext?.kind !== "dock" && workspacePillStyle === "segments" && !noBackground
     readonly property real compactRatio: BarMetrics.indicatorRatio(indicatorStyle, "compact", compactIndicators)
     readonly property real slimRatio: BarMetrics.indicatorRatio(indicatorStyle, "slim", compactIndicators)
     readonly property real activeSlimRatio: BarMetrics.indicatorRatio(indicatorStyle, "activeSlim", compactIndicators)
@@ -208,8 +209,8 @@ BasePill {
 
     readonly property bool shouldShow: workspaces.available
 
-    width: shouldShow ? (isVertical ? barThickness : visualWidth) : 0
-    height: shouldShow ? (isVertical ? visualHeight : barThickness) : 0
+    width: shouldShow ? pillWidth : 0
+    height: shouldShow ? pillHeight : 0
     visible: shouldShow
 
     content: Component {
@@ -255,13 +256,15 @@ BasePill {
         anchors.centerIn: root.visualContent
         spacing: root.segmented ? BarMetrics.segmentGap : Theme.spacingS
         vertical: root.isVertical
+        readonly property real crossSize: root.isVertical ? implicitWidth : implicitHeight
+        scale: root.grouped && crossSize > root.widgetThickness ? root.widgetThickness / crossSize : 1
 
         // mango reports active_tags=0 while the overview is open; surface it as a pill
         Item {
             id: overviewPill
             visible: CompositorService.workspacesHiddenByOverview(root.effectiveScreenName)
-            width: root.isVertical ? root.widgetThickness : overviewBg.width
-            height: root.isVertical ? overviewBg.height : root.widgetThickness
+            width: root.isVertical ? (root.grouped ? Math.max(root.widgetThickness, overviewBg.width) : root.widgetThickness) : overviewBg.width
+            height: root.isVertical ? overviewBg.height : (root.grouped ? Math.max(root.widgetThickness, overviewBg.height) : root.widgetThickness)
 
             readonly property real labelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
 
@@ -270,7 +273,7 @@ BasePill {
                 anchors.centerIn: parent
                 width: root.isVertical ? Math.max(root.widgetThickness * root.compactRatio, overviewContent.implicitWidth + Theme.spacingS) : (overviewContent.implicitWidth + Theme.spacingS * 2)
                 height: Math.max(root.widgetThickness * root.slimRatio, overviewContent.implicitHeight + Theme.spacingXS)
-                radius: BarMetrics.pillRadius(Math.min(width, height), BarMetrics.widgetStyle(root.barConfig))
+                radius: BarMetrics.pillRadius(Math.min(width, height), root.workspacePillStyle)
                 color: Theme.withAlpha(Theme.primary, root.overviewTintAlpha)
 
                 Row {
@@ -744,8 +747,8 @@ BasePill {
                     return CompositorService.focusWindow(winId);
                 }
 
-                width: root.isVertical ? root.widgetThickness : visualWidth
-                height: root.isVertical ? visualHeight : root.widgetThickness
+                width: root.isVertical ? (root.grouped ? Math.max(root.widgetThickness, visualWidth, underline ? contentImplicitWidth + lineThickness + Theme.spacingXXS : 0) : root.widgetThickness) : visualWidth
+                height: root.isVertical ? visualHeight : (root.grouped ? Math.max(root.widgetThickness, visualHeight, underline ? contentImplicitHeight + lineThickness + Theme.spacingXXS : 0) : root.widgetThickness)
 
                 readonly property real outlineWidth: dragHandler.dragging || isUrgent || isDropTarget ? Theme.outlineWidthFocused : 0
                 readonly property color outlineColor: dragHandler.dragging ? Theme.primary : (isUrgent ? urgentColor : (isDropTarget ? Theme.primary : Theme.withAlpha(Theme.primary, 0)))
@@ -770,8 +773,8 @@ BasePill {
 
                 Rectangle {
                     id: focusedBorderRing
-                    x: root.isVertical ? (root.widgetThickness - width) / 2 + delegateRoot.underlineLineShift : (parent.width - width) / 2
-                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetThickness - height) / 2 + delegateRoot.underlineLineShift
+                    x: root.isVertical ? (parent.width - width) / 2 + delegateRoot.underlineLineShift : (parent.width - width) / 2
+                    y: root.isVertical ? (parent.height - height) / 2 : (parent.height - height) / 2 + delegateRoot.underlineLineShift
                     width: {
                         const borderWidth = (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0;
                         return delegateRoot.visualWidth + borderWidth * 2;
@@ -829,10 +832,10 @@ BasePill {
                     id: visualContent
                     width: delegateRoot.visualWidth
                     height: delegateRoot.visualHeight
-                    x: root.isVertical ? (root.widgetThickness - width) / 2 + delegateRoot.underlineLineShift : (parent.width - width) / 2
-                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetThickness - height) / 2 + delegateRoot.underlineLineShift
+                    x: root.isVertical ? (parent.width - width) / 2 + delegateRoot.underlineLineShift : (parent.width - width) / 2
+                    y: root.isVertical ? (parent.height - height) / 2 : (parent.height - height) / 2 + delegateRoot.underlineLineShift
                     thickness: Math.min(width, height)
-                    style: BarMetrics.widgetStyle(root.barConfig)
+                    style: root.workspacePillStyle
                     vertical: root.isVertical
                     joinedStart: root.segmented && index > 0
                     joinedEnd: root.segmented && index < workspaceRepeater.count - 1

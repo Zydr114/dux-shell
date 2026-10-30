@@ -12,6 +12,27 @@ Item {
     readonly property alias item: widgetLoader.item
     readonly property var widgetItem: widgetLoader.item
     readonly property bool active: widgetLoader.active
+    property bool supportsGroup: false
+    readonly property var groupConfig: {
+        const groups = sectionContext.barConfig?.widgetGroups;
+        const id = itemData.groupId;
+        if (!supportsGroup || OverflowLayout.pinned(itemData.widgetId) || typeof id !== "string" || !groups || !Object.prototype.hasOwnProperty.call(groups, id))
+            return null;
+        const config = groups[id];
+        return config && typeof config === "object" && !Array.isArray(config) ? config : null;
+    }
+    readonly property string groupId: groupConfig ? itemData.groupId : ""
+    readonly property var groupContext: !groupConfig ? null : ({
+            id: groupId,
+            style: groupConfig.style === "segments" ? "segments" : "pills",
+            tone: groupConfig.tone === "primary" ? "primary" : "surface",
+            outlineThickness: sectionContext.groupMetrics(groupConfig).outline
+        })
+    onWidgetItemChanged: Qt.callLater(updateGroupSupport)
+
+    function updateGroupSupport() {
+        supportsGroup = !!widgetItem && "groupContext" in widgetItem;
+    }
     readonly property bool itemVisible: widgetItem?.visible ?? false
     readonly property bool effectiveVisible: widgetItem?.effectiveVisible ?? true
     readonly property real itemWidth: widgetItem?.width ?? 0
@@ -23,7 +44,7 @@ Item {
     readonly property real minimumSize: available && widgetItem && "minimumPrimarySize" in widgetItem ? Math.min(preferredSize, widgetItem.minimumPrimarySize) : preferredSize
     readonly property real allottedSize: sectionContext.allottedSizes[occurrenceOrder] ?? 0
     readonly property string overflowMode: OverflowLayout.placement(itemData, sectionContext.overflowDefaultMode)
-    readonly property bool inOverflow: overflowMode === "always" || sectionContext.overflowIndices.includes(occurrenceOrder)
+    readonly property bool inOverflow: (!groupContext && overflowMode === "always") || sectionContext.overflowIndices.includes(occurrenceOrder)
     readonly property bool inPopup: inOverflow && sectionContext.overflowOpen && !!sectionContext.overflowParent
     readonly property bool participates: available && !inOverflow
     readonly property bool presentationLive: !inOverflow || inPopup
@@ -31,7 +52,7 @@ Item {
     property real popupY: 0
 
     visible: active && widgetLoader.widgetEnabled && !inOverflow
-    width: participates ? (sectionContext.isVertical ? sectionContext.width : itemWidth) : 0
+    width: participates ? (sectionContext.isVertical && !groupContext ? sectionContext.width : itemWidth) : 0
     height: participates ? itemHeight : 0
 
     Item {
@@ -55,16 +76,18 @@ Item {
             sectionContext: root.sectionContext
             widgetData: root.itemData
             occurrenceOrder: root.occurrenceOrder
+            groupContext: root.groupContext
+            widgetThickness: root.groupConfig ? root.sectionContext.groupMetrics(root.groupConfig).widgetThickness : root.sectionContext.widgetThickness
             isFirst: !root.inOverflow && root.sectionContext.inlineOrder[0] === root.occurrenceOrder
             isLast: !root.inOverflow && root.sectionContext.inlineOrder[root.sectionContext.inlineOrder.length - 1] === root.occurrenceOrder
-            sectionSpacing: root.inOverflow ? 0 : root.sectionContext.widgetSpacing
+            sectionSpacing: root.inOverflow || root.groupContext ? 0 : root.sectionContext.widgetSpacing
             segmentRole: root.inOverflow ? "solo" : root.sectionContext.roleAt(root.occurrenceOrder)
             blurBarWindow: root.inOverflow ? null : root.sectionContext.blurBarWindow
-            isLeftBarEdge: !root.inOverflow && !isInColumn && section === "left" && root.sectionContext.edgeIsScreenEdge
-            isRightBarEdge: !root.inOverflow && !isInColumn && section === "right" && root.sectionContext.edgeIsScreenEdge
-            isTopBarEdge: !root.inOverflow && isInColumn && section === "left" && root.sectionContext.edgeIsScreenEdge
-            isBottomBarEdge: !root.inOverflow && isInColumn && section === "right" && root.sectionContext.edgeIsScreenEdge
-            crossEdgeExtension: !root.inOverflow && !isInColumn && section !== "center" ? root.sectionContext.crossEdgeExtension : 0
+            isLeftBarEdge: !root.inOverflow && !root.groupContext && !isInColumn && section === "left" && root.sectionContext.edgeIsScreenEdge
+            isRightBarEdge: !root.inOverflow && !root.groupContext && !isInColumn && section === "right" && root.sectionContext.edgeIsScreenEdge
+            isTopBarEdge: !root.inOverflow && !root.groupContext && isInColumn && section === "left" && root.sectionContext.edgeIsScreenEdge
+            isBottomBarEdge: !root.inOverflow && !root.groupContext && isInColumn && section === "right" && root.sectionContext.edgeIsScreenEdge
+            crossEdgeExtension: !root.inOverflow && !root.groupContext && !isInColumn && section !== "center" ? root.sectionContext.crossEdgeExtension : 0
             allottedPrimarySize: root.inOverflow ? 0 : root.allottedSize
             overflowAnchor: root.inOverflow ? root.sectionContext.overflowButton : null
             overflowSurface: root.inOverflow ? root.sectionContext.overflowSurface : null

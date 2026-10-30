@@ -42,6 +42,10 @@ BarSection {
             start = Math.min(start, pos);
             end = Math.max(end, pos + size);
         }
+        for (const group of groupGeometries) {
+            start = Math.min(start, group.position);
+            end = Math.max(end, group.position + group.size);
+        }
         contentStart = start;
         contentSize = end - start;
     }
@@ -70,17 +74,26 @@ BarSection {
                 overflowButtonPosition = layout.positions[index];
                 continue;
             }
-            const widget = widgets[inline.indices[index]];
-            if (!widget || layout.positions[index] === null)
+            if (layout.positions[index] === null)
                 continue;
-            if (isVertical) {
-                widget.anchors.verticalCenter = undefined;
-                widget.y = layout.positions[index];
-                continue;
+            const unit = inline.units[index];
+            for (let memberIndex = 0; memberIndex < unit.members.length; memberIndex++) {
+                const widget = widgets[unit.members[memberIndex]];
+                if (!widget)
+                    continue;
+                const position = layout.positions[index] + unit.offsets[memberIndex];
+                if (isVertical) {
+                    widget.anchors.verticalCenter = undefined;
+                    widget.y = position;
+                    widget.x = (width - widget.width) / 2;
+                    continue;
+                }
+                widget.anchors.horizontalCenter = undefined;
+                widget.x = position;
+                widget.y = (height - widget.height) / 2;
             }
-            widget.anchors.horizontalCenter = undefined;
-            widget.x = layout.positions[index];
         }
+        updateGroups(inline.units, layout.positions);
         centerWidgets = widgets.filter(widget => widget !== null);
         if (overflowButton)
             centerWidgets.push(overflowButton);
@@ -92,8 +105,8 @@ BarSection {
     width: parent.width
     anchors.centerIn: parent
 
-    implicitWidth: isVertical ? widgetThickness : totalSize
-    implicitHeight: isVertical ? totalSize : widgetThickness
+    implicitWidth: isVertical ? Math.max(widgetThickness, groupCrossThickness) : totalSize
+    implicitHeight: isVertical ? totalSize : Math.max(widgetThickness, groupCrossThickness)
 
     Timer {
         id: layoutTimer

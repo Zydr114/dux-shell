@@ -44,8 +44,8 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: root.isVerticalOrientation ? root.contentThickness : contentRow.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? contentColumn.implicitHeight : root.contentThickness
+            implicitWidth: root.isVerticalOrientation ? (root.grouped ? Math.max(root.contentThickness, contentColumn.implicitWidth) : root.contentThickness) : contentRow.implicitWidth
+            implicitHeight: root.isVerticalOrientation ? contentColumn.implicitHeight : (root.grouped ? Math.max(root.contentThickness, contentRow.implicitHeight) : root.contentThickness)
 
             FontMetrics {
                 id: labelMetrics
@@ -60,7 +60,7 @@ BasePill {
 
                 DIcon {
                     name: "keyboard"
-                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                     color: root.contentColor
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showIcon
@@ -86,7 +86,7 @@ BasePill {
 
                 DIcon {
                     name: "keyboard"
-                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                     color: root.contentColor
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.showIcon

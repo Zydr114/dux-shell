@@ -270,6 +270,14 @@ Item {
 
     property var blurRegion: null
     property var _blurWidgetItems: []
+    readonly property bool backgroundBlurEnabled: BlurService.enabledFor(barConfig?.blur)
+    readonly property bool scopedBlurRequested: BlurService.requestedFor(barConfig?.blur) || Object.values(barConfig?.widgetGroups ?? {}).some(group => group?.blur === "on")
+    readonly property bool blurEnabled: BlurService.available && scopedBlurRequested
+
+    onScopedBlurRequestedChanged: {
+        if (scopedBlurRequested)
+            BlurService.probe();
+    }
 
     function registerBlurWidget(item) {
         if (_blurWidgetItems.indexOf(item) >= 0)
@@ -481,19 +489,20 @@ Item {
         id: barBlur
         visible: false
 
-        readonly property bool barHasTransparency: !barWindow.isIsland && barWindow._backgroundAlpha > 0 && barWindow._backgroundAlpha < 1
-        readonly property bool islandTranslucent: !!barWindow.islandHost && barWindow.islandHost.surfaceOpacity > 0 && barWindow.islandHost.surfaceOpacity < 1
+        readonly property bool barHasTransparency: barWindow.backgroundBlurEnabled && !barWindow.isIsland && barWindow._backgroundAlpha > 0 && barWindow._backgroundAlpha < 1
+        readonly property bool islandTranslucent: barWindow.backgroundBlurEnabled && !!barWindow.islandHost && barWindow.islandHost.surfaceOpacity > 0 && barWindow.islandHost.surfaceOpacity < 1
         readonly property bool islandNotch: barWindow.islandHost?.notch ?? false
-        readonly property bool satelliteTranslucent: barWindow.islandSatelliteBackground && barWindow.islandSatellitesEnabled && barWindow.islandSatelliteOpacity > 0 && barWindow.islandSatelliteOpacity < 1
+        readonly property bool satelliteTranslucent: barWindow.backgroundBlurEnabled && barWindow.islandSatelliteBackground && barWindow.islandSatellitesEnabled && barWindow.islandSatelliteOpacity > 0 && barWindow.islandSatelliteOpacity < 1
+        readonly property bool frameOwnsBlur: FrameTransitionState.effectiveFrameEnabled && barWindow.usesFrameBarChrome && BlurService.enabled && SettingsData.frameBlurEnabled
 
         function rebuild() {
             teardown();
-            if (!BlurService.enabled || !BlurService.available)
+            if (!barWindow.blurEnabled)
                 return;
             if (!barWindow.barRevealed && CompositorService.isHyprland)
                 return;
             // FrameWindow owns the blur region for the whole edge while the bar wears frame chrome
-            if (FrameTransitionState.effectiveFrameEnabled && barWindow.usesFrameBarChrome)
+            if (frameOwnsBlur)
                 return;
 
             const widgets = barWindow._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
@@ -587,8 +596,9 @@ Item {
         onIslandTranslucentChanged: _blurRebuildTimer.restart()
         onIslandNotchChanged: _blurRebuildTimer.restart()
         onSatelliteTranslucentChanged: _blurRebuildTimer.restart()
+        onFrameOwnsBlurChanged: _blurRebuildTimer.restart()
 
-        readonly property bool blurServiceEnabled: BlurService.enabled
+        readonly property bool blurServiceEnabled: barWindow.blurEnabled
         readonly property bool frameEffectiveEnabled: FrameTransitionState.effectiveFrameEnabled
 
         onBlurServiceEnabledChanged: rebuild()

@@ -19,7 +19,7 @@ BasePill {
                 id: icon
                 anchors.centerIn: parent
                 name: SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle"
-                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                 color: SessionService.idleInhibited ? inhibitColor : idleColor
             }
         }

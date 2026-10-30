@@ -113,7 +113,7 @@ BasePill {
                 id: icon
                 anchors.centerIn: parent
                 name: root.dropConfirmed ? "check" : "content_paste"
-                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                 color: root.dropConfirmed || draggingOver ? Theme.primary : Theme.widgetIconColor
                 scale: draggingOver ? 1.2 : 1.0
 

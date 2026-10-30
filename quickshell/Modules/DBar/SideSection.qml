@@ -16,7 +16,7 @@ BarSection {
     onYChanged: refreshBlur()
 
     implicitHeight: isVertical ? contentSize : contentThickness
-    implicitWidth: isVertical ? widgetThickness : contentSize
+    implicitWidth: isVertical ? Math.max(widgetThickness, groupCrossThickness) : contentSize
 
     onSegmentedChanged: rolesTimer.restart()
 
@@ -34,14 +34,19 @@ BarSection {
         applyRoles(entries, participating);
         const layout = inlineLayout();
         contentSize = layout.totalSize;
-        let thickness = overflowCount > 0 ? barThickness : 0;
+        updateGroups(layout.units);
+        let thickness = Math.max(overflowCount > 0 ? barThickness : 0, groupCrossThickness);
+        for (let index = 0; index < repeater.count; index++) {
+            const wrapper = repeater.itemAt(index);
+            if (wrapper && layout.positions[index] !== null)
+                thickness = Math.max(thickness, wrapper.itemHeight);
+        }
         for (let index = 0; index < repeater.count; index++) {
             const wrapper = repeater.itemAt(index);
             if (!wrapper || layout.positions[index] === null)
                 continue;
-            thickness = Math.max(thickness, wrapper.itemHeight);
-            wrapper.x = isVertical ? 0 : layout.positions[index];
-            wrapper.y = isVertical ? layout.positions[index] : 0;
+            wrapper.x = isVertical ? (width - wrapper.width) / 2 : layout.positions[index];
+            wrapper.y = isVertical ? layout.positions[index] : (thickness - wrapper.height) / 2;
         }
         contentThickness = thickness;
         overflowButtonPosition = layout.buttonPosition ?? 0;

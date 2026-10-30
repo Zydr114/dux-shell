@@ -274,15 +274,15 @@ BasePill {
             }
             readonly property real visualWidth: root.compactMode ? root.iconCellSize : (root.iconCellSize + Theme.spacingXS + 120)
 
-            width: root.isVerticalOrientation ? root.barThickness : visualWidth
-            height: root.isVerticalOrientation ? root.iconCellSize : root.barThickness
+            width: root.isVerticalOrientation ? root.hitThickness : visualWidth
+            height: root.isVerticalOrientation ? root.iconCellSize : root.hitThickness
 
             BarPillSurface {
                 id: visualContent
                 width: delegateItem.visualWidth
                 height: root.iconCellSize
                 anchors.centerIn: parent
-                style: BarMetrics.widgetStyle(root.barConfig)
+                style: root.grouped ? root.groupContext.style : BarMetrics.widgetStyle(root.barConfig)
                 pressed: mouseArea.pressed
                 color: isFocused ? Theme.selectedContainer : "transparent"
 

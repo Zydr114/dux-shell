@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.Modules.SurfaceWidgets
 import qs.DCommon.Widgets
 import qs.Widgets
@@ -17,24 +18,44 @@ Item {
     readonly property bool open: popout?.shouldBeVisible ?? false
     readonly property var popupParent: popout?.contentLoader.item?.widgetHost ?? null
     readonly property var entries: sectionContext.hiddenEntries
-    readonly property real naturalWidth: entries.reduce((width, entry) => Math.max(width, entry.itemWidth), 0)
-    readonly property real naturalHeight: entries.reduce((height, entry) => height + entry.itemHeight, 0) + Math.max(0, entries.length - 1) * Theme.spacingS
-    readonly property real popupWidth: Math.min(naturalWidth + Theme.spacingS * 2, (sectionContext.parentScreen?.width ?? Infinity) - Theme.spacingL * 2)
-    readonly property real popupHeight: Math.min(naturalHeight + Theme.spacingS * 2, (sectionContext.parentScreen?.height ?? Infinity) - Theme.spacingL * 2)
+    readonly property real dpr: CompositorService.getScreenScale(sectionContext.parentScreen)
+    readonly property var layoutEntries: entries.map(entry => ({
+                size: entry.itemHeight,
+                groupId: entry.groupId ?? "",
+                groupPadding: root.metric(entry.groupConfig?.padding, Theme.spacingXS, Theme.spacingXL),
+                groupSpacing: root.metric(entry.groupConfig?.spacing, Theme.spacingXS, Theme.spacingM)
+            }))
+    readonly property var layout: OverflowLayout.section(layoutEntries, [], Theme.spacingS, 0, layoutEntries.length)
+    readonly property var groupUnits: layout.units.filter(unit => unit.groupId && unit.members.length > 0)
+    readonly property real naturalWidth: layout.units.reduce((width, unit) => Math.max(width, root.unitWidth(unit)), 0)
+    readonly property real naturalHeight: layout.totalSize
+    readonly property real popupWidth: Math.max(0, Math.min(naturalWidth + Theme.spacingS * 2, (sectionContext.parentScreen?.width ?? Infinity) - Theme.spacingL * 2))
+    readonly property real popupHeight: Math.max(0, Math.min(naturalHeight + Theme.spacingS * 2, (sectionContext.parentScreen?.height ?? Infinity) - Theme.spacingL * 2))
     readonly property real contentWidth: Math.max(naturalWidth, popupWidth - Theme.spacingS * 2)
 
     onWantOpenChanged: sectionContext.overflowWanted = wantOpen
     Component.onDestruction: sectionContext.overflowWanted = false
     onEntriesChanged: positionEntries()
-    onNaturalHeightChanged: positionEntries()
+    onLayoutChanged: positionEntries()
     onContentWidthChanged: positionEntries()
 
+    function metric(value, fallback, maximum) {
+        const numeric = Number(value ?? fallback);
+        return Theme.px(Math.max(0, Math.min(maximum, Number.isFinite(numeric) ? numeric : fallback)), root.dpr);
+    }
+
+    function unitWidth(unit) {
+        if (!unit?.members.length)
+            return 0;
+        const width = unit.members.reduce((largest, index) => Math.max(largest, root.entries[index]?.itemWidth ?? 0), 0);
+        return width + unit.padding * 2;
+    }
+
     function positionEntries() {
-        let y = 0;
-        for (const entry of entries) {
+        for (let index = 0; index < entries.length; index++) {
+            const entry = entries[index];
             entry.popupX = (contentWidth - entry.itemWidth) / 2;
-            entry.popupY = y;
-            y += entry.itemHeight + Theme.spacingS;
+            entry.popupY = layout.positions[index] ?? 0;
         }
     }
 
@@ -133,6 +154,27 @@ Item {
                             contentHeight: root.naturalHeight
                             flickableDirection: Flickable.AutoFlickIfNeeded
                             clip: true
+
+                            Repeater {
+                                parent: scroller.contentItem
+                                model: root.groupUnits.length
+
+                                BarGroup {
+                                    required property int index
+                                    readonly property var unit: root.groupUnits[index]
+
+                                    z: -1
+                                    groupId: unit?.groupId ?? ""
+                                    groupConfig: root.entries[unit?.sourceIndices[0]]?.groupConfig ?? null
+                                    barConfig: root.sectionContext.barConfig
+                                    blurBarWindow: null
+                                    isVertical: true
+                                    alongPosition: unit?.position ?? 0
+                                    alongSize: unit?.size ?? 0
+                                    crossPosition: (root.contentWidth - root.unitWidth(unit)) / 2
+                                    crossSize: root.unitWidth(unit)
+                                }
+                            }
                         }
                     }
                 }

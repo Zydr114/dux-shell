@@ -22,6 +22,7 @@ PanelWindow {
     readonly property int barPos: body.barPos
     readonly property bool barRevealed: body.barRevealed
     readonly property bool isIsland: body.isIsland
+    readonly property bool backgroundBlurEnabled: body.backgroundBlurEnabled
     readonly property var islandHost: body.islandHost
     readonly property var leadingSectionRect: body.leadingSectionRect
     readonly property var trailingSectionRect: body.trailingSectionRect
@@ -95,7 +96,7 @@ PanelWindow {
     implicitWidth: body.surfaceImplicitWidth
     exclusiveZone: manualPlacement ? -1 : body.surfaceExclusiveZone
 
-    BackgroundEffect.blurRegion: BlurService.enabled ? body.blurRegion : null
+    BackgroundEffect.blurRegion: body.blurEnabled ? body.blurRegion : null
 
     Component.onCompleted: {
         KeyboardFocus.registerBarWindow(barWindow);

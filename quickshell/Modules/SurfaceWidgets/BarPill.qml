@@ -17,6 +17,8 @@ Item {
     property real barThickness: 48
     property real barSpacing: 4
     property var barConfig: null
+    property var groupContext: null
+    readonly property bool grouped: groupContext !== null
     property bool widgetBackground: !(barConfig?.noBackground ?? false)
     property bool noBackground: !widgetBackground
     property var blurBarWindow: null
@@ -63,14 +65,18 @@ Item {
     readonly property bool trailingJoined: segmentRole === "middle" || segmentRole === "first"
     readonly property bool startJoined: isVerticalOrientation || !mirrored ? leadingJoined : trailingJoined
     readonly property bool endJoined: isVerticalOrientation || !mirrored ? trailingJoined : leadingJoined
-    readonly property real outerRadius: noBackground ? 0 : BarMetrics.pillRadius(widgetThickness, BarMetrics.widgetStyle(barConfig))
-    readonly property real innerRadius: noBackground ? 0 : BarMetrics.segmentInnerRadius
+    readonly property string effectivePillStyle: grouped ? groupContext.style : BarMetrics.widgetStyle(barConfig)
+    readonly property real outerRadius: noBackground && !grouped ? 0 : BarMetrics.pillRadius(widgetThickness, effectivePillStyle)
+    readonly property real innerRadius: noBackground && !grouped ? 0 : BarMetrics.segmentInnerRadius
     property var pressSource: null
     readonly property bool pressed: mouseArea.pressed || (pressSource?.pressed ?? false)
     property real pressProgress: pressed && enableBackgroundHover ? 1 : 0
     readonly property real blurRadius: segmentRole === "solo" ? outerRadius : innerRadius
     readonly property bool radiusMotion: !SettingsData.reduceMotion && !Theme.springMotionDisabled
-    readonly property real outlineThickness: (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? Theme.outlineWidth) : 0
+    readonly property real outlineThickness: grouped ? groupContext.outlineThickness : (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? Theme.outlineWidth) : 0
+    readonly property real hitThickness: grouped ? widgetThickness + outlineThickness * 2 : barThickness
+    readonly property real pillWidth: isVerticalOrientation ? hitThickness : visualWidth + (grouped ? outlineThickness * 2 : 0)
+    readonly property real pillHeight: isVerticalOrientation ? visualHeight + (grouped ? outlineThickness * 2 : 0) : hitThickness
     readonly property color outlineColor: {
         if (outlineThickness <= 0)
             return "transparent";
@@ -87,10 +93,12 @@ Item {
     readonly property color defaultFillColor: {
         if (noBackground)
             return "transparent";
+        if (grouped)
+            return Theme.withAlpha(groupContext.tone === "primary" ? Theme.primaryContainer : Theme.surfaceContainerHigh, SettingsData.barWidgetTransparency(barConfig));
         return BarMetrics.widgetFill(barConfig);
     }
     property color fillColor: defaultFillColor
-    readonly property bool shadowEnabled: barConfig?.island === true && !SettingsData.islandSetting(barConfig, "islandSatelliteBackground") && !noBackground && fillColor.a > 0 && Theme.elevationEnabled && SettingsData.barElevationEnabled
+    readonly property bool shadowEnabled: !grouped && barConfig?.island === true && !SettingsData.islandSetting(barConfig, "islandSatelliteBackground") && !noBackground && fillColor.a > 0 && Theme.elevationEnabled && SettingsData.barElevationEnabled
     readonly property string autoBarShadowDirection: axis?.edge ?? "top"
     readonly property string effectiveShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
 
@@ -114,9 +122,9 @@ Item {
     signal wheel(var wheelEvent)
 
     function cornerRadius(joined) {
-        if (noBackground)
+        if (noBackground && !grouped)
             return 0;
-        return BarMetrics.cornerRadius(widgetThickness, BarMetrics.widgetStyle(barConfig), joined, pressProgress);
+        return BarMetrics.cornerRadius(widgetThickness, effectivePillStyle, joined, pressProgress);
     }
 
     function triggerRipple(sourceItem, mouseX, mouseY) {
@@ -204,8 +212,8 @@ Item {
         };
     }
 
-    width: isVerticalOrientation ? barThickness : visualWidth
-    height: isVerticalOrientation ? visualHeight : barThickness
+    width: pillWidth
+    height: pillHeight
     enabled: width > 0 && height > 0
 
     Item {
@@ -292,7 +300,7 @@ Item {
                     bottomRightRadius: fill.bottomRightRadius
                     enableRipple: false
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    disabled: !root.enableBackgroundHover || root.noBackground
+                    disabled: !root.enableBackgroundHover || (root.noBackground && !root.grouped)
                     cursorShape: root.enableCursor ? Qt.PointingHandCursor : Qt.ArrowCursor
                     onContainsMouseChanged: visualContent.hovered = containsMouse
                     onPressed: mouse => root.handlePress(mouse, stateLayer)
@@ -321,6 +329,8 @@ Item {
             id: contentLoader
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
+            readonly property real crossSize: !item ? 0 : root.isVerticalOrientation ? Math.max(item.width, item.implicitWidth) : Math.max(item.height, item.implicitHeight)
+            scale: root.grouped && crossSize > root.widgetThickness ? root.widgetThickness / crossSize : 1
         }
     }
 
@@ -342,7 +352,7 @@ Item {
     }
 
     property var _blurRegisteredWindow: null
-    readonly property var _blurTargetWindow: BlurService.enabled && !!blurBarWindow && !!blurBarWindow.registerBlurWidget && !root.noBackground && root.visible && root.width > 0 && root.height > 0 ? blurBarWindow : null
+    readonly property var _blurTargetWindow: !root.grouped && (blurBarWindow?.backgroundBlurEnabled ?? BlurService.enabled) && !!blurBarWindow?.registerBlurWidget && !root.noBackground && root.fillColor.a > 0 && root.fillColor.a < 1 && root.visible && root.width > 0 && root.height > 0 ? blurBarWindow : null
 
     on_BlurTargetWindowChanged: _updateBlurRegistration()
 

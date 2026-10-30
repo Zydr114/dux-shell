@@ -29,8 +29,9 @@ BasePill {
     property var widgetData: null
     readonly property bool adaptiveWidthEnabled: SettingsData.widgetOption("music", widgetData, "mediaAdaptiveWidthEnabled")
     property real allottedPrimarySize: 0
-    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap((contentItem?.naturalContentWidth ?? 0) + horizontalPadding * 2, dpr)
-    readonly property real minimumPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap((contentItem?.fixedContentWidth ?? 0) + horizontalPadding * 2, dpr)
+    readonly property real primaryOutlineExtent: grouped ? outlineThickness * 2 : 0
+    readonly property real naturalPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap((contentItem?.naturalContentWidth ?? 0) + horizontalPadding * 2, dpr) + primaryOutlineExtent
+    readonly property real minimumPrimarySize: isVerticalOrientation ? height : !playerAvailable ? 0 : Theme.snap((contentItem?.fixedContentWidth ?? 0) + horizontalPadding * 2, dpr) + primaryOutlineExtent
     readonly property bool lyricsEnabled: SettingsData.widgetOption("music", widgetData, "mediaShowLyrics") && LyricsService.allowed
     readonly property bool coverArtEnabled: SettingsData.widgetOption("music", widgetData, "mediaShowCoverArt")
     readonly property string coverArtUrl: coverArtEnabled && activePlayer && TrackArtService.artReadyFor(activePlayer) ? TrackArtService.resolvedArtUrl : ""
@@ -250,13 +251,13 @@ BasePill {
                 return Math.min(root.maxTextWidth, Math.ceil(rawWidth));
             }
             readonly property real fixedContentWidth: root.badgeExtent + 64 * root.contentScale + Theme.spacingXS * 2
-            readonly property real textBudget: root.allottedPrimarySize > 0 ? Math.max(0, root.allottedPrimarySize - root.horizontalPadding * 2 - fixedContentWidth - Theme.spacingXS) : Infinity
+            readonly property real textBudget: root.allottedPrimarySize > 0 ? Math.max(0, root.allottedPrimarySize - root.primaryOutlineExtent - root.horizontalPadding * 2 - fixedContentWidth - Theme.spacingXS) : Infinity
             readonly property real measuredTextWidth: Math.min(naturalTextWidth, textBudget)
             readonly property real naturalContentWidth: fixedContentWidth + (naturalTextWidth > 0 ? naturalTextWidth + Theme.spacingXS : 0)
-            readonly property int horizontalContentWidth: fixedContentWidth + (measuredTextWidth > 0 ? measuredTextWidth + Theme.spacingXS : 0)
+            readonly property real horizontalContentWidth: fixedContentWidth + (measuredTextWidth > 0 ? measuredTextWidth + Theme.spacingXS : 0)
 
-            implicitWidth: root.playerAvailable ? (root.isVerticalOrientation ? root.currentContentWidth : horizontalContentWidth) : 0
-            implicitHeight: root.playerAvailable ? root.currentContentHeight : 0
+            implicitWidth: root.playerAvailable ? (root.isVerticalOrientation ? (root.grouped ? Math.max(root.contentThickness, verticalLayout.implicitWidth) : root.currentContentWidth) : horizontalContentWidth) : 0
+            implicitHeight: root.playerAvailable ? (root.grouped && !root.isVerticalOrientation ? Math.max(root.currentContentHeight, mediaRow.implicitHeight) : root.currentContentHeight) : 0
             opacity: root.playerAvailable ? 1 : 0
 
             Behavior on opacity {
@@ -364,7 +365,7 @@ BasePill {
 
                         anchors.verticalCenter: parent.verticalCenter
                         width: contentRoot.measuredTextWidth
-                        height: root.widgetThickness
+                        height: root.grouped ? Math.max(root.widgetThickness, mediaText.implicitTextHeight) : root.widgetThickness
                         visible: root.maxTextWidth > 0
                         clip: true
                         color: "transparent"

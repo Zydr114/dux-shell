@@ -17,8 +17,8 @@ BasePill {
     readonly property bool hideWhenIdle: widgetData?.hideWhenIdle === true
     readonly property bool shouldHide: hideWhenIdle && isClean
 
-    width: shouldHide ? 0 : (isVerticalOrientation ? barThickness : visualWidth)
-    height: shouldHide ? 0 : (isVerticalOrientation ? visualHeight : barThickness)
+    width: shouldHide ? 0 : pillWidth
+    height: shouldHide ? 0 : pillHeight
     visible: !shouldHide
     opacity: shouldHide ? 0 : 1
 
@@ -50,7 +50,7 @@ BasePill {
     content: Component {
         Item {
             implicitWidth: root.isVerticalOrientation ? root.widgetThickness : updaterIcon.implicitWidth
-            implicitHeight: root.widgetThickness
+            implicitHeight: root.grouped && !root.isVerticalOrientation ? Math.max(root.widgetThickness, updaterIcon.implicitHeight) : root.widgetThickness
 
             DIcon {
                 id: statusIcon
@@ -66,7 +66,7 @@ BasePill {
                         return "system_update_alt";
                     return "check_circle";
                 }
-                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                 color: {
                     if (SystemUpdateService.hasError)
                         return Theme.error;
@@ -121,7 +121,7 @@ BasePill {
                             return "system_update_alt";
                         return "check_circle";
                     }
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                     color: {
                         if (SystemUpdateService.hasError)
                             return Theme.error;

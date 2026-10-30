@@ -5,6 +5,7 @@ import qs.Common
 import qs.Services
 import "SegmentRoles.js" as SegmentRoles
 import "OverflowLayout.js" as OverflowLayout
+import "GroupLayout.js" as GroupLayout
 
 Item {
     id: root
@@ -32,6 +33,9 @@ Item {
     property string overflowSegmentRole: "solo"
     property var entryRepeater: null
     property int entryRevision: 0
+    property var groupGeometries: []
+    readonly property real groupCrossThickness: groupGeometries.reduce((thickness, group) => Math.max(thickness, group.thickness), 0)
+    readonly property real dpr: parentScreen ? CompositorService.getScreenScale(parentScreen) : 1
     readonly property alias parkingHost: parkingHost
     readonly property var overflowIndices: barContent?.overflowPlan?.hidden?.[section] ?? []
     readonly property string overflowDefaultMode: barConfig?.[section + "OverflowMode"] === "bar" ? "bar" : "auto"
@@ -42,11 +46,11 @@ Item {
         const entries = [];
         for (let index = 0; index < (entryRepeater?.count ?? 0); index++) {
             const wrapper = entryRepeater.itemAt(index);
-            entries.push({
+            entries.push(Object.assign(groupLayoutData(index), {
                 size: wrapper?.preferredSize ?? 0,
                 min: wrapper?.minimumSize ?? 0,
                 mode: wrapper?.overflowMode ?? "bar"
-            });
+            }));
         }
         return entries;
     }
@@ -54,9 +58,9 @@ Item {
         root.entryRevision;
         const entries = [];
         for (let index = 0; index < (entryRepeater?.count ?? 0); index++)
-            entries.push({
+            entries.push(Object.assign(groupLayoutData(index), {
                 size: entryRepeater.itemAt(index)?.primarySize ?? 0
-            });
+            }));
         return entries;
     }
     readonly property var allottedSizes: barContent?.overflowPlan?.sizes?.[section] ?? []
@@ -95,7 +99,7 @@ Item {
     }
     readonly property var inlineOrder: {
         const layout = inlineLayout();
-        return layout.indices.filter((index, position) => layout.sizes[position] !== null);
+        return layout.inlineIndices;
     }
     readonly property var leadingInlineItem: inlineItemAt(0)
     readonly property var trailingInlineItem: inlineItemAt(inlineOrder.length - 1)
@@ -118,6 +122,59 @@ Item {
     onOverflowPositionChanged: requestOverflowLayout()
     onOverflowTriggerSizeChanged: requestOverflowLayout()
     onWidgetSpacingChanged: requestOverflowLayout()
+    onBarThicknessChanged: requestOverflowLayout()
+    onWidgetThicknessChanged: requestOverflowLayout()
+    onOutlineThicknessChanged: requestOverflowLayout()
+
+    function groupFor(index) {
+        root.entryRevision;
+        const wrapper = entryRepeater?.itemAt(index);
+        return wrapper?.groupConfig ?? null;
+    }
+
+    function groupIdAt(index) {
+        return entryRepeater?.itemAt(index)?.groupId ?? "";
+    }
+
+    function groupMetric(value, fallback, maximum) {
+        const number = Number(value ?? fallback);
+        return Theme.px(Math.max(0, Math.min(maximum, Number.isFinite(number) ? number : fallback)), dpr);
+    }
+
+    function groupPadding(group) {
+        return groupMetric(group?.padding, Theme.spacingXS, Theme.spacingXL);
+    }
+
+    function groupMetrics(group) {
+        return GroupLayout.crossMetrics(widgetThickness, barThickness, outlineThickness, groupPadding(group));
+    }
+
+    function groupLayoutData(index) {
+        const group = groupFor(index);
+        if (!group)
+            return {};
+        return {
+            groupId: groupIdAt(index),
+            groupPadding: groupPadding(group),
+            groupSpacing: groupMetric(group.spacing, Theme.spacingXS, Theme.spacingM),
+            groupMode: group.overflowMode
+        };
+    }
+
+    function updateGroups(units, positions) {
+        const next = [];
+        for (let index = 0; index < units.length; index++) {
+            const unit = units[index];
+            const position = positions ? positions[index] : unit.position;
+            if (!unit.groupId || unit.members.length === 0 || position === null || position === undefined)
+                continue;
+            const config = groupFor(unit.members[0]);
+            if (config)
+                next.push({ id: unit.groupId, config, position, size: unit.size, thickness: groupMetrics(config).thickness });
+        }
+        if (JSON.stringify(next) !== JSON.stringify(groupGeometries))
+            groupGeometries = next;
+    }
 
     function requestOverflowLayout() {
         layoutRequested();
@@ -145,6 +202,24 @@ Item {
         clip: true
     }
 
+    Repeater {
+        model: root.groupGeometries.length
+        delegate: BarGroup {
+            required property int index
+            readonly property var geometry: root.groupGeometries[index]
+            z: -1
+            groupId: geometry?.id ?? ""
+            groupConfig: geometry?.config ?? null
+            barConfig: root.barConfig
+            blurBarWindow: root.blurBarWindow
+            isVertical: root.isVertical
+            alongPosition: geometry?.position ?? 0
+            alongSize: geometry?.size ?? 0
+            crossPosition: ((root.isVertical ? root.width : root.height) - crossSize) / 2
+            crossSize: geometry?.thickness ?? 0
+        }
+    }
+
     Loader {
         id: overflowLoader
         // Unloading while the popup is open destroys its window mid-flight and leaves a stale surface.
@@ -167,7 +242,7 @@ Item {
     }
 
     function roleAt(index) {
-        if (!segmented)
+        if (!segmented && !groupFor(index))
             return "solo";
         return roles[index] ?? "solo";
     }
@@ -181,6 +256,10 @@ Item {
     function applyRoles(entries, participating) {
         const allEntries = entries.slice();
         const allStates = participating.slice();
+        for (let index = 0; index < entries.length; index++) {
+            if (groupFor(index))
+                allStates[index] = false;
+        }
         if (overflowCount > 0) {
             allEntries.splice(overflowPosition, 0, {
                 widgetId: "overflow"
@@ -190,6 +269,24 @@ Item {
         const next = SegmentRoles.resolve(allEntries, allStates);
         const buttonRole = overflowCount > 0 ? next.splice(overflowPosition, 1)[0] : "solo";
         overflowSegmentRole = segmented ? buttonRole : "solo";
+        for (let index = 0; index < entries.length;) {
+            const group = groupFor(index);
+            const id = groupIdAt(index);
+            if (!group) {
+                index++;
+                continue;
+            }
+            const members = [];
+            do {
+                next[index] = "solo";
+                if (participating[index] === true)
+                    members.push(index);
+                index++;
+            } while (index < entries.length && groupIdAt(index) === id);
+            if (group.style !== "segments" || members.length < 2)
+                continue;
+            members.forEach((member, position) => next[member] = position === 0 ? "first" : position === members.length - 1 ? "last" : "middle");
+        }
         if (next.join() !== roles.join())
             roles = next;
     }

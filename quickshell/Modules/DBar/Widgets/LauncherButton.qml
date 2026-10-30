@@ -23,8 +23,8 @@ BasePill {
             LauncherLogo {
                 anchors.centerIn: parent
                 mode: root.opt("launcherLogoMode")
-                size: Theme.barIconSize(root.barThickness, root.opt("launcherLogoSizeOffset"), root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                appsIconSize: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, root.opt("launcherLogoSizeOffset"), root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
+                appsIconSize: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                 appsIconColor: Theme.widgetIconColor
                 colorOverride: root.opt("launcherLogoColorOverride")
                 brightness: root.opt("launcherLogoBrightness")

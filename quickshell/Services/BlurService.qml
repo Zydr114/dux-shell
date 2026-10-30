@@ -45,6 +45,14 @@ Singleton {
     }
     readonly property int borderWidth: (SettingsData.blurBorderEnabled ?? false) ? 1 : 0
 
+    function requestedFor(mode) {
+        return mode === "on" || (mode !== "off" && SettingsData.blurEnabled === true);
+    }
+
+    function enabledFor(mode) {
+        return available && requestedFor(mode);
+    }
+
     function hoverColor(baseColor, hoverAlpha) {
         if (!enabled)
             return baseColor;

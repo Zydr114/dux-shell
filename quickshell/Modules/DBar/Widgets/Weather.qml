@@ -18,10 +18,10 @@ BasePill {
                 if (!SettingsData.weatherEnabled)
                     return 0;
                 if (root.isVerticalOrientation)
-                    return root.contentThickness;
+                    return root.grouped ? Math.max(root.contentThickness, weatherColumn.implicitWidth) : root.contentThickness;
                 return Math.min(100 - root.horizontalPadding * 2, weatherRow.implicitWidth);
             }
-            implicitHeight: root.isVerticalOrientation ? weatherColumn.implicitHeight : root.contentThickness
+            implicitHeight: root.isVerticalOrientation ? weatherColumn.implicitHeight : (root.grouped ? Math.max(root.contentThickness, weatherRow.implicitHeight) : root.contentThickness)
 
             Column {
                 id: weatherColumn
@@ -31,7 +31,7 @@ BasePill {
 
                 DIcon {
                     name: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
-                    size: Theme.barIconSize(root.barThickness, -6, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, -6, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                     color: Theme.widgetIconColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -58,7 +58,7 @@ BasePill {
 
                 DIcon {
                     name: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
-                    size: Theme.barIconSize(root.barThickness, -6, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, -6, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                     color: Theme.widgetIconColor
                     anchors.verticalCenter: parent.verticalCenter
                 }

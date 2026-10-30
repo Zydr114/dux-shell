@@ -501,7 +501,7 @@ BasePill {
 
             Item {
                 width: root.trayItemSize
-                height: root.barThickness
+                height: root.hitThickness
                 visible: root.hasHiddenItems
 
                 BarPillSurface {
@@ -509,7 +509,7 @@ BasePill {
                     width: root.trayItemSize
                     height: root.trayItemSize
                     anchors.centerIn: parent
-                    style: BarMetrics.widgetStyle(root.barConfig)
+                    style: root.grouped ? root.groupContext.style : BarMetrics.widgetStyle(root.barConfig)
                     pressed: caretArea.pressed
                     color: Theme.withAlpha(Theme.onSurface, caretArea.pressed ? Theme.stateLayerPressed : caretArea.containsMouse ? Theme.stateLayerHover : 0)
 
@@ -567,8 +567,8 @@ BasePill {
             property string itemKey: modelData.key
             property string iconSource: root.trayIconSourceFor(trayItem)
 
-            width: root.isVerticalOrientation ? root.barThickness : (root.inlineExpanded ? root.trayItemSize : 0)
-            height: root.isVerticalOrientation ? (root.inlineExpanded ? root.trayItemSize : 0) : root.barThickness
+            width: root.isVerticalOrientation ? root.hitThickness : (root.inlineExpanded ? root.trayItemSize : 0)
+            height: root.isVerticalOrientation ? (root.inlineExpanded ? root.trayItemSize : 0) : root.hitThickness
             visible: width > 0 && height > 0
 
             Behavior on width {
@@ -593,7 +593,7 @@ BasePill {
                 height: root.trayItemSize
                 x: root.isVerticalOrientation ? Math.round((parent.width - width) / 2) : (root.reverseInlineHorizontal ? parent.width - width : 0)
                 y: root.isVerticalOrientation ? (root.reverseInlineVertical ? parent.height - height : 0) : Math.round((parent.height - height) / 2)
-                style: BarMetrics.widgetStyle(root.barConfig)
+                style: root.grouped ? root.groupContext.style : BarMetrics.widgetStyle(root.barConfig)
                 pressed: inlineTrayItemArea.pressed
                 color: Theme.withAlpha(Theme.onSurface, inlineTrayItemArea.pressed ? Theme.stateLayerPressed : inlineTrayItemArea.containsMouse ? Theme.stateLayerHover : 0)
                 opacity: root.inlineExpanded ? 1 : 0
@@ -656,8 +656,8 @@ BasePill {
             property string itemKey: modelData.key
             property string iconSource: root.trayIconSourceFor(trayItem)
 
-            width: root.isVerticalOrientation ? root.barThickness : root.trayItemSize
-            height: root.isVerticalOrientation ? root.trayItemSize : root.barThickness
+            width: root.isVerticalOrientation ? root.hitThickness : root.trayItemSize
+            height: root.isVerticalOrientation ? root.trayItemSize : root.hitThickness
             z: dragHandler.dragging ? 100 : 0
 
             property real shiftOffset: root.dragShiftOffset(index, root.draggedIndex, root.dropTargetIndex, root.trayItemSize + root.configuredIconSpacing)
@@ -706,7 +706,7 @@ BasePill {
                 width: root.trayItemSize
                 height: root.trayItemSize
                 anchors.centerIn: parent
-                style: BarMetrics.widgetStyle(root.barConfig)
+                style: root.grouped ? root.groupContext.style : BarMetrics.widgetStyle(root.barConfig)
                 vertical: root.isVerticalOrientation
                 joinedStart: style === "segments" && !delegateRoot.atStart
                 joinedEnd: style === "segments" && !delegateRoot.atEnd
@@ -838,7 +838,7 @@ BasePill {
             }
 
             Item {
-                width: root.barThickness
+                width: root.hitThickness
                 height: root.trayItemSize
                 visible: root.hasHiddenItems
 
@@ -847,7 +847,7 @@ BasePill {
                     width: root.trayItemSize
                     height: root.trayItemSize
                     anchors.centerIn: parent
-                    style: BarMetrics.widgetStyle(root.barConfig)
+                    style: root.grouped ? root.groupContext.style : BarMetrics.widgetStyle(root.barConfig)
                     pressed: caretAreaVert.pressed
                     color: Theme.withAlpha(Theme.onSurface, caretAreaVert.pressed ? Theme.stateLayerPressed : caretAreaVert.containsMouse ? Theme.stateLayerHover : 0)
 

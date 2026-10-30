@@ -48,8 +48,8 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: layout.isVerticalOrientation ? (layout.widgetThickness - layout.horizontalPadding * 2) : layoutContent.implicitWidth
-            implicitHeight: layout.isVerticalOrientation ? layoutColumn.implicitHeight : (layout.widgetThickness - layout.horizontalPadding * 2)
+            implicitWidth: layout.isVerticalOrientation ? (layout.grouped ? Math.max(layout.contentThickness, layoutColumn.implicitWidth) : layout.contentThickness) : layoutContent.implicitWidth
+            implicitHeight: layout.isVerticalOrientation ? layoutColumn.implicitHeight : (layout.grouped ? Math.max(layout.contentThickness, layoutContent.implicitHeight) : layout.contentThickness)
 
             Column {
                 id: layoutColumn
@@ -59,7 +59,7 @@ BasePill {
 
                 DIcon {
                     name: layout.getLayoutIcon(layout.currentLayoutSymbol)
-                    size: Theme.barIconSize(layout.barThickness, undefined, layout.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Math.min(layout.grouped ? layout.widgetThickness : Infinity, Theme.barIconSize(layout.barThickness, undefined, layout.barConfig?.maximizeWidgetIcons, layout.barConfig?.iconScale))
                     color: layout.contentColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -80,7 +80,7 @@ BasePill {
 
                 DIcon {
                     name: layout.getLayoutIcon(layout.currentLayoutSymbol)
-                    size: Theme.barIconSize(layout.barThickness, -4, layout.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Math.min(layout.grouped ? layout.widgetThickness : Infinity, Theme.barIconSize(layout.barThickness, -4, layout.barConfig?.maximizeWidgetIcons, layout.barConfig?.iconScale))
                     color: layout.contentColor
                     anchors.verticalCenter: parent.verticalCenter
                 }

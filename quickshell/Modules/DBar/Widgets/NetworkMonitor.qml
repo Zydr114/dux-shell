@@ -15,8 +15,8 @@ BasePill {
     readonly property bool shouldHide: hideWhenIdle && widgetData?.enabled !== false && Math.max(DgopService.networkRxRate, DgopService.networkTxRate) < 1024
     readonly property string reserveRate: compactMode ? "888 MB/s" : "88.8 MB/s"
 
-    width: shouldHide ? 0 : (isVerticalOrientation ? barThickness : visualWidth)
-    height: shouldHide ? 0 : (isVerticalOrientation ? visualHeight : barThickness)
+    width: shouldHide ? 0 : pillWidth
+    height: shouldHide ? 0 : pillHeight
     visible: !shouldHide
     opacity: shouldHide ? 0 : 1
 
@@ -65,8 +65,8 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: root.isVerticalOrientation ? root.contentThickness : contentRow.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? contentColumn.implicitHeight : root.contentThickness
+            implicitWidth: root.isVerticalOrientation ? (root.grouped ? Math.max(root.contentThickness, contentColumn.implicitWidth) : root.contentThickness) : contentRow.implicitWidth
+            implicitHeight: root.isVerticalOrientation ? contentColumn.implicitHeight : (root.grouped ? Math.max(root.contentThickness, contentRow.implicitHeight) : root.contentThickness)
 
             Column {
                 id: contentColumn
@@ -76,7 +76,7 @@ BasePill {
 
                 DIcon {
                     name: "network_check"
-                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                     color: Theme.widgetIconColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -106,7 +106,7 @@ BasePill {
 
                 DIcon {
                     name: "network_check"
-                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Math.min(root.grouped ? root.widgetThickness : Infinity, Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale))
                     color: Theme.widgetIconColor
                     anchors.verticalCenter: parent.verticalCenter
                 }
