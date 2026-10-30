@@ -112,6 +112,15 @@ Rectangle {
 
 Theme singleton provides Material Design 3 color system, spacing, fonts, and elevation.
 
+The bar clock and the island's home and media clocks share `Widgets/ClockContent.qml`.
+Their clock style is inspired by StatIndet's Clavis Keystone clock: heavy Google Sans
+Flex digits, alternating theme accents, small digit rotations, and spring-driven
+rolling transitions. `Theme` owns the clock typography and motion tokens, and the
+existing bundled font supplies the variable axes. DMS time/date formats, compact
+mode, date order, seconds, and vertical layouts continue to use the existing settings.
+The clock uses `SystemClock` at minute or second precision, pauses when hidden or
+disabled, and suppresses rolling transitions when animations are disabled.
+
 **Application Themes**
 
 Templates in `scripts/templates/` generate themes for:

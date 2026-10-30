@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import qs.Common
@@ -13,8 +15,8 @@ Item {
     property bool dateFirst: false
     property real fontSize: Theme.fontSizeMedium
     property real availableWidth: fontSize * 2
-    property color textColor: Theme.surfaceText
-    property color dateColor: textColor
+    property color textColor: Theme.primary
+    property color dateColor: Theme.surfaceText
     property color separatorColor: Theme.outlineButton
     property bool segmented: false
     property var locale: I18n.locale()
@@ -74,6 +76,7 @@ Item {
                 isMonospace: false
                 color: stack.color
                 font.pixelSize: root.fontSize
+                font.weight: Theme.fontWeightBold
             }
         }
     }
@@ -84,6 +87,8 @@ Item {
         anchors.centerIn: parent
         columns: root.vertical ? 1 : Math.max(1, layout.visibleChildren.length)
         spacing: root.vertical ? 0 : Theme.spacingS
+        horizontalItemAlignment: Grid.AlignHCenter
+        verticalItemAlignment: Grid.AlignVCenter
 
         Loader {
             sourceComponent: root.dateFirst && root.showDate || !root.showTime ? dateComponent : timeComponent
@@ -92,24 +97,16 @@ Item {
         Item {
             id: separator
             visible: root.showTime && root.showDate
-            width: root.vertical ? root.availableWidth : (root.split ? Theme.groupedListGap : dot.implicitWidth)
-            height: root.vertical ? Theme.spacingM : root.fontSize
+            width: root.vertical ? root.availableWidth : (root.split ? Theme.groupedListGap : Theme.spacingS)
+            height: root.vertical ? Theme.spacingM : Theme.clockTextSize(root.fontSize)
 
             Rectangle {
-                visible: root.vertical
+                visible: !root.split
                 anchors.centerIn: parent
-                width: parent.width * 0.6
-                height: 1
+                width: root.vertical ? parent.width * 0.6 : Theme.spacingXXS
+                height: root.vertical ? Theme.spacingXXS : root.fontSize
+                radius: Math.min(width, height) / 2
                 color: root.separatorColor
-            }
-
-            StyledText {
-                id: dot
-                visible: !root.vertical && !root.split
-                anchors.centerIn: parent
-                text: "•"
-                color: root.separatorColor
-                font.pixelSize: Theme.fontSizeSmall
             }
         }
 
@@ -123,8 +120,48 @@ Item {
     Component {
         id: timeComponent
 
-        StackedLines {
-            lines: root.timeLines
+        Column {
+            width: root.vertical ? root.availableWidth : implicitWidth
+
+            Repeater {
+                model: root.timeLines.length
+
+                Column {
+                    id: timeLine
+
+                    required property int index
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Row {
+                        visible: root.vertical && timeLine.index === 1
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: Theme.spacingXS
+                        height: Theme.spacingS
+
+                        Repeater {
+                            model: 2
+
+                            Rectangle {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Theme.spacingXXS
+                                height: width
+                                radius: width / 2
+                                color: root.separatorColor
+                            }
+                        }
+                    }
+
+                    RollingClock {
+                        text: root.timeLines[timeLine.index]
+                        fontSize: Theme.clockTextSize(root.fontSize)
+                        color: root.textColor
+                        decorated: !root.vertical
+                        animate: root.live
+                        scale: root.vertical ? Math.min(1, root.availableWidth / implicitWidth) : 1
+                    }
+                }
+            }
         }
     }
 

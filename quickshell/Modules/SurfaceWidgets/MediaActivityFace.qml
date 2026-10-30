@@ -1,10 +1,8 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Modules.DBar.Widgets
-import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
 
@@ -26,14 +24,6 @@ Item {
     // A fully rounded side strip crowds square content, so the vertical face insets on both axes.
     readonly property real verticalPad: Theme.spacingS
     readonly property real verticalArtworkSize: Math.max(12, Math.min(root.artworkSize, root.width - root.verticalPad * 2))
-    readonly property string timeText: systemClock.date.toLocaleTimeString(I18n.locale(), SettingsData.getEffectiveTimeFormat())
-    readonly property string hourText: {
-        const hours = systemClock.date.getHours();
-        if (SettingsData.use24HourClock)
-            return String(hours).padStart(2, "0");
-        return String(hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours)).padStart(2, "0");
-    }
-    readonly property string minuteText: String(systemClock.date.getMinutes()).padStart(2, "0")
     property bool clockVisible: false
     readonly property real naturalTextWidth: Math.max(root.minTextWidth, titleMetrics.width, root.dense ? 0 : artistMetrics.width) + root.textGutter * 2
     readonly property real measuredWidth: {
@@ -61,13 +51,6 @@ Item {
 
         font.pixelSize: Math.max(9, Theme.fontSizeSmall - 2) * root.contentScale
         text: root.dense ? "" : root.mediaModel.artist
-    }
-
-    SystemClock {
-        id: systemClock
-
-        enabled: root.enabled && root.visible && root.clockVisible
-        precision: SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
     }
 
     MediaArtwork {
@@ -153,18 +136,12 @@ Item {
             radius: Math.min(Theme.cornerRadiusFull, height / 2)
             color: clockArea.containsMouse ? Theme.surfaceTextHover : "transparent"
 
-            NumericText {
+            ClockContent {
                 id: clockText
 
                 anchors.centerIn: parent
-                isMonospace: false
-                text: root.timeText
-                reserveText: root.timeText.replace(/\d/g, "0")
-                width: Math.ceil(Math.max(implicitWidth, reservedWidth))
-                horizontalAlignment: Text.AlignHCenter
-                color: Theme.surfaceText
-                font.pixelSize: Theme.fontSizeSmall * root.contentScale
-                font.weight: Theme.fontWeightMedium
+                displayMode: "time"
+                fontSize: Theme.fontSizeSmall * root.contentScale
             }
 
             MouseArea {
@@ -210,33 +187,13 @@ Item {
             width: verticalClock.width
             height: verticalClock.height
 
-            // A side strip cannot fit "10:42 PM" on one line, so the hour sits over the minute.
-            Column {
+            ClockContent {
                 id: verticalClock
 
-                spacing: 0
-
-                NumericText {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    isMonospace: false
-                    text: root.hourText
-                    reserveText: "00"
-                    horizontalAlignment: Text.AlignHCenter
-                    color: Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeSmall * root.contentScale
-                    font.weight: Theme.fontWeightMedium
-                }
-
-                NumericText {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    isMonospace: false
-                    text: root.minuteText
-                    reserveText: "00"
-                    horizontalAlignment: Text.AlignHCenter
-                    color: Theme.surfaceTextMedium
-                    font.pixelSize: Theme.fontSizeSmall * root.contentScale
-                    font.weight: Theme.fontWeightMedium
-                }
+                vertical: true
+                displayMode: "time"
+                availableWidth: root.verticalArtworkSize
+                fontSize: Theme.fontSizeSmall * root.contentScale
             }
 
             MouseArea {

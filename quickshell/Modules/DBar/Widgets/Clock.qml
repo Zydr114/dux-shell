@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import qs.Common
 import qs.Modules.DBar
@@ -44,8 +46,8 @@ BasePill {
                     dateFirst: root.widgetData?.clockDateOrder === "dateFirst"
                     fontSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     availableWidth: root.widgetThickness
-                    textColor: root.contentColor
-                    dateColor: vertical ? Theme.primary : root.contentColor
+                    textColor: Theme.primary
+                    dateColor: root.contentColor
                 }
 
                 Rectangle {
