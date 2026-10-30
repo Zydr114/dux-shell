@@ -15,7 +15,7 @@ Item {
     readonly property bool isVertical: root.controller.isVertical
     readonly property string headerText: root.notificationModel.appName + (root.notificationModel.timeText ? " · " + root.notificationModel.timeText : "")
     readonly property string summaryText: root.dense && root.notificationModel.appName ? root.notificationModel.appName + " · " + root.notificationModel.summary : root.notificationModel.summary
-    readonly property real measuredWidth: Theme.spacingS * 3 + root.iconSize + Theme.spacingXS + Math.max(root.dense ? 0 : headerLabel.implicitWidth, summaryLabel.implicitWidth)
+    readonly property real measuredWidth: Theme.spacingM * 2 + root.iconSize + Theme.spacingS + Math.max(root.dense ? 0 : headerLabel.implicitWidth, summaryLabel.implicitWidth)
 
     function pushMeasuredLength() {
         root.controller.setNotificationContentLength(root.isVertical ? root.iconSize + Theme.spacingS * 2 : root.measuredWidth);
@@ -41,8 +41,8 @@ Item {
         visible: !root.isVertical
         anchors {
             fill: parent
-            leftMargin: Theme.spacingS
-            rightMargin: Theme.spacingS
+            leftMargin: Theme.spacingM
+            rightMargin: Theme.spacingM
         }
         spacing: Theme.spacingS
 
@@ -59,7 +59,7 @@ Item {
         Column {
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width - root.iconSize - parent.spacing
-            spacing: 1
+            spacing: Theme.spacingXXS
 
             StyledText {
                 id: headerLabel

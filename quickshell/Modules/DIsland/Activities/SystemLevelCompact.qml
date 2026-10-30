@@ -10,141 +10,82 @@ Item {
 
     required property var systemModel
     property bool isVertical: false
-    property real iconSize: 36
+    property real iconSize: Theme.iconSizeLarge
 
     readonly property int maximum: Math.max(root.systemModel.minimum + 1, Math.round(root.systemModel.maximum))
-    readonly property real fillRatio: Math.max(0, Math.min(1, (root.systemModel.value - root.systemModel.minimum) / Math.max(1, root.maximum - root.systemModel.minimum)))
-    // DSlider's own metrics, transposed, so the two orientations read as the same control.
-    readonly property real trackThickness: 12
-    readonly property real handleThickness: 4
-    readonly property real handleBreadth: 20
-    readonly property real fillHandleGap: 3
+    readonly property bool showValue: SettingsData.osdAlwaysShowValue
+    readonly property bool mirrored: !root.isVertical && I18n.isRtl
+    readonly property real inset: Theme.spacingM
+    readonly property real gap: Theme.spacingS
+    readonly property real valueExtent: root.showValue ? (root.isVertical ? valueLabel.implicitHeight : valueLabel.reservedWidth) + root.gap : 0
 
-    function trackFraction(localY) {
-        if (track.travel <= 0)
-            return 0;
-        return 1 - (localY - root.handleThickness / 2) / track.travel;
-    }
+    OsdIcon {
+        id: levelIcon
 
-    function applyFraction(fraction) {
-        const clamped = Math.max(0, Math.min(1, fraction));
-        const level = root.systemModel.minimum + clamped * (root.maximum - root.systemModel.minimum);
-        root.systemModel.setRatio(level / Math.max(1, root.maximum));
-    }
-
-    OsdLevelRow {
-        anchors.fill: parent
-        visible: !root.isVertical
+        x: root.isVertical ? (parent.width - width) / 2 : root.mirrored ? parent.width - width - root.inset : root.inset
+        y: root.isVertical ? root.inset : (parent.height - height) / 2
+        width: Math.min(Theme.iconSize, root.iconSize)
+        height: width
         iconName: root.systemModel.iconName
-        tonalIcon: false
-        iconInteractive: root.systemModel.mutable
-        iconLabel: root.systemModel.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
-        value: Math.round(root.systemModel.value)
-        minimum: root.systemModel.minimum
-        maximum: root.maximum
-        unit: root.systemModel.unit
-        displayText: root.systemModel.displayValue
-        sliderEnabled: root.systemModel.available
-        onIconClicked: root.systemModel.toggleMute()
-        onSliderValueChanged: newValue => root.systemModel.setRatio(newValue / Math.max(1, root.maximum))
+        iconColor: Theme.surfaceText
+        tonal: false
+        interactive: root.systemModel.mutable
+        available: root.systemModel.available
+        label: root.systemModel.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
+        onClicked: root.systemModel.toggleMute()
     }
 
-    // DSlider is horizontal only, so a side strip gets its own stacked track.
     Item {
-        id: verticalFace
+        id: sliderSlot
 
-        anchors.fill: parent
-        anchors.topMargin: Theme.spacingS
-        anchors.bottomMargin: Theme.spacingS
-        visible: root.isVertical
+        x: root.isVertical ? 0 : root.mirrored ? root.inset + root.valueExtent : root.inset + levelIcon.width + root.gap
+        y: root.isVertical ? levelIcon.y + levelIcon.height + root.gap : 0
+        width: Math.max(0, root.isVertical ? parent.width : parent.width - root.inset * 2 - levelIcon.width - root.gap - root.valueExtent)
+        height: Math.max(0, root.isVertical ? parent.height - y - root.inset - root.valueExtent : parent.height)
 
-        DIcon {
-            id: levelIcon
+        DSlider {
+            id: levelSlider
 
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: parent.top
-            name: root.systemModel.iconName
-            size: Math.min(Theme.iconSize, root.iconSize)
-            color: root.systemModel.mutable ? Theme.surfaceText : Theme.primary
+            anchors.centerIn: parent
+            width: root.isVertical ? parent.height : parent.width
+            rotation: root.isVertical ? -90 : 0
+            LayoutMirroring.enabled: !root.isVertical && I18n.isRtl
+            trackHeight: Theme.spacingXS
+            handleHeight: Theme.iconSizeSmall
+            fillColor: Theme.surfaceText
+            trackColor: Theme.onSurface_38
+            minimum: root.systemModel.minimum
+            maximum: root.maximum
+            enabled: root.systemModel.available
+            showValue: false
+            unit: root.systemModel.unit
+            valueOverride: Math.round(root.systemModel.value)
+            Accessible.name: root.systemModel.title
+            onSliderValueChanged: newValue => root.systemModel.setRatio(newValue / Math.max(1, root.maximum))
 
-            MouseArea {
-                anchors.fill: parent
-                enabled: root.systemModel.mutable
-                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onClicked: root.systemModel.toggleMute()
+            Binding on value {
+                value: Math.round(root.systemModel.value)
+                restoreMode: Binding.RestoreNone
+                when: !levelSlider.isDragging
             }
         }
+    }
 
-        StyledText {
-            id: levelLabel
+    NumericText {
+        id: valueLabel
 
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            text: root.systemModel.displayValue.length > 0 ? root.systemModel.displayValue : (Math.round(root.systemModel.value) + root.systemModel.unit)
-            color: Theme.surfaceText
-            font.pixelSize: Theme.fontSizeSmall
-            font.weight: Theme.fontWeightMedium
-        }
-
-        Item {
-            id: track
-
-            readonly property real travel: Math.max(0, height - root.handleThickness)
-            readonly property real handleOffset: track.travel * root.fillRatio
-
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: levelIcon.bottom
-            anchors.topMargin: Theme.spacingS
-            anchors.bottom: levelLabel.top
-            anchors.bottomMargin: Theme.spacingS
-            width: root.handleBreadth
-
-            Rectangle {
-                id: groove
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: root.trackThickness
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.outline, Theme.foregroundAlpha)
-
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    height: Math.max(0, Math.min(parent.height, track.handleOffset - root.fillHandleGap))
-                    radius: Theme.cornerRadius
-                    topLeftRadius: 0
-                    topRightRadius: 0
-                    color: root.systemModel.available ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.12)
-                }
-            }
-
-            Rectangle {
-                anchors.horizontalCenter: parent.horizontalCenter
-                y: track.travel - track.handleOffset
-                width: root.handleBreadth
-                height: root.handleThickness
-                radius: Theme.cornerRadius
-                color: root.systemModel.available ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.12)
-            }
-
-            MouseArea {
-                id: trackArea
-
-                readonly property real grabPad: Theme.spacingS
-
-                anchors.fill: parent
-                anchors.margins: -grabPad
-                enabled: root.systemModel.available
-                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onPressed: mouse => root.applyFraction(root.trackFraction(mouse.y - grabPad))
-                onPositionChanged: mouse => {
-                    if (pressed)
-                        root.applyFraction(root.trackFraction(mouse.y - grabPad));
-                }
-            }
-        }
+        x: root.isVertical ? (parent.width - width) / 2 : root.mirrored ? root.inset : parent.width - width - root.inset
+        y: root.isVertical ? parent.height - height - root.inset : (parent.height - height) / 2
+        width: root.isVertical ? Math.max(0, parent.width - Theme.spacingXS * 2) : reservedWidth
+        height: implicitHeight
+        visible: root.showValue
+        text: root.systemModel.displayValue.length > 0 ? root.systemModel.displayValue : Math.round(root.systemModel.value) + root.systemModel.unit
+        reserveText: root.maximum + root.systemModel.unit
+        color: Theme.surfaceText
+        font.pixelSize: root.isVertical ? Theme.fontSizeSmall : Theme.fontSizeMedium
+        font.weight: Theme.fontWeightBold
+        horizontalAlignment: root.isVertical ? Text.AlignHCenter : Text.AlignRight
+        verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
     }
 }

@@ -26,13 +26,16 @@ Item {
     readonly property real groupSpacing: root.controller.homeSlotMargin
     readonly property bool isVertical: root.controller.isVertical
     readonly property string clockDisplay: root.controller.homeClockDisplay
-    readonly property real edgePad: Math.max(root.groupSpacing, ((root.isVertical ? root.height - compactColumn.height : root.width - compactRow.width)) / 2)
     readonly property bool weatherSlotEnabled: root.controller.homeWeatherEnabled
     readonly property var brightnessDevice: BrightnessService.getCurrentDeviceInfo()
     readonly property real brightnessMaximum: BrightnessService.brightnessMaximum(root.brightnessDevice)
     readonly property int brightnessPercent: root.brightnessMaximum > 0 ? Math.round(BrightnessService.brightnessLevel / root.brightnessMaximum * 100) : 0
     readonly property int volumePercent: AudioService.sinkVolumePercent
-    readonly property var groupIds: root.groupsForSide("left").concat(["clock"]).concat(root.groupsForSide("right"))
+    readonly property var leftGroupIds: root.groupsForSide("left")
+    readonly property var rightGroupIds: root.groupsForSide("right")
+    readonly property real leftLaneLength: root.leftGroupIds.length > 0 ? (root.isVertical ? leadingLane.implicitHeight : leadingLane.implicitWidth) + root.groupSpacing : 0
+    readonly property real rightLaneLength: root.rightGroupIds.length > 0 ? (root.isVertical ? trailingLane.implicitHeight : trailingLane.implicitWidth) + root.groupSpacing : 0
+    readonly property real measuredContentLength: (root.isVertical ? clockGroup.height : clockGroup.width) + Math.max(root.leftLaneLength, root.rightLaneLength) * 2
     readonly property real touchpadThreshold: 100
     property real wheelAccumulator: 0
     property bool weatherRefHeld: false
@@ -354,12 +357,11 @@ Item {
     }
 
     function pushMeasuredLength() {
-        root.controller.setHomeContentLength(root.isVertical ? compactColumn.implicitHeight : compactRow.implicitWidth);
+        root.controller.setHomeContentLength(root.measuredContentLength);
     }
 
     onWeatherSlotEnabledChanged: root.syncWeatherRef(root.weatherSlotEnabled)
-    onIsVerticalChanged: root.pushMeasuredLength()
-    onVisibleTrayItemsChanged: root.pushMeasuredLength()
+    onMeasuredContentLengthChanged: root.pushMeasuredLength()
     Component.onCompleted: {
         root.syncWeatherRef(root.weatherSlotEnabled);
         root.pushMeasuredLength();
@@ -469,10 +471,12 @@ Item {
 
         required property string groupId
         required property int slotIndex
+        required property int slotCount
+        property bool leading: false
 
         readonly property bool vertical: root.isVertical
-        readonly property real leadPad: group.slotIndex === 0 ? root.edgePad : root.groupSpacing / 2
-        readonly property real trailPad: group.slotIndex === root.groupIds.length - 1 ? root.edgePad : root.groupSpacing / 2
+        readonly property real leadPad: group.leading && group.slotIndex === 0 ? root.groupSpacing : root.groupSpacing / 2
+        readonly property real trailPad: !group.leading && group.slotIndex === group.slotCount - 1 ? root.groupSpacing : root.groupSpacing / 2
         readonly property bool isClock: group.groupId === "clock"
         readonly property bool isMedia: group.groupId === "media"
         readonly property bool isWeather: group.groupId === "weather"
@@ -955,44 +959,56 @@ Item {
         }
     }
 
-    Row {
-        id: compactRow
+    HomeGroup {
+        id: clockGroup
 
         anchors.centerIn: parent
-        visible: !root.isVertical
-        onImplicitWidthChanged: root.pushMeasuredLength()
-        height: root.slotSize
+        groupId: "clock"
+        slotIndex: 0
+        slotCount: 1
+    }
+
+    Grid {
+        id: leadingLane
+
+        x: root.isVertical ? 0 : clockGroup.x - root.groupSpacing - width
+        y: root.isVertical ? clockGroup.y - root.groupSpacing - height : (root.height - height) / 2
+        width: root.isVertical ? root.width : implicitWidth
+        columns: root.isVertical ? 1 : Math.max(1, root.leftGroupIds.length)
         spacing: root.groupSpacing
 
         Repeater {
-            model: root.isVertical ? [] : root.groupIds
+            model: root.leftGroupIds
 
             HomeGroup {
                 required property var modelData
                 required property int index
                 groupId: String(modelData)
                 slotIndex: index
+                slotCount: root.leftGroupIds.length
+                leading: true
             }
         }
     }
 
-    Column {
-        id: compactColumn
+    Grid {
+        id: trailingLane
 
-        anchors.centerIn: parent
-        visible: root.isVertical
-        onImplicitHeightChanged: root.pushMeasuredLength()
-        width: root.width
+        x: root.isVertical ? 0 : clockGroup.x + clockGroup.width + root.groupSpacing
+        y: root.isVertical ? clockGroup.y + clockGroup.height + root.groupSpacing : (root.height - height) / 2
+        width: root.isVertical ? root.width : implicitWidth
+        columns: root.isVertical ? 1 : Math.max(1, root.rightGroupIds.length)
         spacing: root.groupSpacing
 
         Repeater {
-            model: root.isVertical ? root.groupIds : []
+            model: root.rightGroupIds
 
             HomeGroup {
                 required property var modelData
                 required property int index
                 groupId: String(modelData)
                 slotIndex: index
+                slotCount: root.rightGroupIds.length
             }
         }
     }

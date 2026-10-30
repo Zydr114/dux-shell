@@ -25,6 +25,7 @@ Item {
     // The colour painted behind the faces, so edge fades blend into it.
     required property color surfaceColor
     property bool freeMode: false
+    property bool reducedMotion: false
     property Component compactFaceOverride: null
     // Hosted islands fold the slot anchor into every target; the face must pin to the same resolved slot.
     property var resolveTarget: target => target
@@ -71,6 +72,17 @@ Item {
     property real activityFade: 1
     property real outgoingMorph: 0
     property bool homeExpandedTouched: false
+
+    function settleActivity() {
+        activityTransition.stop();
+        activityFade = 1;
+        outgoingActivity = "";
+    }
+
+    onReducedMotionChanged: {
+        if (reducedMotion)
+            settleActivity();
+    }
 
     Keys.onEscapePressed: root.controller.requestCollapse()
 
@@ -150,6 +162,10 @@ Item {
         outgoingMorph = morphProgress;
         outgoingActivity = renderedActivity;
         renderedActivity = activityId;
+        if (root.reducedMotion) {
+            root.settleActivity();
+            return;
+        }
         activityFade = 0;
         activityTransition.restart();
     }
@@ -204,6 +220,7 @@ Item {
         opacity: !active ? 0 : root.controller.isSystemActivity(activity) ? root.systemOpacity(root.compactOpacity) : root.compactOpacity(activity)
         visible: opacity > 0.001
         enabled: opacity >= 0.5
+        scale: root.reducedMotion ? 1 : 1 - (1 - opacity) * Theme.spacingXXS / Math.max(1, Math.min(width, height))
     }
 
     // Pinned to the sheet's settled slot so the content holds still while the island morphs.
@@ -225,6 +242,8 @@ Item {
         opacity: !active ? 0 : root.controller.isSystemActivity(activity) ? root.systemOpacity(root.expandedOpacity) : root.expandedOpacity(activity)
         visible: opacity > 0.001
         enabled: opacity >= 0.5
+        scale: root.reducedMotion ? 1 : 1 - (1 - opacity) * Theme.spacingM / Math.max(1, Math.min(width, height))
+        transformOrigin: isVertical ? (root.controller.farEdge ? Item.Right : Item.Left) : (root.controller.farEdge ? Item.Bottom : Item.Top)
     }
 
     CompactFace {

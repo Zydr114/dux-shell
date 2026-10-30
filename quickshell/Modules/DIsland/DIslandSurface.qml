@@ -387,8 +387,8 @@ Item {
         height: root.currentVisualHeight
         // Embedded, the band already paints the in-band strip; overhangFill draws the rest, so a translucent band never double-alphas.
         color: root.embedded ? "transparent" : root.effectiveSurfaceColor
-        border.width: root.notificationAccentColor !== "transparent" ? 1.5 : root.embedded ? 0 : root.highContrast ? 2 : root.materialIi ? 0 : (root.popupStyled && !root.notch ? BlurService.borderWidth : 0)
-        border.color: root.notificationAccentColor !== "transparent" ? root.notificationAccentColor : (root.highContrast ? Theme.outlineStrong : (root.popupStyled && !root.notch ? BlurService.borderColor : "transparent"))
+        border.width: root.notificationAccentColor !== "transparent" ? Theme.outlineWidthFocused : root.embedded ? 0 : root.highContrast ? Theme.outlineWidthFocused : root.materialIi || root.notch ? 0 : root.popupStyled ? BlurService.borderWidth : Theme.outlineWidth
+        border.color: root.notificationAccentColor !== "transparent" ? root.notificationAccentColor : root.highContrast ? Theme.outlineStrong : root.popupStyled ? BlurService.borderColor : Theme.outlineLight
 
         Behavior on color {
             ColorAnimation {
@@ -437,6 +437,7 @@ Item {
             controller: root.controller
             surfaceColor: root.effectiveSurfaceColor
             freeMode: root.freeMode
+            reducedMotion: root.reducedMotion
             compactFaceOverride: root.compactFaceOverride
             resolveTarget: target => root.resolveTarget(target)
             expandedInset: root.embedded && !root.freeMode ? root.nearInset : 0
@@ -875,6 +876,7 @@ Item {
 
         NotificationExpanded {
             notificationModel: root.notificationModel
+            controller: root.controller
         }
     }
 }

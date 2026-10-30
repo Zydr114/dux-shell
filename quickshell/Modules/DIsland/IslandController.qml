@@ -111,6 +111,7 @@ QtObject {
     readonly property int dashboardRowBudget: Math.max(DashMetrics.minimumTabRows, Math.floor((dashboardAvailableHeight - DashMetrics.islandEditChromeHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)))
     readonly property real mediaCompactMaxLength: 360
     property real notificationContentLength: 0
+    property real notificationExpandedHeight: Theme.iconSizeLarge + Theme.spacingXL * 4
     readonly property real notificationCompactMinLength: isVertical ? compactFaceThickness : (compactDense ? 200 : 240)
     readonly property real notificationCompactMaxLength: mediaCompactMaxLength
 
@@ -128,6 +129,13 @@ QtObject {
         if (!isFinite(next) || next <= 0 || Math.abs(next - notificationContentLength) < 2)
             return;
         notificationContentLength = next;
+    }
+
+    function setNotificationExpandedHeight(height) {
+        const next = Math.ceil(height);
+        if (!isFinite(next) || next <= 0 || notificationExpandedHeight === next)
+            return;
+        notificationExpandedHeight = next;
     }
 
     function setDashboardContentHeight(activityId, height) {
@@ -489,7 +497,7 @@ QtObject {
     readonly property var systemStateCompactTarget: pillTarget(Math.ceil(Math.max(compactFaceThickness, systemStateContentLength + destinationCompactEndPad * 2)), compactFaceThickness)
     readonly property var systemExpandedTarget: sheetTarget(460, 176)
     readonly property var notificationCompactTarget: pillTarget(Math.ceil(Math.max(notificationCompactMinLength, Math.min(notificationCompactMaxLength, notificationContentLength))), compactFaceThickness)
-    readonly property var notificationExpandedTarget: sheetTarget(520, 220)
+    readonly property var notificationExpandedTarget: sheetTarget(Math.min(520, dashboardAvailableWidth), Math.min(notificationExpandedHeight, dashboardAvailableHeight))
     readonly property var notificationCenterExpandedTarget: dashboardTargetFor("notificationcenter")
     readonly property var clipboardExpandedTarget: sheetTarget(Math.min(dashboardAvailableWidth, ClipboardConstants.sizeWidth(SettingsData.clipboardSize)), Math.min(dashboardAvailableHeight, ClipboardConstants.sizeHeight(SettingsData.clipboardSize)))
     readonly property var powerMenuExpandedTarget: sheetTarget(Math.max(1, Math.min(dashboardAvailableWidth, powerMenuContentWidth)), Math.max(1, Math.min(dashboardAvailableHeight, destinationContentHeight("powermenu"))))
