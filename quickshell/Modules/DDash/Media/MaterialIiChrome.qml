@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import qs.Common
-import qs.Services
 import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modules.DDash
@@ -13,10 +12,20 @@ import "../../../DCommon/Common/FocusNavigation.js" as FocusNavigation
 MediaChromeBase {
     id: root
 
-    artSize: DashMetrics.mediaArtSizeDash
-    baseHeight: DashMetrics.tabMinHeight
+    artSize: DashMetrics.mediaArtSizeDash * DashMetrics.mediaPopupScale
+    baseHeight: DashMetrics.mediaPopupHeightFor(width)
+    padding: Theme.spacingM
+    borderWidth: 0
+    backdropRadius: Theme.windowRadius
     backdropBlur: (root.player.options?.popupBackdropBlur ?? 60) / 100
-    readonly property var transportFocusTargets: [shuffleButton, previousButton, playButton, nextButton, repeatButton]
+    readonly property var transportFocusTargets: [previousButton, playButton, nextButton]
+
+    backdropContent: MediaSpectrumBackdrop {
+        radius: root.backdropRadius
+        live: root.player.live
+        playing: !!root.presentation?.playing
+        spectrumColor: root.player.accent
+    }
 
     focusTargets: transportFocusTargets.concat(seekbar.canSeek ? [seekbar] : [], sourceGroup.focusTargets, [blurButton])
     panelButtons: sourceGroup.panelButtons.concat([blurButton])
@@ -27,7 +36,7 @@ MediaChromeBase {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: footer.top
-        anchors.bottomMargin: Theme.spacingL
+        anchors.bottomMargin: Theme.spacingM
 
         MediaArtView {
             id: art
@@ -42,10 +51,10 @@ MediaChromeBase {
         Item {
             id: details
             anchors.left: art.right
-            anchors.leftMargin: Theme.spacingL
+            anchors.leftMargin: Theme.spacingM
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            height: Math.max(metadata.implicitHeight + seekBlock.height + transport.implicitHeight + Theme.spacingL * 2, art.height)
+            height: art.height
 
             Column {
                 id: metadata
@@ -60,10 +69,8 @@ MediaChromeBase {
                     text: root.title
                     fontToken: root.titleFontToken
                     color: Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeXXLarge
-                    font.weight: Theme.fontWeightBold
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    maximumLineCount: 2
+                    font.pixelSize: Theme.fontSizeXLarge
+                    font.weight: Theme.fontWeightMedium
                     elide: Text.ElideRight
                 }
 
@@ -80,7 +87,7 @@ MediaChromeBase {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.bottom: seekBlock.visible ? seekBlock.top : transport.top
+                anchors.bottom: seekbar.visible ? seekbar.top : transport.top
                 anchors.bottomMargin: Theme.spacingM
                 active: root.player.lyricsOpen && root.player.live
                 onLoaded: (item as Item)?.forceActiveFocus(Qt.PopupFocusReason)
@@ -89,40 +96,14 @@ MediaChromeBase {
                 }
             }
 
-            Column {
-                id: seekBlock
+            MediaSeekbar {
+                id: seekbar
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: transport.top
-                anchors.bottomMargin: Theme.spacingM
-                spacing: Theme.spacingXS
+                anchors.bottomMargin: Theme.spacingXS
                 visible: root.hasSeekbar
-
-                MediaSeekbar {
-                    id: seekbar
-                    width: parent.width
-                    player: root.player
-                }
-
-                Item {
-                    width: parent.width
-                    height: elapsed.implicitHeight
-
-                    NumericText {
-                        id: elapsed
-                        anchors.left: parent.left
-                        text: Format.formatDuration(seekbar.value * (root.presentation?.length ?? 0))
-                        color: Theme.onSurfaceVariant
-                        font.pixelSize: Theme.fontSizeSmall
-                    }
-
-                    NumericText {
-                        anchors.right: parent.right
-                        text: Format.formatDuration(root.presentation?.length ?? 0)
-                        color: Theme.onSurfaceVariant
-                        font.pixelSize: Theme.fontSizeSmall
-                    }
-                }
+                player: root.player
             }
 
             RowLayout {
@@ -133,10 +114,11 @@ MediaChromeBase {
                 spacing: Theme.spacingXS
                 Keys.onPressed: event => event.accepted = FocusNavigation.handleHorizontalKey(event, root.transportFocusTargets, I18n.isRtl)
 
-                MediaTransportButton {
-                    id: shuffleButton
-                    player: root.player
-                    mediaAction: "shuffle"
+                NumericText {
+                    text: Format.formatDuration(seekbar.value * (root.presentation?.length ?? 0))
+                    color: Theme.onSurfaceVariant
+                    font.pixelSize: Theme.fontSizeSmall
+                    visible: root.hasSeekbar
                 }
 
                 Item {
@@ -147,34 +129,39 @@ MediaChromeBase {
                     id: previousButton
                     player: root.player
                     mediaAction: "previous"
+                    keepNavigation: true
+                    widthMode: "narrow"
+                    buttonSize: Theme.buttonHeightXS
                 }
 
                 MediaTransportButton {
                     id: playButton
                     player: root.player
                     mediaAction: "play"
-                    size: "m"
-                    widthMode: "wide"
-                    variant: "filled"
-                    round: false
-                    containerColor: MediaAccentService.accentContainer
-                    contentColor: MediaAccentService.onAccentContainer
+                    checkable: false
+                    iconFilled: true
+                    widthMode: "narrow"
+                    buttonSize: Theme.buttonHeightXS
                 }
 
                 MediaTransportButton {
                     id: nextButton
                     player: root.player
                     mediaAction: "next"
+                    keepNavigation: true
+                    widthMode: "narrow"
+                    buttonSize: Theme.buttonHeightXS
                 }
 
                 Item {
                     Layout.fillWidth: true
                 }
 
-                MediaTransportButton {
-                    id: repeatButton
-                    player: root.player
-                    mediaAction: "repeat"
+                NumericText {
+                    text: Format.formatDuration(root.presentation?.length ?? 0)
+                    color: Theme.onSurfaceVariant
+                    font.pixelSize: Theme.fontSizeSmall
+                    visible: root.hasSeekbar
                 }
             }
         }

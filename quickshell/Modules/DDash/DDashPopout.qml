@@ -37,6 +37,7 @@ DPopout {
 
     property bool dashVisible: false
     property bool mediaBarPopout: false
+    readonly property bool compactMedia: mediaBarPopout && (activeTabId === "media" || isClosing)
     property var triggerScreen: null
     property string currentTabId: DashRegistry.defaultTabId
     property string detailTabId: ""
@@ -45,7 +46,7 @@ DPopout {
 
     onEditModeChanged: {
         if (!editMode)
-            contentLoader.item?.panelResizer.cancel();
+            contentLoader.item?.panelResizer?.cancel();
         if (!shouldBeVisible)
             return;
         Qt.callLater(() => contentLoader.item?.focusInitial());
@@ -84,8 +85,9 @@ DPopout {
     readonly property int columnCap: DashMetrics.columnCapFor(screen ? screen.width - navigationWidth : undefined, SettingsData.showWeekNumber)
     readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
 
-    popupWidth: panelWidthFor(DashMetrics.panelColumnsFor(activeTabId))
-    minimumSurfaceWidth: panelWidthFor(editMode ? columnCap : DashRegistry.widestPanelColumns)
+    popupWidth: panelWidthFor(DashMetrics.panelColumnsFor(activeTabId)) * (compactMedia ? DashMetrics.mediaPopupScale : 1)
+    minimumSurfaceWidth: compactMedia ? popupWidth : panelWidthFor(editMode ? columnCap : DashRegistry.widestPanelColumns)
+    surfaceBorderEnabled: !compactMedia
     popupHeight: contentLoader.item?.implicitHeight ?? (DashMetrics.tabDefaultHeight + Theme.navigationHeight + DashMetrics.contentGap + DashMetrics.contentPadding * 2)
     triggerWidth: DashMetrics.triggerWidth
     screen: triggerScreen
@@ -136,7 +138,7 @@ DPopout {
     onActiveTabIdChanged: {
         editMode = false;
         contentLoader.item?.dismissOptions();
-        contentLoader.item?.resetScroll();
+        contentLoader.item?.resetScroll?.();
         if (shouldBeVisible && !contentLoader.item?.navigationFocused)
             contentLoader.item?.focusInitial();
     }
@@ -190,8 +192,9 @@ DPopout {
     onPopoutClosed: {
         editMode = false;
         detailTabId = "";
-        mediaBarPopout = false;
     }
+
+    onCloseAnimationFinished: mediaBarPopout = false
 
     function presentWhenReady() {
         primeContent();
@@ -249,7 +252,60 @@ DPopout {
 
     onBackgroundClicked: dashVisible = false
 
-    content: Component {
+    content: compactMedia ? mediaPopupContent : dashboardContent
+
+    Component {
+        id: mediaPopupContent
+
+        FocusScope {
+            id: mediaPopup
+
+            implicitWidth: root.popupWidth
+            implicitHeight: DashMetrics.mediaPopupHeightFor(root.popupWidth)
+            readonly property bool ready: true
+            readonly property bool navigationFocused: false
+            focus: true
+
+            function focusInitial() {
+                mediaPlayer.focusTarget?.forceActiveFocus(Qt.PopupFocusReason);
+            }
+
+            function focusNavigation(backwards) {
+                mediaPlayer.cycleFocus(backwards);
+            }
+
+            function dismissOptions() {
+                mediaPlayer.panel = "";
+            }
+
+            Keys.onPressed: event => {
+                if (mediaPlayer.handleKeyEvent(event)) {
+                    event.accepted = true;
+                    return;
+                }
+                if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
+                    event.accepted = mediaPlayer.cycleFocus(event.key === Qt.Key_Backtab || !!(event.modifiers & Qt.ShiftModifier));
+                    return;
+                }
+                if (event.key !== Qt.Key_Escape)
+                    return;
+                root.dashVisible = false;
+                event.accepted = true;
+            }
+
+            MediaPlayerTab {
+                id: mediaPlayer
+                anchors.fill: parent
+                barPopout: true
+                live: root.dashVisible || root.isClosing
+                contentViewport: mediaPopup
+            }
+        }
+    }
+
+    Component {
+        id: dashboardContent
+
         FocusScope {
             id: mainContainer
 

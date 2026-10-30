@@ -20,6 +20,9 @@ Item {
     property var panelButtons: []
     property bool inlineVolume: false
     property real backdropBlur: 0.8
+    property real borderWidth: Theme.layerOutlineWidth
+    property real padding: DashMetrics.mediaCardMargin
+    property Component backdropContent: null
 
     readonly property var activePlayer: root.player.activePlayer
     readonly property var presentation: root.player.presentation
@@ -27,7 +30,6 @@ Item {
     readonly property string artist: presentation?.artist || I18n.tr("Unknown Artist")
     readonly property string album: presentation?.album ?? ""
     readonly property string artUrl: presentation?.artUrl ?? ""
-    readonly property real padding: DashMetrics.mediaCardMargin
     readonly property string titleFontToken: root.player.options?.titleFont ?? MediaOptions.defaultTitleFont
     readonly property bool seekbarEnabled: root.player.options?.seekbar ?? MediaOptions.defaults.seekbar
     readonly property bool hasSeekbar: seekbarEnabled && !!presentation && presentation.length > 0
@@ -60,16 +62,16 @@ Item {
         anchors.fill: parent
         radius: root.backdropRadius
         color: root.surfaceColor
-        border.width: Theme.layerOutlineWidth
+        border.width: root.borderWidth
         border.color: Theme.outlineMedium
 
         Loader {
             anchors.fill: parent
-            anchors.margins: Theme.layerOutlineWidth
+            anchors.margins: root.borderWidth
             active: root.player.wallpaperEnabled && !!root.presentation
 
             sourceComponent: MediaArtBackdrop {
-                radius: root.backdropRadius - Theme.layerOutlineWidth
+                radius: Math.max(0, root.backdropRadius - root.borderWidth)
                 stableHeight: root.baseHeight
                 activePlayer: root.activePlayer
                 artUrl: root.artUrl
@@ -77,10 +79,15 @@ Item {
             }
         }
 
+        Loader {
+            anchors.fill: parent
+            sourceComponent: root.backdropContent
+        }
+
         Item {
             id: cardBody
             anchors.fill: parent
-            anchors.margins: root.padding + Theme.layerOutlineWidth
+            anchors.margins: root.padding + root.borderWidth
         }
     }
 

@@ -192,6 +192,14 @@ Singleton {
     readonly property real sheetWidth: 400
 
     readonly property real mediaCardMargin: Theme.spacingL
+    readonly property real mediaPopupScale: 0.7
+    readonly property real mediaPopupBodyAspect: 3
+
+    function mediaPopupHeightFor(width) {
+        const padding = Theme.spacingM;
+        const heroHeight = Math.max(0, width - padding * 2) / mediaPopupBodyAspect;
+        return Math.min((tabMinHeight + contentPadding * 2) * mediaPopupScale, heroHeight + padding * 3 + Theme.buttonHeightS);
+    }
     readonly property real mediaArtSize: 150
     readonly property real mediaArtSizeDash: 336
     readonly property real mediaArtSizeMaterial: 200

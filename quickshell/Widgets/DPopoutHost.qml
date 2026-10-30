@@ -1826,7 +1826,7 @@ Item {
             readonly property real surfaceRadius: root.usesConnectedSurfaceChrome ? Theme.connectedSurfaceRadius : Theme.windowRadius
             readonly property color surfaceColor: root.usesConnectedSurfaceChrome ? Theme.connectedSurfaceColor : Theme.readableSurface
             readonly property color surfaceBorderColor: root.usesConnectedSurfaceChrome ? Theme.withAlpha(BlurService.borderColor, 0) : BlurService.borderColor
-            readonly property real surfaceBorderWidth: root.usesConnectedSurfaceChrome ? 0 : BlurService.borderWidth
+            readonly property real surfaceBorderWidth: root.usesConnectedSurfaceChrome || !root.popoutHandle.surfaceBorderEnabled ? 0 : BlurService.borderWidth
             readonly property real surfaceTopLeftRadius: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barLeft) ? 0 : surfaceRadius
             readonly property real surfaceTopRightRadius: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barRight) ? 0 : surfaceRadius
             readonly property real surfaceBottomLeftRadius: root.usesConnectedSurfaceChrome && (contentContainer.barBottom || contentContainer.barLeft) ? 0 : surfaceRadius
@@ -2183,7 +2183,7 @@ Item {
                     radius: Theme.windowRadius
                     color: "transparent"
                     border.color: BlurService.borderColor
-                    border.width: BlurService.borderWidth
+                    border.width: root.popoutHandle.surfaceBorderEnabled ? BlurService.borderWidth : 0
                     z: 100
                 }
             }

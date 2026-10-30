@@ -11,6 +11,7 @@ Item {
     property Component overlayContent: null
     property real popupWidth: 400
     property real popupHeight: 300
+    property bool surfaceBorderEnabled: true
     property real triggerX: 0
     property real triggerY: 0
     property real triggerWidth: 40
