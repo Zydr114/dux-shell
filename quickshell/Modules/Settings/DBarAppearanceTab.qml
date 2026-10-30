@@ -172,6 +172,15 @@ Item {
             tags: ["background", "opacity", "corners", "rounded", "goth", "shadow", "palette", "contrast"]
             visible: (bar.selectedBarConfig?.enabled ?? false) && !bar.selectedBarFrameStyled
 
+            SettingsDropdownRow {
+                settingKey: "barBlur"
+                tags: ["blur", "background", "glass", "frosted", "capsule", "group"]
+                text: I18n.tr("Background blur")
+                options: [I18n.tr("Default"), I18n.tr("On"), I18n.tr("Off")]
+                currentValue: bar.selectedBarConfig?.blur === "on" ? options[1] : bar.selectedBarConfig?.blur === "off" ? options[2] : options[0]
+                onValueChanged: value => bar.apply("blur", value === options[1] ? "on" : value === options[2] ? "off" : "inherit")
+            }
+
             SettingsButtonGroupRow {
                 settingKey: "islandPalette"
                 tags: ["island", "appearance", "palette", "surface", "bright", "dim"]

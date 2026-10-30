@@ -39,6 +39,8 @@ make lint-qml  # Run from repo root; requires quickshell/.qmlls.ini (generated b
 - `Modules/DBar/` - Customizable widget bar with plugin support
 - `Modules/Dock/` - Application dock with window management
 
+See [capsule groups](../docs/capsule-groups.md) for nested pill styling, size constraints, overflow and backdrop blur.
+
 **System Controls**
 - `Modules/ControlCenter/` - WiFi, Bluetooth, audio, display settings
 - `Modules/Notifications/` - Notification center with popups

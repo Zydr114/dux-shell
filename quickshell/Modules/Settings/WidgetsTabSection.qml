@@ -45,7 +45,7 @@ Column {
         });
     }
 
-    signal itemEnabledChanged(string sectionId, string itemId, bool enabled)
+    signal itemEnabledChanged(string sectionId, int widgetIndex, bool enabled)
     signal itemOrderChanged(string sectionId, var indices)
     signal addWidget(string sectionId)
     signal removeWidget(string sectionId, int widgetIndex)
@@ -57,6 +57,7 @@ Column {
     property var reorderGroup: null
     property string highlightedId: ""
     property string highlightedSection: ""
+    property int highlightedIndex: -1
 
     width: parent.width
     height: implicitHeight
@@ -145,7 +146,7 @@ Column {
             readonly property bool configurable: BarWidgetCatalog.configurable(modelData)
 
             reorderList: reorderArea
-            highlighted: !dragging && root.highlightedId === modelData.id && root.highlightedSection === root.sectionId
+            highlighted: !dragging && root.highlightedIndex === index && root.highlightedSection === root.sectionId
             opacity: dragging && reorderArea.crossSectionActive ? 0 : 1
             title: modelData.text
             iconName: modelData.icon
@@ -218,7 +219,16 @@ Column {
                 visible: widgetRow.modelData.id !== "spacer"
                 checked: widgetRow.modelData.enabled
                 anchors.verticalCenter: parent.verticalCenter
-                onToggled: value => root.itemEnabledChanged(root.sectionId, widgetRow.modelData.id, value)
+                onToggled: value => root.itemEnabledChanged(root.sectionId, widgetRow.index, value)
+            }
+
+            DActionButton {
+                anchors.verticalCenter: parent.verticalCenter
+                iconName: widgetRow.modelData.groupId ? "layers" : "group_work"
+                tooltipText: widgetRow.modelData.groupId ? I18n.tr("Edit group") : I18n.tr("Create group")
+                Accessible.name: tooltipText
+                visible: groupEditor.canGroup(widgetRow.index)
+                onClicked: groupEditor.selectOrCreate(widgetRow.index)
             }
 
             DActionButton {
@@ -229,6 +239,15 @@ Column {
                 onClicked: root.removeWidget(root.sectionId, widgetRow.index)
             }
         }
+    }
+
+    WidgetGroupsEditor {
+        id: groupEditor
+
+        width: parent.width
+        barId: root.barId
+        sectionId: root.sectionId
+        items: root.items
     }
 
     DButton {

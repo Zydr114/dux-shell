@@ -4,6 +4,7 @@ import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
 import qs.Modules.Settings.Widgets
+import "WidgetGroups.js" as WidgetGroups
 
 Item {
     id: widgetsTab
@@ -12,6 +13,9 @@ Item {
     property string selectedBarId: SettingsUiState.selectedBarId
 
     onSelectedBarIdChanged: {
+        highlightedId = "";
+        highlightedSection = "";
+        highlightedIndex = -1;
         if (SettingsUiState.selectedBarId !== selectedBarId)
             SettingsUiState.selectedBarId = selectedBarId;
     }
@@ -58,6 +62,7 @@ Item {
 
     property string highlightedId: ""
     property string highlightedSection: ""
+    property int highlightedIndex: -1
 
     property alias reorderGroup: dragGroup
 
@@ -65,7 +70,7 @@ Item {
         id: dragGroup
 
         coordinateItem: widgetsTab
-        onTransferred: (source, sourceIndex, target, targetIndex) => widgetsTab.moveWidget(source.groupKey, target.groupKey, source.model[sourceIndex].id, targetIndex, sourceIndex)
+        onTransferred: (source, sourceIndex, target, targetIndex) => widgetsTab.moveWidget(source.groupKey, target.groupKey, targetIndex, sourceIndex)
     }
 
     readonly property var widgetAvailability: {
@@ -135,21 +140,22 @@ Item {
         if (flat.length === 0)
             return;
         var ctrl = (event.modifiers & Qt.ControlModifier) !== 0;
+        var focusedRow = focusedWidgetRow();
+        if (focusedRow) {
+            highlightedSection = focusedRow.section;
+            highlightedId = focusedRow.id;
+            highlightedIndex = focusedRow.index;
+        }
         if (event.key === Qt.Key_Up || event.key === Qt.Key_Down) {
-            var focusedRow = focusedWidgetRow();
-            if (focusedRow) {
-                highlightedSection = focusedRow.section;
-                highlightedId = focusedRow.id;
-            }
             widgetsTab.forceActiveFocus();
             var dir = event.key === Qt.Key_Down ? 1 : -1;
             if (ctrl) {
                 if (highlightedId !== "")
-                    moveWithinSection(highlightedSection, highlightedId, dir);
+                    moveWithinSection(highlightedSection, highlightedIndex, dir);
             } else {
                 var idx = -1;
                 for (var i = 0; i < flat.length; i++) {
-                    if (flat[i].section === highlightedSection && flat[i].id === highlightedId) {
+                    if (flat[i].section === highlightedSection && flat[i].index === highlightedIndex) {
                         idx = i;
                         break;
                     }
@@ -158,16 +164,18 @@ Item {
                     var f = dir > 0 ? flat[0] : flat[flat.length - 1];
                     highlightedSection = f.section;
                     highlightedId = f.id;
+                    highlightedIndex = f.index;
                 } else {
                     idx = Math.max(0, Math.min(flat.length - 1, idx + dir));
                     highlightedSection = flat[idx].section;
                     highlightedId = flat[idx].id;
+                    highlightedIndex = flat[idx].index;
                 }
             }
             event.accepted = true;
         } else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right) && ctrl) {
             if (highlightedId !== "")
-                moveAcrossSections(highlightedSection, highlightedId, event.key === Qt.Key_Right ? 1 : -1);
+                moveAcrossSections(highlightedSection, highlightedIndex, event.key === Qt.Key_Right ? 1 : -1);
             event.accepted = true;
         } else if (event.key === Qt.Key_Space) {
             if (highlightedId !== "") {
@@ -273,23 +281,7 @@ Item {
     function setWidgetsForSection(sectionId, widgets) {
         if (sectionId === "center" && dankIslandOwnsSelectedBarCenter)
             return;
-        switch (sectionId) {
-        case "left":
-            SettingsData.updateBarConfig(selectedBarId, {
-                leftWidgets: widgets
-            });
-            break;
-        case "center":
-            SettingsData.updateBarConfig(selectedBarId, {
-                centerWidgets: widgets
-            });
-            break;
-        case "right":
-            SettingsData.updateBarConfig(selectedBarId, {
-                rightWidgets: widgets
-            });
-            break;
-        }
+        SettingsData.updateBarConfig(selectedBarId, WidgetGroups.normalize(selectedBarConfig, { [barKey(sectionId)]: widgets }));
     }
 
     function getWidgetsForPopup() {
@@ -327,6 +319,9 @@ Item {
         var widgets = getWidgetsForSection(sectionId).slice();
         if (widgetIndex >= 0 && widgetIndex < widgets.length)
             widgets.splice(widgetIndex, 1);
+        highlightedId = "";
+        highlightedSection = "";
+        highlightedIndex = -1;
         setWidgetsForSection(sectionId, widgets);
     }
 
@@ -339,18 +334,13 @@ Item {
         return Object.assign({}, widget);
     }
 
-    function handleItemEnabledChanged(sectionId, itemId, enabled) {
+    function handleItemEnabledChanged(sectionId, index, enabled) {
         var widgets = getWidgetsForSection(sectionId).slice();
-        for (var i = 0; i < widgets.length; i++) {
-            var widget = widgets[i];
-            var widgetId = typeof widget === "string" ? widget : widget.id;
-            if (widgetId !== itemId)
-                continue;
-            var newWidget = cloneWidgetData(widget);
-            newWidget.enabled = enabled;
-            widgets[i] = newWidget;
-            break;
-        }
+        if (index < 0 || index >= widgets.length)
+            return;
+        var newWidget = cloneWidgetData(widgets[index]);
+        newWidget.enabled = enabled;
+        widgets[index] = newWidget;
         setWidgetsForSection(sectionId, widgets);
     }
 
@@ -362,25 +352,13 @@ Item {
         return sectionId === "left" ? leftSection : sectionId === "center" ? centerSection : sectionId === "right" ? rightSection : null;
     }
 
-    function reorderSection(sectionId, orderedIds) {
-        var remaining = getWidgetsForSection(sectionId).slice();
-        var reordered = [];
-        orderedIds.forEach(id => {
-            var idx = remaining.findIndex(w => (typeof w === "string" ? w : w.id) === id);
-            if (idx < 0)
-                return;
-            reordered.push(remaining.splice(idx, 1)[0]);
-        });
-        setWidgetsForSection(sectionId, reordered.concat(remaining));
-    }
-
-    function moveWidget(fromSection, toSection, movedId, toIndex, sourceIndex = -1) {
+    function moveWidget(fromSection, toSection, toIndex, sourceIndex) {
         if (dankIslandOwnsSelectedBarCenter && (fromSection === "center" || toSection === "center"))
             return;
         if (fromSection === toSection) {
             var arr = getWidgetsForSection(fromSection).slice();
-            var fi = arr.findIndex(w => (typeof w === "string" ? w : w.id) === movedId);
-            if (fi < 0)
+            var fi = sourceIndex;
+            if (fi < 0 || fi >= arr.length)
                 return;
             var m = arr.splice(fi, 1)[0];
             arr.splice(Math.max(0, Math.min(toIndex, arr.length)), 0, m);
@@ -388,7 +366,7 @@ Item {
             return;
         }
         var src = getWidgetsForSection(fromSection).slice();
-        var fromIdx = sourceIndex >= 0 ? sourceIndex : src.findIndex(w => (typeof w === "string" ? w : w.id) === movedId);
+        var fromIdx = sourceIndex;
         if (fromIdx < 0 || fromIdx >= src.length)
             return;
         var moved = src.splice(fromIdx, 1)[0];
@@ -397,7 +375,7 @@ Item {
         var updates = {};
         updates[barKey(fromSection)] = src;
         updates[barKey(toSection)] = dst;
-        SettingsData.updateBarConfig(selectedBarId, updates);
+        SettingsData.updateBarConfig(selectedBarId, WidgetGroups.normalize(selectedBarConfig, updates));
     }
 
     // A row reached with Tab has focus but no cursor, so the cursor starts from it
@@ -409,7 +387,8 @@ Item {
                 if (section.sectionId !== undefined)
                     return {
                         "section": section.sectionId,
-                        "id": item.modelData.id
+                        "id": item.modelData.id,
+                        "index": item.index
                     };
             }
             return null;
@@ -420,50 +399,55 @@ Item {
     function flatList() {
         var out = [];
         ["left", "center", "right"].forEach(s => {
-            getWidgetsForSection(s).forEach(w => {
+            getWidgetsForSection(s).forEach((w, index) => {
                 out.push({
                     "section": s,
-                    "id": (typeof w === "string" ? w : w.id)
+                    "id": (typeof w === "string" ? w : w.id),
+                    "index": index
                 });
             });
         });
         return out;
     }
 
-    function moveWithinSection(sectionId, id, delta) {
-        var ids = getWidgetsForSection(sectionId).map(w => typeof w === "string" ? w : w.id);
-        var pos = ids.indexOf(id);
+    function moveWithinSection(sectionId, pos, delta) {
+        var entries = getWidgetsForSection(sectionId).slice();
         var next = pos + delta;
-        if (pos < 0 || next < 0 || next >= ids.length)
+        if (pos < 0 || pos >= entries.length || next < 0 || next >= entries.length)
             return;
-        ids.splice(pos, 1);
-        ids.splice(next, 0, id);
-        reorderSection(sectionId, ids);
+        const moved = entries.splice(pos, 1)[0];
+        entries.splice(next, 0, moved);
+        setWidgetsForSection(sectionId, entries);
+        highlightedIndex = next;
     }
 
-    function moveAcrossSections(sectionId, id, delta) {
+    function moveAcrossSections(sectionId, index, delta) {
+        if (index < 0 || index >= getWidgetsForSection(sectionId).length)
+            return;
         var order = dankIslandOwnsSelectedBarCenter ? ["left", "right"] : ["left", "center", "right"];
         var si = order.indexOf(sectionId);
         var ti = si + delta;
         if (si < 0 || ti < 0 || ti >= order.length)
             return;
         var to = order[ti];
-        moveWidget(sectionId, to, id, getWidgetsForSection(to).length);
+        const destinationIndex = getWidgetsForSection(to).length;
+        moveWidget(sectionId, to, destinationIndex, index);
         highlightedSection = to;
+        highlightedIndex = destinationIndex;
     }
 
     function toggleHighlighted() {
         if (highlightedId === "" || highlightedSection === "")
             return;
-        var w = getWidgetsForSection(highlightedSection).find(x => (typeof x === "string" ? x : x.id) === highlightedId);
+        var w = getWidgetsForSection(highlightedSection)[highlightedIndex];
         if (w === undefined)
             return;
         var en = (typeof w === "string") ? true : (w.enabled !== false);
-        handleItemEnabledChanged(highlightedSection, highlightedId, !en);
+        handleItemEnabledChanged(highlightedSection, highlightedIndex, !en);
     }
 
     function configureHighlighted() {
-        const index = getWidgetsForSection(highlightedSection).findIndex(x => (typeof x === "string" ? x : x.id) === highlightedId);
+        const index = highlightedIndex;
         if (index < 0)
             return;
         if (!BarWidgetCatalog.configurable(getItemsForSection(highlightedSection)[index]))
@@ -623,9 +607,13 @@ Item {
                 backgroundColor: Theme.secondaryContainer
                 textColor: Theme.onSecondaryContainer
                 onClicked: {
-                    setWidgetsForSection("left", defaultLeftWidgets);
-                    setWidgetsForSection("center", defaultCenterWidgets);
-                    setWidgetsForSection("right", defaultRightWidgets);
+                    const updates = { leftWidgets: defaultLeftWidgets, rightWidgets: defaultRightWidgets };
+                    if (!widgetsTab.dankIslandOwnsSelectedBarCenter)
+                        updates.centerWidgets = defaultCenterWidgets;
+                    SettingsData.updateBarConfig(widgetsTab.selectedBarId, WidgetGroups.normalize(widgetsTab.selectedBarConfig, updates));
+                    widgetsTab.highlightedId = "";
+                    widgetsTab.highlightedSection = "";
+                    widgetsTab.highlightedIndex = -1;
                 }
             }
 
@@ -660,11 +648,12 @@ Item {
                 barId: widgetsTab.selectedBarId
                 allWidgets: widgetsTab.baseWidgetDefinitions
                 items: widgetsTab.getItemsForSection("left")
-                onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                    widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
+                onItemEnabledChanged: (sectionId, index, enabled) => {
+                    widgetsTab.handleItemEnabledChanged(sectionId, index, enabled);
                 }
                 highlightedId: widgetsTab.highlightedId
                 highlightedSection: widgetsTab.highlightedSection
+                highlightedIndex: widgetsTab.highlightedIndex
                 onItemOrderChanged: (sectionId, indices) => {
                     const items = widgetsTab.getWidgetsForSection(sectionId);
                     widgetsTab.setWidgetsForSection(sectionId, indices.map(i => items[i]));
@@ -752,11 +741,12 @@ Item {
                 barId: widgetsTab.selectedBarId
                 allWidgets: widgetsTab.baseWidgetDefinitions
                 items: widgetsTab.getItemsForSection("center")
-                onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                    widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
+                onItemEnabledChanged: (sectionId, index, enabled) => {
+                    widgetsTab.handleItemEnabledChanged(sectionId, index, enabled);
                 }
                 highlightedId: widgetsTab.highlightedId
                 highlightedSection: widgetsTab.highlightedSection
+                highlightedIndex: widgetsTab.highlightedIndex
                 onItemOrderChanged: (sectionId, indices) => {
                     const items = widgetsTab.getWidgetsForSection(sectionId);
                     widgetsTab.setWidgetsForSection(sectionId, indices.map(i => items[i]));
@@ -786,11 +776,12 @@ Item {
                 barId: widgetsTab.selectedBarId
                 allWidgets: widgetsTab.baseWidgetDefinitions
                 items: widgetsTab.getItemsForSection("right")
-                onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                    widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
+                onItemEnabledChanged: (sectionId, index, enabled) => {
+                    widgetsTab.handleItemEnabledChanged(sectionId, index, enabled);
                 }
                 highlightedId: widgetsTab.highlightedId
                 highlightedSection: widgetsTab.highlightedSection
+                highlightedIndex: widgetsTab.highlightedIndex
                 onItemOrderChanged: (sectionId, indices) => {
                     const items = widgetsTab.getWidgetsForSection(sectionId);
                     widgetsTab.setWidgetsForSection(sectionId, indices.map(i => items[i]));
