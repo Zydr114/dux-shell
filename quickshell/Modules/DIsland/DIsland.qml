@@ -270,6 +270,7 @@ Item {
             "activity": host.islandController.activeActivity,
             "expanded": host.islandController.expanded,
             "mediaAvailable": host.islandController.mediaAvailable,
+            "mediaPresentation": host.islandController.mediaLyricsPresentation ? "clavis-lyrics" : "standard",
             "idleActivity": host.islandController.idleActivity(),
             "targetWidth": host.islandController.targetDescriptor.width,
             "targetHeight": host.islandController.targetDescriptor.height,

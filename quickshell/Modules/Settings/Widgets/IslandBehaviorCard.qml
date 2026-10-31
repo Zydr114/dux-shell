@@ -177,7 +177,7 @@ SettingsCard {
     SettingsToggleRow {
         settingKey: root.keyPrefix + "MediaClockVisible"
         tags: ["island", "media", "clock", "compact", "time"]
-        visible: !root.isDot
+        visible: !root.isDot && root.store.setting("islandMediaPresentation") !== "clavis-lyrics"
         text: I18n.tr("Keep clock with media", "island settings: clock in media face toggle")
         checked: root.store.setting("islandMediaClockVisible")
         onToggled: checked => root.store.apply("islandMediaClockVisible", checked)
@@ -193,9 +193,24 @@ SettingsCard {
     }
 
     SettingsButtonGroupRow {
+        settingKey: root.keyPrefix + "MediaPresentation"
+        tags: ["island", "media", "lyrics", "clavis", "compact"]
+        visible: !root.isDot
+        resetStore: root.store
+        resetKeys: ["islandMediaPresentation"]
+        text: I18n.tr("Compact media style")
+        description: I18n.tr("Clavis lyrics shows the cover, current lyric and spectrum. Lyrics are requested independently of the media page's lyrics option.")
+        model: [I18n.tr("Standard"), I18n.tr("Clavis lyrics")]
+        values: ["standard", "clavis-lyrics"]
+        value: root.store.setting("islandMediaPresentation")
+        fallbackValue: "standard"
+        onValueSelected: value => root.store.apply("islandMediaPresentation", value)
+    }
+
+    SettingsButtonGroupRow {
         settingKey: root.keyPrefix + "MediaTextMode"
         tags: ["island", "media", "lyrics", "title", "track"]
-        visible: !root.isDot
+        visible: !root.isDot && root.store.setting("islandMediaPresentation") !== "clavis-lyrics"
         resetStore: root.store
         resetKeys: ["islandMediaTextMode"]
         text: I18n.tr("Media text")

@@ -69,6 +69,7 @@ QtObject {
     property real compactThickness: 38
     property string batteryStyle: "duo"
     property bool mediaClockVisible: true
+    readonly property bool mediaLyricsPresentation: !isVertical && !dotMode && SettingsData.islandSetting(barConfig, "islandMediaPresentation") === "clavis-lyrics"
     readonly property string mediaTextMode: SettingsData.islandSetting(barConfig, "islandMediaTextMode") || "title"
     readonly property real mediaMaximumWidth: Math.max(360, Math.min(560, Number(SettingsData.islandSetting(barConfig, "islandMediaMaxWidth")) || 560))
     readonly property bool osdAccessoryEnabled: SettingsData.islandSetting(barConfig, "islandOsdPresentation") === "accessory" && !dotMode
@@ -513,7 +514,7 @@ QtObject {
         return root.dotMode && root.dotTransientActivities.indexOf(activityId) === -1;
     }
     readonly property var homeCompactTarget: pillTarget(Math.min(dashboardAvailableWidth, homeCompactLength + accessoryLength), compactFaceThickness)
-    readonly property var mediaCompactTarget: pillTarget(Math.min(mediaCompactMaxLength, mediaCompactLength + accessoryLength), compactFaceThickness)
+    readonly property var mediaCompactTarget: pillTarget(Math.min(mediaCompactMaxLength, mediaCompactLength + accessoryLength), mediaLyricsPresentation ? Math.min(dashboardAvailableHeight, Math.max(compactFaceThickness, Theme.clavisLyricsHeight)) : compactFaceThickness)
     readonly property var homeExpandedTarget: dashboardTargetFor("home")
     readonly property real legacyMediaWidth: dashboardWidthFor("media") * DashMetrics.mediaPopupScale
     readonly property var mediaPopupSize: MediaOptions.popupSize(dashboardAvailableWidth, dashboardAvailableHeight, DashMetrics.islandHandleHeight, legacyMediaWidth, DashMetrics.mediaPopupHeightFor(legacyMediaWidth))

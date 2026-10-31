@@ -141,6 +141,8 @@ Singleton {
     // Blending toward onSurface desaturates into the onSurfaceVariant lyric text, so shift tone in HCT instead.
     function _readableLyricColor(color) {
         const backgrounds = lyricsBackgrounds;
+        if (backgrounds.length === 0)
+            return color;
         const hct = Hct.toHct(color);
         const chroma = Math.max(hct.chroma, lyricsChromaMin);
         const backgroundTone = Hct.toHct(backgrounds[0]).tone;

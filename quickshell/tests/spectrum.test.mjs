@@ -24,6 +24,16 @@ test("aggregation preserves every input bin including fractional boundaries", ()
     assert.ok(thirtySix.every(value => value === 0.5));
 });
 
+test("compact spectrum keeps comparable levels when the shared sampler changes scale", () => {
+    for (const [values, maximum] of [[Array(6).fill(500), 1000], [Array(6).fill(22.5), 45]]) {
+        const five = array(spectrum.normalizedBins(values, maximum, 5));
+        assert.equal(five.length, 5);
+        assert.ok(five.every(value => Math.abs(value - 0.5) < 1e-12));
+    }
+    assert.deepEqual(array(spectrum.normalizedBins([-5, NaN, 2000, 250], 1000, 4)), [0, 0, 1, 0.25]);
+    assert.deepEqual(array(spectrum.normalizedBins([100], 0, 5)), []);
+});
+
 test("spectrum subscriptions are idempotent and retain independent consumers", () => {
     const first = {};
     const second = {};

@@ -12,7 +12,8 @@ Singleton {
     id: root
 
     property int refCount: 0
-    readonly property bool allowed: DashRegistry.option("media", "lyrics") === true && controller.available
+    readonly property bool available: controller.available
+    readonly property bool allowed: DashRegistry.option("media", "lyrics") === true && available
     readonly property bool subscribed: refCount > 0 && controller.available
     onSubscribedChanged: {
         MediaAccentService.lyricsConsumers += subscribed ? 1 : -1;

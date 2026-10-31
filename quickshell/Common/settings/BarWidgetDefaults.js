@@ -38,6 +38,7 @@ var ISLAND_DEFAULTS = {
     islandHighContrast: false,
     islandMediaClockVisible: true,
     islandMediaAutoSwitch: false,
+    islandMediaPresentation: "standard",
     islandMediaTextMode: "title",
     islandMediaMaxWidth: 560,
     islandOsdPresentation: "replace",

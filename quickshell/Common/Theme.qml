@@ -65,6 +65,20 @@ Singleton {
     readonly property int clavisProgressMaterialSmoothingDuration: 1500
     readonly property real clavisProgressMaterialSmoothingVelocity: 200
     readonly property real clavisSecondaryAlpha: 0.72
+    readonly property real clavisLyricsHeight: 42
+    readonly property real clavisLyricsCoverSize: 26
+    readonly property real clavisLyricsCoverRadius: 5
+    readonly property real clavisLyricsEndPadding: 15
+    readonly property real clavisLyricsGap: 12
+    readonly property real clavisLyricsMinTextWidth: 120
+    readonly property real clavisLyricsMaxTextWidth: 800
+    readonly property real clavisLyricsFontSize: 15
+    readonly property int clavisLyricsTransitionDuration: 400
+    readonly property real clavisLyricsSpectrumSize: 21
+    readonly property int clavisLyricsSpectrumCount: 5
+    readonly property real clavisLyricsSpectrumBarWidth: 2.6
+    readonly property real clavisLyricsSpectrumGap: 2
+    readonly property int clavisLyricsSpectrumDuration: 80
 
     readonly property real popupDistance: {
         if (typeof SettingsData === "undefined")
