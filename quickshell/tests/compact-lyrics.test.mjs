@@ -4,6 +4,7 @@ import { loadScript } from "./qml-script.mjs";
 
 const lyrics = loadScript(new URL("../Common/CompactLyrics.js", import.meta.url));
 const part = (x, t, e, background = false) => ({ x, t, e, background });
+const group = (...parts) => ({ t: Math.min(...parts.map(part => part.t)), e: Math.max(...parts.map(part => part.e)), parts });
 
 test("compact lyrics show the active lead voices and flatten multiline text", () => {
     const lines = [{ parts: [part(" 第一行\n第二行 ", 1, 5), part("echo", 1, 5, true), part("next", 4, 6)] }];
@@ -19,6 +20,104 @@ test("interludes and seek-before-first-line clear the previous lyric without inv
     assert.equal(lyrics.lineText(lines, 0, 4), "echo");
     assert.equal(lyrics.lineText(lines, 0, 5), "");
     assert.equal(lyrics.lineText([], 0, 10), "");
+});
+
+test("short gaps retain text after removed blank cues and explicit word-timed ends", () => {
+    const cases = [
+        [46.57, 52.08, 52.66],
+        [37, 39.73, 39.74],
+        [30, 31.728, 33.526],
+        [10, 12, 15], // Consecutive blank cues have already been removed by the provider cleanup.
+    ];
+    for (const [start, end, next] of cases) {
+        const lines = [group(part("previous", start, end)), group(part("next", next, next + 2))];
+        const source = JSON.stringify(lines);
+        assert.equal(lyrics.lineText(lines, 0, end), "", `opt-in at ${end}`);
+        for (const at of [end, (end + next) / 2, next - 0.0001])
+            assert.equal(lyrics.lineText(lines, 0, at, 4), "previous", `gap ${end}–${next}, sampled ${at}`);
+        assert.equal(lyrics.lineText(lines, 1, next, 4), "next");
+        assert.equal(JSON.stringify(lines), source);
+    }
+});
+
+test("only known interior gaps no longer than the complete threshold retain text", () => {
+    for (const [end, next, expected] of [
+        [4, 8, "previous"],
+        [5.06, 9.06, "previous"],
+        [14.04, 18.04, "previous"],
+        [4, 8.001, ""],
+        [5.06, 9.061, ""],
+        [14.04, 18.041, ""],
+        [4, 16, ""],
+    ]) {
+        const lines = [group(part("previous", end - 2, end)), group(part("next", next, next + 2))];
+        assert.equal(lyrics.lineText(lines, -1, end - 3, 4), "", "intro");
+        assert.equal(lyrics.lineText(lines, 0, end, 4), expected, `gap ${end}–${next} start`);
+        assert.equal(lyrics.lineText(lines, 0, next - 0.001, 4), expected, `gap ${end}–${next} end`);
+        assert.equal(lyrics.lineText(lines, 1, next, 4), "next");
+        assert.equal(lyrics.lineText(lines, 1, next + 2, 4), "", "outro");
+    }
+    const lines = [group(part("previous", 1, 2)), group(part(" \n ", 3, 4)), group(part("next", 8, 9))];
+    assert.equal(lyrics.lineText(lines, 0, 2.5, 4), "", "blank cue does not turn a long gap into a short one");
+    assert.equal(lyrics.lineText(lines.slice(0, 2), 0, 2.5, 4), "", "blank cue does not create an interior gap");
+});
+
+test("current vocals take precedence over held text across overlapping groups", () => {
+    const lines = [
+        group(part("lead", 1, 8)),
+        group(part("reply", 2, 4)),
+        group(part("next", 9, 12)),
+    ];
+    assert.equal(lyrics.lineText(lines, 1, 2.5, 4, [0, 1]), "reply");
+    assert.equal(lyrics.lineText(lines, 1, 5, 4, [0]), "lead");
+    assert.equal(lyrics.lineText(lines, 1, 8.5, 4), "lead", "hold the voice that actually ended last");
+    assert.equal(lyrics.lineText(lines, 2, 9, 4, [2]), "next");
+
+    const background = [
+        group(part("lead", 1, 3)),
+        group(part(" \n ", 2, 4), part("harmony", 2, 4, true)),
+        group(part("next", 6, 8)),
+    ];
+    assert.equal(lyrics.lineText(background, 1, 2.5, 4, [0, 1]), "lead", "active lead outranks background");
+    assert.equal(lyrics.lineText(background, 1, 3.5, 4, [1]), "harmony", "active background outranks an ended lead");
+    assert.equal(lyrics.lineText(background, 1, 4.5, 4), "harmony");
+});
+
+test("held chorus text preserves repeated lead voices and filters background voices", () => {
+    const lines = [
+        group(part(" refrain ", 1, 3), part("refrain", 1, 3), part("echo", 1, 3, true)),
+        group(part("next", 5, 7)),
+    ];
+    assert.equal(lyrics.lineText(lines, 0, 3.5, 4), "refrain · refrain");
+});
+
+test("a later part in an earlier group can end the held interval", () => {
+    const lines = [
+        group(part("first", 1, 2), part("return", 5, 6)),
+        group(part("reply", 3, 4)),
+    ];
+    assert.equal(lyrics.lineText(lines, 1, 4.5, 4), "reply");
+    assert.equal(lyrics.lineText(lines, 1, 5, 4, [0]), "return");
+    assert.equal(lyrics.lineText(lines, 1, 6, 4), "");
+});
+
+test("holding text is independent of seek order and replaced track arrays", () => {
+    const first = [group(part("first", 2, 4)), group(part("second", 5, 6))];
+    const second = [group(part("other", 10, 11)), group(part("later", 13, 14))];
+    for (const [index, at, expected] of [
+        [0, 4.5, "first"],
+        [1, 5.5, "second"],
+        [-1, 1.5, ""],
+        [0, 3, "first"],
+        [0, 4.5, "first"],
+        [1, 7, ""],
+        [0, 4.5, "first"],
+    ])
+        assert.equal(lyrics.lineText(first, index, at, 4), expected, `seek to ${at}`);
+    assert.equal(lyrics.lineText(second, -1, 4.5, 4), "");
+    assert.equal(lyrics.lineText(second, 0, 11.5, 4), "other");
+    assert.equal(lyrics.lineText([], 0, 11.5, 4), "");
+    assert.equal(lyrics.lineText(first, 0, 4.5, 4), "first");
 });
 
 test("compact lyric width grows with headroom and retains the last adopted width", () => {

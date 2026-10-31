@@ -49,8 +49,42 @@ test("ended lyrics clear focus and word timing while retaining the transcript po
         assert.equal(lyrics.activeIndex, position, `scroll position at ${at}`);
         assert.deepEqual(Array.from(lyrics.focusedGroups), focused, `focused vocals at ${at}`);
         assert.equal(lyrics.wordTime, word, `word cue at ${at}`);
-        assert.equal(compact.lineText(lyrics.lines, lyrics.activeIndex, lyrics.sampleTime), text, `Clavis lyric at ${at}`);
+        assert.equal(compact.lineText(lyrics.lines, lyrics.activeIndex, lyrics.sampleTime, 4, lyrics.focusedGroups), text, `Clavis lyric at ${at}`);
     }
+});
+
+test("paused short-gap display does not extend focus, word timing, or source intervals", () => {
+    const lyrics = controller();
+    const source = [
+        { t: 30, e: 31.728, x: "before", w: [{ t: 30, e: 30.9, x: "be" }, { t: 30.9, e: 32, x: "fore" }] },
+        { t: 33.526, e: 35, x: "after", w: [{ t: 33.526, e: 35, x: "after" }] },
+    ];
+    const original = JSON.stringify(source);
+    lyrics.lines = lyrics.prepareLines(source, {});
+    const prepared = JSON.stringify(lyrics.lines);
+    let scheduled = 0;
+    lyrics.tick = { stop() {}, start() { scheduled++; } };
+    for (const [at, index, focused, text, word, end] of [
+        [31.7, 0, [0], "before", 30.9, 31.728],
+        [31.728, 0, [], "before", -1, -1],
+        [32.8, 0, [], "before", -1, -1],
+        [33.526, 1, [1], "after", 33.526, 35],
+        [35, 1, [], "", -1, -1],
+        [31.728, 0, [], "before", -1, -1],
+        [29, -1, [], "", -1, -1],
+        [32.8, 0, [], "before", -1, -1],
+    ]) {
+        lyrics.at = at;
+        lyrics.resync();
+        assert.equal(lyrics.activeIndex, index, `scroll position at ${at}`);
+        assert.deepEqual(Array.from(lyrics.focusedGroups), focused, `focused vocals at ${at}`);
+        assert.equal(lyrics.wordTime, word, `word cue at ${at}`);
+        assert.equal(lyrics.wordEnd, end, `word end at ${at}`);
+        assert.equal(compact.lineText(lyrics.lines, lyrics.activeIndex, lyrics.sampleTime, 4, lyrics.focusedGroups), text, `compact display at ${at}`);
+    }
+    assert.equal(scheduled, 0, "paused samples do not schedule playback ticks");
+    assert.equal(JSON.stringify(source), original);
+    assert.equal(JSON.stringify(lyrics.lines), prepared);
 });
 
 test("overlapping vocals remain current after a later group ends", () => {
@@ -65,6 +99,7 @@ test("overlapping vocals remain current after a later group ends", () => {
     assert.deepEqual(Array.from(lyrics.focusedGroups), [0]);
     assert.equal(lyrics.wordTime, 1);
     assert.equal(lyrics.wordEnd, 8);
+    assert.equal(compact.lineText(lyrics.lines, lyrics.activeIndex, lyrics.sampleTime, 4, lyrics.focusedGroups), "lead");
 });
 
 test("word lookup respects the part interval when asked for an ended or future vocal", () => {

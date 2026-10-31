@@ -2,9 +2,10 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.DCommon.Widgets
+import qs.Modules.DDash
 import qs.Services
 import qs.Widgets
-import qs.DCommon.Widgets
 import "../../../Common/CompactLyrics.js" as CompactLyrics
 import "../../../Common/Spectrum.js" as Spectrum
 
@@ -18,7 +19,7 @@ Item {
     readonly property bool live: enabled && visible && (Window.window?.visible ?? false) && mediaModel.available
     readonly property bool sampling: live && mediaModel.playing && !SettingsData.reduceMotion
     readonly property bool animationsEnabled: live && !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
-    readonly property string lineText: live && lyrics.synced ? CompactLyrics.lineText(lyrics.lines, lyrics.activeIndex, lyrics.sampleTime) : ""
+    readonly property string lineText: live && lyrics.synced ? CompactLyrics.lineText(lyrics.lines, lyrics.activeIndex, lyrics.sampleTime, DashMetrics.mediaLyricsShortGapSeconds, lyrics.focusedGroups) : ""
     readonly property string displayText: {
         if (!LyricsService.available)
             return I18n.tr("Unavailable");
