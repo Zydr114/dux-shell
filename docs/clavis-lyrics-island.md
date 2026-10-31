@@ -87,3 +87,34 @@
 独立仪表盘媒体弹窗另有 4 项实机检查通过：以元数据打开、中键进入歌词、再次中键返回、关闭后保留灵动岛选择。见 [弹窗状态](evidence/clavis-media-fixes-20261031/popup-middle-states.json) 与 [弹窗恢复记录](evidence/clavis-media-fixes-20261031/popup-middle-restoration.json)，配置、缓存与音量同样精确恢复，验收窗口无 WARN / ERROR。
 
 ![独立仪表盘媒体页歌词](evidence/clavis-media-fixes-20261031/middle-popup-lyrics.png)
+
+## 自适应宽度修复（2026-11-01）
+
+Clavis 紧凑歌词统一文字测量与实际渲染方式，同时取字形边界和排版占用宽度的较大值并预留边缘空间，避免字体测量偏小导致短句提前省略。歌词路径不再忽略 1px 的必要增宽。原来的 **Maximum media width** 继续作为整体硬上限，包含封面、频谱、间距和附属 OSD，并服从屏幕可用宽度；本机原配置的 560px 保持不变。
+
+新增 **Lyrics resize threshold**（`islandLyricsWidthThreshold`），默认 24px，可设 0–96px，仅在 Clavis 歌词呈现下显示：
+
+- 当前歌词放不下时立即增宽，目标为“所需宽度 + 阈值”，受硬上限约束。
+- 新目标比当前宽度至少小一个阈值才缩窄；较小变化保留当前宽度。
+- 设为 0 时按所需宽度调整。修改上限时立即遵守新边界。
+- 同步歌词的间奏音符沿用上一行宽度，下一句再按上述规则调整。
+
+这里的所需宽度包含固定部件，以及至少 120px 的歌词文字区域。例如阈值为 24px 时，本机样例所需宽度 256 → 271 → 286 → 256px，对应采用宽度 280 → 280 → 310 → 280px。
+
+紧凑歌词的实际绘制宽度在弹簧动画和像素对齐后同样遵守上限。展开播放器保留自己的尺寸；从展开态收起及途中切换歌词时保留完整收起动画，结束后恢复紧凑上限。宽度更新由内容、设置和字体变化触发，并合并同一轮事件；只新增一个保留宽度值和一个动画状态标记，没有新增轮询、定时器或进程。
+
+![短句完整显示](evidence/lyrics-width-20261101/short-chinese.png)
+
+![英文完整显示](evidence/lyrics-width-20261101/english-full.png)
+
+![长句与附属音量共享硬上限](evidence/lyrics-width-20261101/long-line-with-osd.png)
+
+最终版本通过 `make lint-qml`、修改 QML 的 `qmlformat` 解析、`git diff --check`、Qt 31、lock 38 及完整 logic 套件。紧凑歌词 Common JS 共 7 项测试，其中 5 项覆盖新增宽度策略及其边界；新增策略和小数上限均有失败反例。
+
+现有 Niri / Quickshell 会话的 27 项实机检查通过，覆盖中英日文与标点的完整显示、余量复用、增宽和缩窄、长句省略、间奏、降低上限、附属 OSD、零阈值、快速切行、展开 / 收起及中途重定向、普通呈现与减少动态效果。屏幕为 HDMI-A-1、逻辑尺寸 2048×1152、缩放 1.25，字体为 Noto Serif CJK SC；验收使用临时人工 MPRIS 来源及本地 LRC，没有启动额外 shell 或 compositor，也没有向真实播放器发送控制命令。
+
+临时逐帧计数记录到 173 次原始弹簧超调回调，实际紧凑宽度越界计数为 0；另留存 20 个动画状态样本。配置、缓存恢复字节一致，音量恢复，临时来源退出。详见 [状态记录](evidence/lyrics-width-20261101/states.json)、[动画样本](evidence/lyrics-width-20261101/animation-samples.json)、[恢复结果](evidence/lyrics-width-20261101/result.json) 与 [验收说明](evidence/lyrics-width-20261101/README.md)。临时诊断代码已移除。
+
+运行日志未出现指向本次修改文件的错误或绑定循环，但本机仍有已有插件弃用、缺失图标和初始化警告；本轮不声称全局日志无警告。以上为单屏、有限样例验收，未做长期 CPU / 内存基准或多屏、竖向及其他 compositor 验收。
+
+最终已重载本机 `dms.service` 用户服务，新 Quickshell 实例从当前仓库的 `quickshell/` 加载，IPC 确认 Clavis 歌词呈现可用、最大宽度 560px、有效默认阈值 24px；验证期间配置字节保持一致。见 [部署记录](evidence/lyrics-width-20261101/deployment.json)。本次只有 QML / JS 改动，无需替换 Go 二进制。

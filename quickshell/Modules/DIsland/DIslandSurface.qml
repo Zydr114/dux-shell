@@ -97,6 +97,8 @@ Item {
     readonly property alias fittsStripItem: fittsStrip
     readonly property alias surfaceMotion: motion
     readonly property bool motionRunning: motion.running
+    // Keep expanded geometry through collapse, including targets changed mid-flight.
+    property bool expandedMorph: false
     onMotionRunningChanged: {
         if (!motionRunning && requestedWindow)
             openWindow.restart();
@@ -104,6 +106,7 @@ Item {
             motionStartBounds = Qt.rect(currentVisualX, currentVisualY, currentVisualWidth, currentVisualHeight);
             return;
         }
+        expandedMorph = controller.expanded;
         controller.releaseIdleVisuals();
     }
     readonly property real springTimeConstantMs: motion.timeConstantMs
@@ -117,10 +120,11 @@ Item {
     readonly property real crossExtent: root.isVertical ? root.width : root.height
     readonly property bool snapsAlongEdges: root.notch || (root.embedded && !root.chromeless)
     readonly property real dpr: CompositorService.getScreenScale(root.effectiveScreen)
-    readonly property real motionAlong: isVertical ? motion.currentHeight : motion.currentWidth
+    readonly property real compactLyricsWidthLimit: controller.mediaLyricsPresentation && controller.activeActivity === "media" && !controller.expanded && !expandedMorph && !isVertical ? controller.mediaCompactMaxLength : Infinity
+    readonly property real motionAlong: isVertical ? motion.currentHeight : Math.min(motion.currentWidth, compactLyricsWidthLimit)
     readonly property real motionAlongPos: (alongExtent - motionAlong) / 2 + motion.currentOffsetAlong
     readonly property real currentAlongPos: snapsAlongEdges ? Theme.snap(motionAlongPos, dpr) : motionAlongPos
-    readonly property real currentVisualAlong: snapsAlongEdges ? Theme.snap(motionAlongPos + motionAlong, dpr) - currentAlongPos : motionAlong
+    readonly property real currentVisualAlong: Math.min(compactLyricsWidthLimit, snapsAlongEdges ? Theme.snap(motionAlongPos + motionAlong, dpr) - currentAlongPos : motionAlong)
     readonly property real currentVisualWidth: isVertical ? motion.currentWidth : currentVisualAlong
     readonly property real currentVisualHeight: isVertical ? currentVisualAlong : motion.currentHeight
     readonly property real currentVisualCross: isVertical ? motion.currentWidth : motion.currentHeight
@@ -231,6 +235,8 @@ Item {
     }
 
     function applyTarget(seedVelocity) {
+        if (controller.expanded)
+            expandedMorph = true;
         root.targetPending = controller.expanded && !root.hostReady;
         if (root.targetPending)
             return;
@@ -243,8 +249,10 @@ Item {
         const seed = seedVelocity ?? root.flingSeed;
         root.flingSeed = null;
         motion.setTarget(root.resolveTarget(controller.targetDescriptor), seed);
-        if (!motion.running)
+        if (!motion.running) {
+            expandedMorph = controller.expanded;
             root.controller.releaseIdleVisuals();
+        }
     }
 
     // Neighbours re-layout without animation, so a settled collapsed pill snaps with them; a size change or an open sheet springs.
@@ -252,6 +260,7 @@ Item {
         if (!root.freeMode && !root.embedded)
             return;
         if (root.anchorSnaps) {
+            expandedMorph = controller.expanded;
             motion.snapTo(root.resolveTarget(controller.targetDescriptor));
             return;
         }
@@ -259,6 +268,7 @@ Item {
         const compact = root.resolveTarget(controller.compactTarget);
         const settledCompact = root.embedded && !motion.running && !controller.expanded && compact.width === motion.targetWidth && compact.height === motion.targetHeight;
         if (settledCompact) {
+            expandedMorph = false;
             motion.snapTo(compact);
             return;
         }
@@ -304,6 +314,7 @@ Item {
         trackedCrossExtent = crossExtent;
         fadeCompactCross = root.descriptorCross(controller.compactTarget);
         fadeExpandedCross = root.descriptorCross(root.resolveTarget(controller.expandedTarget));
+        expandedMorph = controller.expanded;
         motion.snapTo(root.resolveTarget(controller.targetDescriptor));
     }
 

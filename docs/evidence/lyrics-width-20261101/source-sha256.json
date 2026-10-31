@@ -1,0 +1,12 @@
+{
+  "quickshell/Common/CompactLyrics.js": "d7b52994f50f7ca4f3fa7e516b6d361b9cc927d3b30740b70725bac476a69c89",
+  "quickshell/Common/Theme.qml": "93cc40d7cf31e9b63638c9e1d4270f4edbcbb6ca35840c765c1130c7a413d010",
+  "quickshell/Common/settings/BarWidgetDefaults.js": "ad135f01d081bd9e4e123fec46937339f16fde4517c519967a4b1382288b190f",
+  "quickshell/Modules/DIsland/Activities/ClavisLyricsCompact.qml": "c8db0d6595a8944d9f0ad124fa5d6be792fe42c4e76bdd07262a1767096cc238",
+  "quickshell/Modules/DIsland/Activities/MediaCompact.qml": "e2b21b5a14457d1e41d4801acb337063200f0c15b6b9c2fbdf1cc54a84f4662e",
+  "quickshell/Modules/DIsland/DIslandSurface.qml": "3732f3b94a8db7ad9805bafcf2b7f731e542b353d66d614daf16d71566488c87",
+  "quickshell/Modules/DIsland/IslandController.qml": "0dd2601e35450e8d2e9efde0cefdfa5a033e574d462454e24683c7989d784ce4",
+  "quickshell/Modules/Settings/Widgets/IslandBehaviorCard.qml": "2c04f2fe54397bf9be894699adcd16edeb52653e02408d5b7ba921fa6a4fae75",
+  "quickshell/tests/compact-lyrics.test.mjs": "6858e31e8f78293d4dc01d407edb5cedcd0397cd2e94dd7061ee5cd022b21a0b",
+  "quickshell/translations/settings_search_index.json": "3df2f757a8980907a80c0712bd0bdd1f043f10ed9d0b01e34076dd24f215b83f"
+}

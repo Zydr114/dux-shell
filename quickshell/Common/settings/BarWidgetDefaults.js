@@ -41,6 +41,7 @@ var ISLAND_DEFAULTS = {
     islandMediaPresentation: "standard",
     islandMediaTextMode: "title",
     islandMediaMaxWidth: 560,
+    islandLyricsWidthThreshold: 24,
     islandOsdPresentation: "replace",
     islandNotificationCountdown: true,
     islandNotificationBadgeClearOnOpen: false,

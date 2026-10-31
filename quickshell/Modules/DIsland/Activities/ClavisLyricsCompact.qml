@@ -12,6 +12,8 @@ Item {
     id: root
 
     required property var mediaModel
+    required property real maximumWidth
+    required property real resizeThreshold
     readonly property LyricsController lyrics: LyricsService.controller
     readonly property bool live: enabled && visible && (Window.window?.visible ?? false) && mediaModel.available
     readonly property bool sampling: live && mediaModel.playing && !SettingsData.reduceMotion
@@ -34,13 +36,17 @@ Item {
         }
         return I18n.tr("No results");
     }
-    readonly property real textWidth: Math.max(Theme.clavisLyricsMinTextWidth, Math.min(Theme.clavisLyricsMaxTextWidth, measure.width))
+    readonly property real fixedWidth: Theme.clavisLyricsEndPadding * 2 + Theme.clavisLyricsCoverSize + Theme.clavisLyricsGap * 2 + Theme.clavisLyricsSpectrumSize
+    readonly property real minimumWidth: fixedWidth + Theme.clavisLyricsMinTextWidth
+    readonly property real naturalWidth: fixedWidth + Math.max(Theme.clavisLyricsMinTextWidth, Math.ceil(Math.max(measure.width, measure.advanceWidth)) + Theme.spacingXS)
+    readonly property bool interlude: lyrics.state === "ready" && lyrics.synced && lineText === ""
     readonly property list<real> levels: spectrumHeld && CavaService.spectrumAvailable ? Spectrum.peakBins(CavaService.spectrumValues, Theme.clavisLyricsSpectrumCount) : []
     property bool spectrumHeld: false
     property bool initialized: false
     property real shift: 0
+    property real retainedWidth: 0
 
-    implicitWidth: Theme.clavisLyricsEndPadding * 2 + Theme.clavisLyricsCoverSize + Theme.clavisLyricsGap * 2 + textWidth + Theme.clavisLyricsSpectrumSize
+    implicitWidth: retainedWidth
     implicitHeight: Theme.clavisLyricsHeight
     clip: true
 
@@ -56,14 +62,27 @@ Item {
         }
     }
     onSamplingChanged: syncSpectrum()
+    onNaturalWidthChanged: Qt.callLater(root.updateWidth)
+    onMaximumWidthChanged: Qt.callLater(root.updateWidth)
+    onResizeThresholdChanged: Qt.callLater(root.updateWidth)
+    onInterludeChanged: Qt.callLater(root.updateWidth)
     Component.onCompleted: {
         initialized = true;
+        updateWidth();
         turnTo(displayText);
         syncSpectrum();
     }
     Component.onDestruction: {
         if (spectrumHeld)
             CavaService.releaseSpectrum(root);
+    }
+
+    function updateWidth() {
+        if (!initialized)
+            return;
+        const currentWidth = retainedWidth;
+        const requiredWidth = interlude && currentWidth > 0 ? Math.max(minimumWidth, currentWidth - resizeThreshold) : naturalWidth;
+        retainedWidth = CompactLyrics.resolveWidth(currentWidth, requiredWidth, minimumWidth, maximumWidth, resizeThreshold);
     }
 
     function syncSpectrum() {
@@ -96,6 +115,7 @@ Item {
         text: root.displayText
         font.pixelSize: Theme.clavisLyricsFontSize
         font.weight: Theme.fontWeightBold
+        renderType: currentLabel.renderType
     }
 
     MediaArtwork {

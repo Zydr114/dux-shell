@@ -75,6 +75,10 @@ QtObject {
     readonly property string mediaTextMode: mediaPresentationOverride === "standard" ? "title" : SettingsData.islandSetting(barConfig, "islandMediaTextMode") || "title"
     onConfiguredMediaPresentationChanged: mediaPresentationOverride = ""
     readonly property real mediaMaximumWidth: Math.max(360, Math.min(560, Number(SettingsData.islandSetting(barConfig, "islandMediaMaxWidth")) || 560))
+    readonly property real mediaLyricsWidthThreshold: {
+        const value = Number(SettingsData.islandSetting(barConfig, "islandLyricsWidthThreshold"));
+        return isFinite(value) ? Math.max(0, Math.min(96, value)) : SettingsData.islandDefaults.islandLyricsWidthThreshold;
+    }
     readonly property bool osdAccessoryEnabled: SettingsData.islandSetting(barConfig, "islandOsdPresentation") === "accessory" && !dotMode
     readonly property bool notificationCountdown: SettingsData.islandSetting(barConfig, "islandNotificationCountdown") !== false
     property string accessoryActivity: ""
@@ -207,7 +211,7 @@ QtObject {
 
     function setMediaContentLength(length) {
         const next = Math.ceil(length);
-        if (!isFinite(next) || next <= 0 || Math.abs(next - mediaContentLength) < 2)
+        if (!isFinite(next) || next <= 0 || (mediaLyricsPresentation ? next === mediaContentLength : Math.abs(next - mediaContentLength) < 2))
             return;
         mediaContentLength = next;
     }

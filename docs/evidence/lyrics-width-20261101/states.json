@@ -1,0 +1,1446 @@
+[
+  {
+    "case": "short-chinese-full",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 244.80000000000007,
+        "rawWidth": 245,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 0,
+        "threshold": 24,
+        "compact": {
+          "text": "短句",
+          "naturalWidth": 221,
+          "retainedWidth": 245,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "短句",
+              "width": 144,
+              "implicitWidth": 30,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 245,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "line-a-grows-with-headroom",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 280,
+        "rawWidth": 280,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 0,
+        "threshold": 24,
+        "compact": {
+          "text": "星河静静流淌在你眼前",
+          "naturalWidth": 256,
+          "retainedWidth": 280,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "星河静静流淌在你眼前",
+              "width": 179,
+              "implicitWidth": 150,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 280,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "line-b-fits-headroom",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 280,
+        "rawWidth": 280,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 0,
+        "threshold": 24,
+        "compact": {
+          "text": "星河静静流淌在你的眼前",
+          "naturalWidth": 271,
+          "retainedWidth": 280,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "星河静静流淌在你的眼前",
+              "width": 179,
+              "implicitWidth": 165,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 280,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "line-c-exceeds-headroom",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 310.4000000000001,
+        "rawWidth": 310,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 0,
+        "threshold": 24,
+        "compact": {
+          "text": "星河正静静流淌在你的眼前",
+          "naturalWidth": 286,
+          "retainedWidth": 310,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "星河正静静流淌在你的眼前",
+              "width": 209,
+              "implicitWidth": 180,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 310,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "shrink-past-threshold",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 280,
+        "rawWidth": 280,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 0,
+        "threshold": 24,
+        "compact": {
+          "text": "星河静静流淌在你眼前",
+          "naturalWidth": 256,
+          "retainedWidth": 280,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "星河静静流淌在你眼前",
+              "width": 179,
+              "implicitWidth": 150,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 280,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "english-full",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 353.5999999999999,
+        "rawWidth": 354,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 0,
+        "threshold": 24,
+        "compact": {
+          "text": "A quiet light across the ocean",
+          "naturalWidth": 330,
+          "retainedWidth": 354,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "A quiet light across the ocean",
+              "width": 253,
+              "implicitWidth": 223.78125,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 354,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "long-line-hard-cap",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 440,
+        "rawWidth": 440,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 36,
+        "threshold": 24,
+        "compact": {
+          "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+          "naturalWidth": 1725,
+          "retainedWidth": 440,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+              "width": 339,
+              "implicitWidth": 1620,
+              "truncated": true
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "interlude-retains-width",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 440,
+        "rawWidth": 440,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 36,
+        "threshold": 24,
+        "compact": {
+          "text": "♪",
+          "naturalWidth": 221,
+          "retainedWidth": 440,
+          "maximumWidth": 440,
+          "interlude": true,
+          "labels": [
+            {
+              "text": "♪",
+              "width": 339,
+              "implicitWidth": 15,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "short-after-interlude",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 244.80000000000007,
+        "rawWidth": 245,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 36,
+        "threshold": 24,
+        "compact": {
+          "text": "短句",
+          "naturalWidth": 221,
+          "retainedWidth": 245,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "短句",
+              "width": 144,
+              "implicitWidth": 30,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 245,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "compact-animation-hard-cap",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 440,
+        "rawWidth": 440,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 71,
+        "threshold": 24,
+        "compact": {
+          "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+          "naturalWidth": 1725,
+          "retainedWidth": 440,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+              "width": 339,
+              "implicitWidth": 1620,
+              "truncated": true
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "rapid-line-retargets-keep-hard-cap",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 440,
+        "rawWidth": 440,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 105,
+        "threshold": 24,
+        "compact": {
+          "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+          "naturalWidth": 1725,
+          "retainedWidth": 440,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+              "width": 339,
+              "implicitWidth": 1620,
+              "truncated": true
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "lowering-cap-forces-width",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 360,
+        "rawWidth": 360,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 360,
+        "violations": 0,
+        "overshoots": 137,
+        "threshold": 24,
+        "compact": {
+          "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+          "naturalWidth": 1725,
+          "retainedWidth": 360,
+          "maximumWidth": 360,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+              "width": 259,
+              "implicitWidth": 1620,
+              "truncated": true
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 360,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "accessory-respects-total-cap",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 440,
+        "rawWidth": 440,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+          "naturalWidth": 1725,
+          "retainedWidth": 344,
+          "maximumWidth": 344,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+              "width": 243,
+              "implicitWidth": 1620,
+              "truncated": true
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "accessory-expiry-restores-budget",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 440,
+        "rawWidth": 440,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+          "naturalWidth": 1725,
+          "retainedWidth": 440,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。漫天星光沿着遥远地平线缓缓升起，在无尽夜色中照亮每一段悠长而温柔的旋律。",
+              "width": 339,
+              "implicitWidth": 1620,
+              "truncated": true
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "zero-threshold-exact-width",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 329.5999999999999,
+        "rawWidth": 330,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 0,
+        "compact": {
+          "text": "A quiet light across the ocean",
+          "naturalWidth": 330,
+          "retainedWidth": 330,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "A quiet light across the ocean",
+              "width": 229,
+              "implicitWidth": 223.78125,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 330,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "zero-threshold-chinese-full",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 256,
+        "rawWidth": 256,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 0,
+        "compact": {
+          "text": "星河静静流淌在你眼前",
+          "naturalWidth": 256,
+          "retainedWidth": 256,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "星河静静流淌在你眼前",
+              "width": 155,
+              "implicitWidth": 150,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 256,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "zero-threshold-latin-punctuation-full",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 395.19999999999993,
+        "rawWidth": 395,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 0,
+        "compact": {
+          "text": "Walking, waiting, finding a little light.",
+          "naturalWidth": 395,
+          "retainedWidth": 395,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "Walking, waiting, finding a little light.",
+              "width": 294,
+              "implicitWidth": 289.515625,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 395,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "zero-threshold-japanese-full",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 300.0000000000001,
+        "rawWidth": 300,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 0,
+        "compact": {
+          "text": "夜空の向こうへ歩いていこう",
+          "naturalWidth": 300,
+          "retainedWidth": 300,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "夜空の向こうへ歩いていこう",
+              "width": 199,
+              "implicitWidth": 195,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 300,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "return-to-default-threshold",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 244.80000000000007,
+        "rawWidth": 245,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "短句",
+          "naturalWidth": 221,
+          "retainedWidth": 245,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "短句",
+              "width": 144,
+              "implicitWidth": 30,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 245,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "expanded-player-retains-own-size",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 640,
+        "rawWidth": 640,
+        "running": false,
+        "expandedMorph": true,
+        "compactLimit": null,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "♪",
+          "naturalWidth": 221,
+          "retainedWidth": 245,
+          "maximumWidth": 440,
+          "interlude": true,
+          "labels": [
+            {
+              "text": "♪",
+              "width": 144,
+              "implicitWidth": 15,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": true,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 640,
+      "targetHeight": 264,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "collapse-start-preserves-expanded-geometry",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 603.1999999999999,
+        "rawWidth": 603.0642793307479,
+        "running": true,
+        "expandedMorph": true,
+        "compactLimit": null,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "♪",
+          "naturalWidth": 221,
+          "retainedWidth": 245,
+          "maximumWidth": 440,
+          "interlude": true,
+          "labels": [
+            {
+              "text": "♪",
+              "width": 144,
+              "implicitWidth": 15,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 245,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "collapse-retarget-keeps-expanded-geometry",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 270.4000000000001,
+        "rawWidth": 269.72126601181606,
+        "running": true,
+        "expandedMorph": true,
+        "compactLimit": null,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "短句",
+          "naturalWidth": 221,
+          "retainedWidth": 245,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "短句",
+              "width": 144,
+              "implicitWidth": 30,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 245,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "collapse-restores-compact-lyrics",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 244.80000000000007,
+        "rawWidth": 245,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "短句",
+          "naturalWidth": 221,
+          "retainedWidth": 245,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "短句",
+              "width": 144,
+              "implicitWidth": 30,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 245,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "standard-presentation-still-works",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 440,
+        "rawWidth": 440,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": null,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": null
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "standard",
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "lyrics-presentation-restored",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 244.80000000000007,
+        "rawWidth": 245,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "短句",
+          "naturalWidth": 221,
+          "retainedWidth": 245,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "短句",
+              "width": 144,
+              "implicitWidth": 30,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 245,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "reduced-motion-full-text",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 280,
+        "rawWidth": 280,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "星河静静流淌在你眼前",
+          "naturalWidth": 256,
+          "retainedWidth": 280,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "星河静静流淌在你眼前",
+              "width": 179,
+              "implicitWidth": 150,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 280,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  {
+    "case": "reduced-motion-collapse-resets-cap-latch",
+    "state": {
+      "_widthProbe": {
+        "visualWidth": 280,
+        "rawWidth": 280,
+        "running": false,
+        "expandedMorph": false,
+        "compactLimit": 440,
+        "violations": 0,
+        "overshoots": 173,
+        "threshold": 24,
+        "compact": {
+          "text": "星河静静流淌在你眼前",
+          "naturalWidth": 256,
+          "retainedWidth": 280,
+          "maximumWidth": 440,
+          "interlude": false,
+          "labels": [
+            {
+              "text": "星河静静流淌在你眼前",
+              "width": 179,
+              "implicitWidth": 150,
+              "truncated": false
+            }
+          ]
+        }
+      },
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 280,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  }
+]

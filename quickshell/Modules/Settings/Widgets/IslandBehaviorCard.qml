@@ -235,4 +235,20 @@ SettingsCard {
         value: root.store.setting("islandMediaMaxWidth")
         onSliderDragFinished: value => root.store.apply("islandMediaMaxWidth", value)
     }
+
+    SettingsSliderRow {
+        settingKey: root.keyPrefix + "LyricsWidthThreshold"
+        tags: ["island", "media", "lyrics", "width"]
+        visible: !root.isDot && root.store.setting("islandMediaPresentation") === "clavis-lyrics"
+        resetStore: root.store
+        resetKeys: ["islandLyricsWidthThreshold"]
+        text: I18n.tr("Lyrics resize threshold")
+        description: I18n.tr("Reserve space when lyrics grow and ignore small reductions in width.")
+        unit: "px"
+        minimum: 0
+        maximum: 96
+        step: 2
+        value: root.store.setting("islandLyricsWidthThreshold")
+        onSliderDragFinished: value => root.store.apply("islandLyricsWidthThreshold", value)
+    }
 }

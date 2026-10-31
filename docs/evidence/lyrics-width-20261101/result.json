@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "failure": null,
+  "restoration": {
+    "configurationBytesExact": true,
+    "configurationJsonExact": true,
+    "cacheBytesExact": true,
+    "outputVolumeRestored": true,
+    "fixtureExited": true
+  }
+}

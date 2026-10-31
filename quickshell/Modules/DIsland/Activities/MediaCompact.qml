@@ -59,6 +59,8 @@ Item {
 
         ClavisLyricsCompact {
             mediaModel: root.mediaModel
+            maximumWidth: Math.max(0, root.controller.mediaCompactMaxLength - root.controller.accessoryLength)
+            resizeThreshold: root.controller.mediaLyricsWidthThreshold
         }
     }
 }

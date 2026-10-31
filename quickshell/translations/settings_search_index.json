@@ -3312,6 +3312,37 @@
     "conditionKey": "islandEnabled"
   },
   {
+    "section": "islandMediaPresentation",
+    "label": "Compact media style",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "clavis",
+      "compact",
+      "cover",
+      "current",
+      "general",
+      "independently",
+      "island",
+      "lyric",
+      "lyrics",
+      "media",
+      "option",
+      "panel",
+      "requested",
+      "shows",
+      "spectrum",
+      "statusbar",
+      "style",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "description": "Clavis lyrics shows the cover, current lyric and spectrum. Lyrics are requested independently of the media page's lyrics option.",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "islandRouteControlCenter",
     "label": "Control Center",
     "tabIndex": 3,
@@ -3726,6 +3757,35 @@
     "conditionKey": "frameEnabled"
   },
   {
+    "section": "islandLyricsWidthThreshold",
+    "label": "Lyrics resize threshold",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "general",
+      "grow",
+      "ignore",
+      "island",
+      "lyrics",
+      "media",
+      "panel",
+      "reductions",
+      "reserve",
+      "resize",
+      "small",
+      "space",
+      "statusbar",
+      "taskbar",
+      "threshold",
+      "topbar",
+      "width"
+    ],
+    "parentLabel": "Bar",
+    "description": "Reserve space when lyrics grow and ignore small reductions in width.",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "barManualVisibility",
     "label": "Manual show/hide",
     "tabIndex": 3,
@@ -3781,6 +3841,27 @@
     "conditionKey": "windowRulesCapable"
   },
   {
+    "section": "islandMediaMaxWidth",
+    "label": "Maximum media width",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "general",
+      "island",
+      "lyrics",
+      "maximum",
+      "media",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "width"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "islandRouteMedia",
     "label": "Media",
     "tabIndex": 3,
@@ -3797,6 +3878,28 @@
       "statusbar",
       "taskbar",
       "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
+  },
+  {
+    "section": "islandMediaTextMode",
+    "label": "Media text",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "general",
+      "island",
+      "lyrics",
+      "media",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "text",
+      "title",
+      "topbar",
+      "track"
     ],
     "parentLabel": "Bar",
     "conditionKey": "islandEnabled"
@@ -3876,6 +3979,33 @@
     "conditionKey": "islandEnabled"
   },
   {
+    "section": "islandNotificationCountdown",
+    "label": "Notification countdown",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "alert",
+      "bar",
+      "countdown",
+      "general",
+      "island",
+      "notif",
+      "notification",
+      "panel",
+      "popup",
+      "progress",
+      "remaining",
+      "show",
+      "statusbar",
+      "taskbar",
+      "time",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "description": "Show the remaining popup time",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "islandNotifications",
     "label": "Notifications",
     "tabIndex": 3,
@@ -3900,6 +4030,28 @@
     ],
     "parentLabel": "Bar",
     "icon": "notifications",
+    "conditionKey": "islandEnabled"
+  },
+  {
+    "section": "islandOsdPresentation",
+    "label": "OSD presentation",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "brightness",
+      "general",
+      "island",
+      "media",
+      "osd",
+      "panel",
+      "presentation",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "volume"
+    ],
+    "parentLabel": "Bar",
     "conditionKey": "islandEnabled"
   },
   {
@@ -4881,6 +5033,27 @@
       "taskbar",
       "topbar",
       "widget"
+    ],
+    "parentLabel": "Bar"
+  },
+  {
+    "section": "barBlur",
+    "label": "Background blur",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "background",
+      "bar",
+      "blur",
+      "capsule",
+      "frosted",
+      "glass",
+      "group",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar"
     ],
     "parentLabel": "Bar"
   },
@@ -8261,18 +8434,29 @@
     "category": "Media player",
     "keywords": [
       "audio",
+      "caelestia",
       "cava",
+      "covers",
+      "enable",
+      "include",
+      "keeps",
       "media",
+      "motion",
       "mpris",
       "music",
       "playback",
       "player",
+      "reduced",
       "sound",
       "spectrum",
       "spotify",
-      "visualizer"
+      "still",
+      "their",
+      "visualizer",
+      "visualizers"
     ],
-    "parentLabel": "Sound & media"
+    "parentLabel": "Sound & media",
+    "description": "Enable other media visualizers. Caelestia covers include their own spectrum; reduced motion keeps them still."
   },
   {
     "section": "bluetoothMpris",
@@ -9847,7 +10031,7 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:27",
+    "section": "barWidgetOption:IslandOptions.qml:31",
     "label": "Charging",
     "tabIndex": 22,
     "keywords": [],
@@ -9855,7 +10039,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:29",
+    "section": "barWidgetOption:IslandOptions.qml:35",
     "label": "Clear badge on open",
     "tabIndex": 22,
     "keywords": [],
@@ -9917,6 +10101,14 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:24",
+    "label": "Compact media style",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
   },
   {
     "section": "barWidgetOption:AppsDockOptions.qml:1",
@@ -10071,7 +10263,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:28",
+    "section": "barWidgetOption:IslandOptions.qml:34",
     "label": "Expand by default",
     "tabIndex": 22,
     "keywords": [],
@@ -10303,6 +10495,14 @@
     "optionFile": "MusicOptions.qml"
   },
   {
+    "section": "barWidgetOption:IslandOptions.qml:27",
+    "label": "Lyrics resize threshold",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
     "section": "barWidgetOption:AppsDockOptions.qml:24",
     "label": "Magnification",
     "tabIndex": 22,
@@ -10343,6 +10543,14 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
+    "section": "barWidgetOption:IslandOptions.qml:26",
+    "label": "Maximum media width",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
     "section": "barWidgetOption:IslandOptions.qml:15",
     "label": "Media",
     "tabIndex": 22,
@@ -10357,6 +10565,14 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "MusicOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:25",
+    "label": "Media text",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
   },
   {
     "section": "barWidgetOption:PrivacyOptions.qml:2",
@@ -10375,7 +10591,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:30",
+    "section": "barWidgetOption:IslandOptions.qml:36",
     "label": "Motion",
     "tabIndex": 22,
     "keywords": [],
@@ -10423,8 +10639,24 @@
     "optionFile": "ClockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:24",
+    "section": "barWidgetOption:IslandOptions.qml:33",
+    "label": "Notification countdown",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:28",
     "label": "Notifications",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:32",
+    "label": "OSD presentation",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
@@ -10703,7 +10935,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:32",
+    "section": "barWidgetOption:IslandOptions.qml:38",
     "label": "Spring damping",
     "tabIndex": 22,
     "keywords": [],
@@ -10711,7 +10943,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:33",
+    "section": "barWidgetOption:IslandOptions.qml:39",
     "label": "Spring mass",
     "tabIndex": 22,
     "keywords": [],
@@ -10719,7 +10951,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:31",
+    "section": "barWidgetOption:IslandOptions.qml:37",
     "label": "Spring stiffness",
     "tabIndex": 22,
     "keywords": [],
@@ -10799,7 +11031,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:26",
+    "section": "barWidgetOption:IslandOptions.qml:30",
     "label": "Use standard OSDs",
     "tabIndex": 22,
     "keywords": [],
@@ -10807,7 +11039,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:25",
+    "section": "barWidgetOption:IslandOptions.qml:29",
     "label": "Use standard popups",
     "tabIndex": 22,
     "keywords": [],
@@ -14120,6 +14352,66 @@
     "parentLabel": "Power & battery"
   },
   {
+    "section": "audioVisualizerEnabled",
+    "label": "Audio visualizer",
+    "tabIndex": 43,
+    "category": "Dashboard",
+    "keywords": [
+      "audio",
+      "caelestia",
+      "clavis",
+      "covers",
+      "dashboard",
+      "enable",
+      "include",
+      "keeps",
+      "media",
+      "motion",
+      "reduced",
+      "spectrum",
+      "still",
+      "their",
+      "visualizer",
+      "visualizers"
+    ],
+    "description": "Enable other media visualizers. Caelestia covers include their own spectrum; reduced motion keeps them still."
+  },
+  {
+    "section": "dashClavisCards",
+    "label": "Clavis dashboard cards",
+    "tabIndex": 43,
+    "category": "Dashboard",
+    "keywords": [
+      "battery",
+      "cards",
+      "clavis",
+      "cookie",
+      "cpu",
+      "dashboard",
+      "disk",
+      "memory",
+      "network",
+      "weather"
+    ],
+    "icon": "palette"
+  },
+  {
+    "section": "dashClavisPreset",
+    "label": "Clavis reference appearance",
+    "tabIndex": 43,
+    "category": "Dashboard",
+    "keywords": [
+      "appearance",
+      "caelestia",
+      "clavis",
+      "dashboard",
+      "media",
+      "preset",
+      "reference"
+    ],
+    "icon": "auto_awesome"
+  },
+  {
     "section": "_tab_43",
     "label": "Dashboard",
     "tabIndex": 43,
@@ -14162,18 +14454,38 @@
     ]
   },
   {
+    "section": "dashClavisImport",
+    "label": "Import Clavis media appearance",
+    "tabIndex": 43,
+    "category": "Dashboard",
+    "keywords": [
+      "appearance",
+      "clavis",
+      "color",
+      "cover",
+      "dashboard",
+      "import",
+      "media",
+      "progress"
+    ],
+    "icon": "refresh"
+  },
+  {
     "section": "dashMediaSettings",
     "label": "Media player",
     "tabIndex": 43,
     "category": "Dashboard",
     "keywords": [
       "audio",
+      "caelestia",
+      "clavis",
       "dashboard",
       "media",
       "mpris",
       "music",
       "playback",
-      "player"
+      "player",
+      "preset"
     ],
     "icon": "music_note"
   },
@@ -17930,6 +18242,33 @@
     "conditionKey": "dotEnabled"
   },
   {
+    "section": "dotNotificationCountdown",
+    "label": "Notification countdown",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "alert",
+      "bar",
+      "countdown",
+      "dot",
+      "island",
+      "notif",
+      "notification",
+      "panel",
+      "popup",
+      "progress",
+      "remaining",
+      "show",
+      "statusbar",
+      "taskbar",
+      "time",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "description": "Show the remaining popup time",
+    "conditionKey": "dotEnabled"
+  },
+  {
     "section": "dotNotifications",
     "label": "Notifications",
     "tabIndex": 65,
@@ -17954,6 +18293,28 @@
     ],
     "parentLabel": "Bar",
     "icon": "notifications",
+    "conditionKey": "dotEnabled"
+  },
+  {
+    "section": "dotOsdPresentation",
+    "label": "OSD presentation",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "brightness",
+      "dot",
+      "island",
+      "media",
+      "osd",
+      "panel",
+      "presentation",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "volume"
+    ],
+    "parentLabel": "Bar",
     "conditionKey": "dotEnabled"
   },
   {

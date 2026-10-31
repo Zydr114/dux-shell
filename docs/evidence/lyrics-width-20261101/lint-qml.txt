@@ -1,0 +1,2 @@
+lint-qml: checking 2 entrypoints with /usr/lib/qt6/bin/qmllint
+lint-qml: PASS (2 entrypoints)

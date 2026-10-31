@@ -71,7 +71,6 @@ Singleton {
     readonly property real clavisLyricsEndPadding: 15
     readonly property real clavisLyricsGap: 12
     readonly property real clavisLyricsMinTextWidth: 120
-    readonly property real clavisLyricsMaxTextWidth: 800
     readonly property real clavisLyricsFontSize: 15
     readonly property int clavisLyricsTransitionDuration: 400
     readonly property real clavisLyricsSpectrumSize: 21
