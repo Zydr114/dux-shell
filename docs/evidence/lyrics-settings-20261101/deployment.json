@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-11-01T01:31:42.556992+08:00",
+  "implementationCommit": "a6b1c9c86b76d6cd80773b006dde59b2e01568e6",
+  "version": "2.0.0+git5363.a6b1c9c8",
+  "activation": "atomic user binary replacement and user service restart",
+  "service": {
+    "ActiveState": "active",
+    "SubState": "running",
+    "ActiveEnterTimestamp": "Sun 2026-11-01 01:30:38 CST",
+    "MainPID": "379035"
+  },
+  "quickshell": [
+    {
+      "pid": 379053,
+      "argv": "qs -p /home/zydr/AgentWorkspace/dms-custom/quickshell"
+    }
+  ],
+  "binarySha256": "7e97bc5fa67a055ec2023bda04d214693e0547983a83f9fa66e7cdece8eec812",
+  "builtBinaryMatchesInstalled": true,
+  "cleanBuildMetadata": true,
+  "settingsUnchangedSinceDeploymentBackup": true,
+  "mediaPresentation": "clavis-lyrics",
+  "changedComponentWarningsOrBindingLoops": [],
+  "keyboardAutomationStopped": true,
+  "fixtureProcessesExited": true,
+  "realPlayerControlsSent": false
+}

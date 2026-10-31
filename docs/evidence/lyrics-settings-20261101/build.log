@@ -1,0 +1,7 @@
+Building dms...
+make[1]: Entering directory '/home/zydr/AgentWorkspace/dms-custom/core'
+Building dms...
+CGO_ENABLED=0 go build -tags withshell -ldflags='-s -w -X main.Version=2.0.0+git5363.a6b1c9c8 -X main.buildTime=2026-10-31_17:29:23 -X main.commit=a6b1c9c8' -o bin/dms ./cmd/dms
+Build complete: bin/dms
+make[1]: Leaving directory '/home/zydr/AgentWorkspace/dms-custom/core'
+Build complete

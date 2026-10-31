@@ -20,4 +20,8 @@ Settings search navigated to the new interlude field. The user resumed desktop i
 
 There are no new runtime timers, processes, polling loops or persistent indexes. Settings use existing writes and reactive bindings. These checks do not claim long-term resource measurements, multi-screen or other compositor acceptance.
 
+## Build and startup
+
+Implementation commit: `a6b1c9c86b76d6cd80773b006dde59b2e01568e6`. `make build` succeeded with clean Git metadata and version `2.0.0+git5363.a6b1c9c8`. The user binary was replaced atomically and `dms.service` restarted at 01:30:38 Asia/Shanghai. The installed and built hashes match, the service is active, and its sole Quickshell process loads this checkout. Settings bytes remained unchanged since the deployment backup, including the user's concurrent preferences. No changed-component warnings or binding loops were found in the post-restart journal. See `build.log` and `deployment.json`.
+
 ![Synthetic settings cases](contact-sheet.png)
