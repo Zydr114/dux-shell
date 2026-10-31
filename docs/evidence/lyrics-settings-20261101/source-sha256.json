@@ -1,0 +1,16 @@
+{
+  "quickshell/Common/CompactLyrics.js": "68f9442e8e587f3a20237dbc4b1dd0606781f85a073b7eae4fee8c075ca13e9a",
+  "quickshell/Common/settings/BarWidgetDefaults.js": "e61e5226cd075c4f072b31ec097fa527af4c4356ae37c8f0899b12da9f89d520",
+  "quickshell/Modules/DDash/DashMetrics.qml": "00a7c36d0ac7856a9fbdc33c7bb062490703f20009b087824a55dea437db408c",
+  "quickshell/Modules/DIsland/Activities/ClavisLyricsCompact.qml": "819c8af8449616cdc260ba02f1df6f3340562ba13084f17b6cd07a59d95b727c",
+  "quickshell/Modules/DIsland/Activities/MediaCompact.qml": "00ed279a53557c81e5675aad4d154ab64d0fef9e24d5d0df18589dfe48b5a3ec",
+  "quickshell/Modules/DIsland/IslandController.qml": "abfde9bfb7a149cdb34bcb134a7f62b951130496f2496e7067c1601bb80caf0d",
+  "quickshell/Modules/Settings/BarWidgetOptions/IslandOptions.qml": "f93761791c78f3d4f249f668eb07f5d8045c374862e8d1c07733419fbd395a18",
+  "quickshell/Modules/Settings/DBarTab.qml": "e291fe96dac8e6755342ad16b6285ea9c0f10888a1679a91e847d59406c0e287",
+  "quickshell/Modules/Settings/DDotTab.qml": "8322dd95fc35fc80068e794e1084cd55a8e02b5fec6678143e2dbe1dce92c5be",
+  "quickshell/Modules/Settings/Widgets/IslandBehaviorCard.qml": "461ea766fa4e9fcc4da92817ded3efd0a6a7513a128ac50bbabc1716de142237",
+  "quickshell/tests/compact-lyrics.test.mjs": "09543f6019bf905490e408c898ceabaf8ba850d44f50ca1341604878a27ae1c9",
+  "quickshell/tests/island-routing.test.mjs": "8bed4a24e1f2c4691ee580b05cdb65836b736ba2ffebded3258adcf2973705a1",
+  "quickshell/translations/settings_search_index.json": "722eda712d5fbf3b02d814c18d27d43f21cecd4cd9f000729cb72da4a4db8c2e",
+  "quickshell/Modules/Settings/Widgets/IslandMediaCard.qml": "2e2710fae88a8eda51fe174a6de895a68e73187f65a73906821469e8e965de91"
+}

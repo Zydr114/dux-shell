@@ -3658,6 +3658,38 @@
     "conditionKey": "windowRulesCapable"
   },
   {
+    "section": "islandLyricsHoldShortGaps",
+    "label": "Hold lyrics through short gaps",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "clavis",
+      "during",
+      "gap",
+      "gaps",
+      "general",
+      "hold",
+      "instrumental",
+      "island",
+      "keep",
+      "lyric",
+      "lyrics",
+      "media",
+      "panel",
+      "previous",
+      "short",
+      "statusbar",
+      "taskbar",
+      "through",
+      "topbar",
+      "visible"
+    ],
+    "parentLabel": "Bar",
+    "description": "Keep the previous lyric visible during short instrumental gaps.",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "hoverPopouts",
     "label": "Hover popouts",
     "tabIndex": 3,
@@ -3680,6 +3712,37 @@
     "icon": "touch_app"
   },
   {
+    "section": "islandLyricsInterludeText",
+    "label": "Interlude text",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "clavis",
+      "during",
+      "empty",
+      "gaps",
+      "general",
+      "hide",
+      "instrumental",
+      "interlude",
+      "island",
+      "leave",
+      "lyrics",
+      "media",
+      "panel",
+      "shown",
+      "statusbar",
+      "taskbar",
+      "text",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "icon": "restart_alt",
+    "description": "Shown during instrumental gaps. Leave empty to hide it.",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "islandMediaClockVisible",
     "label": "Keep clock with media",
     "tabIndex": 3,
@@ -3700,6 +3763,37 @@
       "watch"
     ],
     "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
+  },
+  {
+    "section": "islandLyricsKeepInterludeWidth",
+    "label": "Keep width during interludes",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "appears",
+      "bar",
+      "clavis",
+      "during",
+      "general",
+      "interlude",
+      "interludes",
+      "island",
+      "keep",
+      "last",
+      "lyric",
+      "lyrics",
+      "media",
+      "next",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "until",
+      "width"
+    ],
+    "parentLabel": "Bar",
+    "description": "Keep the last lyric's width until the next lyric appears.",
     "conditionKey": "islandEnabled"
   },
   {
@@ -3862,6 +3956,31 @@
     "conditionKey": "islandEnabled"
   },
   {
+    "section": "islandLyricsShortGapSeconds",
+    "label": "Maximum short gap",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "clavis",
+      "duration",
+      "gap",
+      "general",
+      "island",
+      "lyrics",
+      "maximum",
+      "media",
+      "panel",
+      "seconds",
+      "short",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "islandRouteMedia",
     "label": "Media",
     "tabIndex": 3,
@@ -3880,6 +3999,29 @@
       "topbar"
     ],
     "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
+  },
+  {
+    "section": "islandMedia",
+    "label": "Media and lyrics",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "clavis",
+      "compact",
+      "general",
+      "island",
+      "lyrics",
+      "media",
+      "panel",
+      "playback",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "icon": "music_note",
     "conditionKey": "islandEnabled"
   },
   {
@@ -10031,7 +10173,7 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:31",
+    "section": "barWidgetOption:IslandOptions.qml:36",
     "label": "Charging",
     "tabIndex": 22,
     "keywords": [],
@@ -10039,7 +10181,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:35",
+    "section": "barWidgetOption:IslandOptions.qml:40",
     "label": "Clear badge on open",
     "tabIndex": 22,
     "keywords": [],
@@ -10103,7 +10245,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:24",
+    "section": "barWidgetOption:IslandOptions.qml:25",
     "label": "Compact media style",
     "tabIndex": 22,
     "keywords": [],
@@ -10263,7 +10405,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:34",
+    "section": "barWidgetOption:IslandOptions.qml:39",
     "label": "Expand by default",
     "tabIndex": 22,
     "keywords": [],
@@ -10375,6 +10517,14 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
+    "section": "barWidgetOption:IslandOptions.qml:29",
+    "label": "Hold lyrics through short gaps",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
     "section": "barWidgetOption:IslandOptions.qml:1",
     "label": "Home compact",
     "tabIndex": 22,
@@ -10455,8 +10605,24 @@
     "optionFile": "ControlCenterOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:22",
+    "section": "barWidgetOption:IslandOptions.qml:31",
+    "label": "Interlude text",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:23",
     "label": "Keep clock with media",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:32",
+    "label": "Keep width during interludes",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
@@ -10495,7 +10661,7 @@
     "optionFile": "MusicOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:27",
+    "section": "barWidgetOption:IslandOptions.qml:28",
     "label": "Lyrics resize threshold",
     "tabIndex": 22,
     "keywords": [],
@@ -10543,8 +10709,16 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:26",
+    "section": "barWidgetOption:IslandOptions.qml:27",
     "label": "Maximum media width",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:30",
+    "label": "Maximum short gap",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
@@ -10559,6 +10733,14 @@
     "optionFile": "IslandOptions.qml"
   },
   {
+    "section": "barWidgetOption:IslandOptions.qml:22",
+    "label": "Media and lyrics",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
     "section": "barWidgetOption:MusicOptions.qml:7",
     "label": "Media player",
     "tabIndex": 22,
@@ -10567,7 +10749,7 @@
     "optionFile": "MusicOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:25",
+    "section": "barWidgetOption:IslandOptions.qml:26",
     "label": "Media text",
     "tabIndex": 22,
     "keywords": [],
@@ -10591,7 +10773,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:36",
+    "section": "barWidgetOption:IslandOptions.qml:41",
     "label": "Motion",
     "tabIndex": 22,
     "keywords": [],
@@ -10639,7 +10821,7 @@
     "optionFile": "ClockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:33",
+    "section": "barWidgetOption:IslandOptions.qml:38",
     "label": "Notification countdown",
     "tabIndex": 22,
     "keywords": [],
@@ -10647,7 +10829,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:28",
+    "section": "barWidgetOption:IslandOptions.qml:33",
     "label": "Notifications",
     "tabIndex": 22,
     "keywords": [],
@@ -10655,7 +10837,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:32",
+    "section": "barWidgetOption:IslandOptions.qml:37",
     "label": "OSD presentation",
     "tabIndex": 22,
     "keywords": [],
@@ -10935,7 +11117,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:38",
+    "section": "barWidgetOption:IslandOptions.qml:43",
     "label": "Spring damping",
     "tabIndex": 22,
     "keywords": [],
@@ -10943,7 +11125,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:39",
+    "section": "barWidgetOption:IslandOptions.qml:44",
     "label": "Spring mass",
     "tabIndex": 22,
     "keywords": [],
@@ -10951,7 +11133,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:37",
+    "section": "barWidgetOption:IslandOptions.qml:42",
     "label": "Spring stiffness",
     "tabIndex": 22,
     "keywords": [],
@@ -10983,7 +11165,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:23",
+    "section": "barWidgetOption:IslandOptions.qml:24",
     "label": "Switch to media when playback starts",
     "tabIndex": 22,
     "keywords": [],
@@ -11031,7 +11213,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:30",
+    "section": "barWidgetOption:IslandOptions.qml:35",
     "label": "Use standard OSDs",
     "tabIndex": 22,
     "keywords": [],
@@ -11039,7 +11221,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:29",
+    "section": "barWidgetOption:IslandOptions.qml:34",
     "label": "Use standard popups",
     "tabIndex": 22,
     "keywords": [],

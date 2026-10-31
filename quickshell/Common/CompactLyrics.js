@@ -1,4 +1,19 @@
 .pragma library
+.import "settings/BarWidgetDefaults.js" as WidgetDefaults
+
+function shortGapSeconds(enabled, value) {
+    if (enabled === false)
+        return 0;
+    if (!Number.isFinite(value))
+        return WidgetDefaults.ISLAND_DEFAULTS.islandLyricsShortGapSeconds;
+    return Math.max(1, Math.min(10, value));
+}
+
+function interludeText(value) {
+    if (typeof value !== "string")
+        return WidgetDefaults.ISLAND_DEFAULTS.islandLyricsInterludeText;
+    return value.replace(/\s+/g, " ").trim().slice(0, 128).replace(/[\uD800-\uDBFF]$/, "");
+}
 
 function partText(parts) {
     const vocals = parts.map(part => ({
@@ -76,13 +91,15 @@ function lineText(lines, index, at, shortGap = 0, focusedGroups = []) {
     return held.text;
 }
 
-function resolveWidth(current, required, minimum, maximum, threshold) {
+function resolveWidth(current, required, minimum, maximum, threshold, retain = false) {
     minimum = Number.isFinite(minimum) ? Math.max(0, Math.ceil(minimum)) : 0;
     maximum = Number.isFinite(maximum) ? Math.max(0, Math.floor(maximum)) : minimum;
     minimum = Math.min(minimum, maximum);
     threshold = Number.isFinite(threshold) ? Math.max(0, Math.ceil(threshold)) : 0;
     required = Number.isFinite(required) ? Math.ceil(required) : minimum;
     required = Math.max(minimum, Math.min(required, maximum));
+    if (retain && Number.isFinite(current) && current > 0)
+        required = Math.max(required, Math.min(Math.ceil(current), maximum) - threshold);
     const desired = Math.min(required + threshold, maximum);
     if (!Number.isFinite(current) || current <= 0)
         return desired;

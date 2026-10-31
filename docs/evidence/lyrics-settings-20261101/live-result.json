@@ -1,0 +1,14 @@
+{
+  "finishedAt": "2026-11-01T01:21:18.280584+08:00",
+  "failure": null,
+  "settingsBytesRestored": true,
+  "conflicts": [],
+  "fixtureExited": true,
+  "realPlayerControlsSent": false,
+  "uiVerification": {
+    "settingsSearchNavigatedToInterludeField": true,
+    "typingAndResetAcceptance": "stopped when the user resumed desktop interaction; no claim of completed input or reset acceptance",
+    "independentPreferences": "user changed interlude text and width preference; retained both during cleanup",
+    "newProcessesExited": true
+  }
+}

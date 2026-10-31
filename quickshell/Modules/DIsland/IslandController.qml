@@ -7,6 +7,7 @@ import qs.Modals.DLauncherV2.Components
 import qs.Modules.ControlCenter
 import qs.Modules.DBar
 import qs.Modules.DDash
+import "../../Common/CompactLyrics.js" as CompactLyrics
 import "../../Common/IslandInteraction.js" as IslandInteraction
 import "../../Common/TransientExpiry.js" as TransientExpiry
 
@@ -79,6 +80,9 @@ QtObject {
         const value = Number(SettingsData.islandSetting(barConfig, "islandLyricsWidthThreshold"));
         return isFinite(value) ? Math.max(0, Math.min(96, value)) : SettingsData.islandDefaults.islandLyricsWidthThreshold;
     }
+    readonly property real mediaLyricsShortGapSeconds: CompactLyrics.shortGapSeconds(SettingsData.islandSetting(barConfig, "islandLyricsHoldShortGaps"), SettingsData.islandSetting(barConfig, "islandLyricsShortGapSeconds"))
+    readonly property string mediaLyricsInterludeText: CompactLyrics.interludeText(SettingsData.islandSetting(barConfig, "islandLyricsInterludeText"))
+    readonly property bool mediaLyricsKeepInterludeWidth: SettingsData.islandSetting(barConfig, "islandLyricsKeepInterludeWidth") !== false
     readonly property bool osdAccessoryEnabled: SettingsData.islandSetting(barConfig, "islandOsdPresentation") === "accessory" && !dotMode
     readonly property bool notificationCountdown: SettingsData.islandSetting(barConfig, "islandNotificationCountdown") !== false
     property string accessoryActivity: ""

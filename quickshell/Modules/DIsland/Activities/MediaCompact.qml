@@ -61,6 +61,9 @@ Item {
             mediaModel: root.mediaModel
             maximumWidth: Math.max(0, root.controller.mediaCompactMaxLength - root.controller.accessoryLength)
             resizeThreshold: root.controller.mediaLyricsWidthThreshold
+            shortGapSeconds: root.controller.mediaLyricsShortGapSeconds
+            interludeText: root.controller.mediaLyricsInterludeText
+            keepInterludeWidth: root.controller.mediaLyricsKeepInterludeWidth
         }
     }
 }

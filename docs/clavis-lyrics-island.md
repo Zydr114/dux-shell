@@ -124,3 +124,22 @@ Clavis 紧凑歌词统一文字测量与实际渲染方式，同时取字形边�
 为避免歌词在句间反复切成音符，Clavis 在不超过 4 秒的完整句间空档保留前句文字；超过阈值的空档继续显示音符。重叠声部中仍在演唱的内容优先，逐字时间与展开歌词高亮不延长。规则同时处理提供者的空白 cue 和逐字格式自身的句尾间隙，不改写缓存或增加定时器。
 
 17 项定向测试及旧实现失败回放、完整 QML 测试、lint、真实提供者样本回放、13 个现有桌面状态和截图检查通过。已构建、安装并启动对应版本；配置恢复和进程信息见[验收记录](evidence/lyrics-gaps-20261101/README.md)。
+
+## 媒体与歌词设置（2026-11-01）
+
+在「设置 → 状态栏 → 常规」选择对应灵动岛后，媒体选项集中在 **Media and lyrics** 卡片。嵌入普通状态栏的灵动岛在其部件设置中使用同一卡片；Dot 不显示这些选项。原来的媒体自动切换、紧凑呈现、时钟和文字模式均保留。
+
+| 设置 | 配置键 | 默认值与行为 |
+| --- | --- | --- |
+| Maximum media width | `islandMediaMaxWidth` | 560px，范围 360–560px，整体硬上限 |
+| Lyrics resize threshold | `islandLyricsWidthThreshold` | 24px，范围 0–96px，控制增宽余量和缩窄阈值 |
+| Hold lyrics through short gaps | `islandLyricsHoldShortGaps` | 开启；关闭后，句间空档直接显示间奏内容 |
+| Maximum short gap | `islandLyricsShortGapSeconds` | 4 秒，可设 1–10 秒；只在开启短空档保留时生效 |
+| Interlude text | `islandLyricsInterludeText` | `♪`；可输入文字、标点和 emoji，留空不显示文字 |
+| Keep width during interludes | `islandLyricsKeepInterludeWidth` | 开启；关闭后按间奏内容和宽度阈值重新计算 |
+
+歌词专属选项仅在 Clavis lyrics 呈现下显示。每项均可独立恢复默认值，配置按灵动岛实例保存。短空档开关和时长只改变紧凑文字驻留，不延长逐字或展开歌词的高亮时间。
+
+间奏文字在输入完成或离开输入框时保存，按纯文本显示，适用于同步歌词的前奏、句间空档和尾奏；正在加载、无同步时间、纯音乐和错误状态保留各自提示。多余空白压成单个空格，首尾空白移除，最多 128 个 UTF-16 单元，截断不保留半个 emoji。自定义内容比上一句更长时仍会按需增宽，超过最大宽度则省略。保持宽度开启时，间奏不会因短占位内容而缩窄。
+
+验证范围与截图见[设置验收记录](evidence/lyrics-settings-20261101/README.md)。

@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.DCommon.Widgets
-import qs.Modules.DDash
 import qs.Services
 import qs.Widgets
 import "../../../Common/CompactLyrics.js" as CompactLyrics
@@ -15,11 +14,14 @@ Item {
     required property var mediaModel
     required property real maximumWidth
     required property real resizeThreshold
+    required property real shortGapSeconds
+    required property string interludeText
+    required property bool keepInterludeWidth
     readonly property LyricsController lyrics: LyricsService.controller
     readonly property bool live: enabled && visible && (Window.window?.visible ?? false) && mediaModel.available
     readonly property bool sampling: live && mediaModel.playing && !SettingsData.reduceMotion
     readonly property bool animationsEnabled: live && !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
-    readonly property string lineText: live && lyrics.synced ? CompactLyrics.lineText(lyrics.lines, lyrics.activeIndex, lyrics.sampleTime, DashMetrics.mediaLyricsShortGapSeconds, lyrics.focusedGroups) : ""
+    readonly property string lineText: live && lyrics.synced ? CompactLyrics.lineText(lyrics.lines, lyrics.activeIndex, lyrics.sampleTime, shortGapSeconds, lyrics.focusedGroups) : ""
     readonly property string displayText: {
         if (!LyricsService.available)
             return I18n.tr("Unavailable");
@@ -33,7 +35,7 @@ Item {
         case "ready":
             if (!lyrics.synced)
                 return I18n.tr("Unsynced", "Lyrics have no timestamps");
-            return lineText || "♪";
+            return lineText || interludeText;
         }
         return I18n.tr("No results");
     }
@@ -66,6 +68,7 @@ Item {
     onNaturalWidthChanged: Qt.callLater(root.updateWidth)
     onMaximumWidthChanged: Qt.callLater(root.updateWidth)
     onResizeThresholdChanged: Qt.callLater(root.updateWidth)
+    onKeepInterludeWidthChanged: Qt.callLater(root.updateWidth)
     onInterludeChanged: Qt.callLater(root.updateWidth)
     Component.onCompleted: {
         initialized = true;
@@ -82,8 +85,7 @@ Item {
         if (!initialized)
             return;
         const currentWidth = retainedWidth;
-        const requiredWidth = interlude && currentWidth > 0 ? Math.max(minimumWidth, currentWidth - resizeThreshold) : naturalWidth;
-        retainedWidth = CompactLyrics.resolveWidth(currentWidth, requiredWidth, minimumWidth, maximumWidth, resizeThreshold);
+        retainedWidth = CompactLyrics.resolveWidth(currentWidth, naturalWidth, minimumWidth, maximumWidth, resizeThreshold, interlude && keepInterludeWidth);
     }
 
     function syncSpectrum() {

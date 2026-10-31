@@ -1,0 +1,67 @@
+✖ short gap settings disable holding and bound custom durations (1.257527ms)
+✖ custom interlude text preserves an empty choice and literal Unicode content (0.296267ms)
+✔ compact lyrics show the active lead voices and flatten multiline text (0.828449ms)
+✔ interludes and seek-before-first-line clear the previous lyric without inventing timestamps (0.261202ms)
+✔ short gaps retain text after removed blank cues and explicit word-timed ends (0.783685ms)
+✔ only known interior gaps no longer than the complete threshold retain text (0.513346ms)
+✔ current vocals take precedence over held text across overlapping groups (0.3188ms)
+✔ held chorus text preserves repeated lead voices and filters background voices (0.345761ms)
+✔ a later part in an earlier group can end the held interval (0.304083ms)
+✔ holding text is independent of seek order and replaced track arrays (0.544655ms)
+✔ compact lyric width grows with headroom and retains the last adopted width (0.364125ms)
+✔ compact lyric width respects changed caps and never holds a width that truncates fitting text (0.193384ms)
+✔ zero threshold tracks exact pixel width without fractional churn (0.123633ms)
+✖ interlude width retention can be disabled and still accommodates custom text (0.967872ms)
+✔ fractional screen budgets remain hard caps when rounding required pixels (0.177895ms)
+✔ compact lyric width normalizes invalid sizes and conflicting bounds (0.238349ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 13
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 77.867983
+
+✖ failing tests:
+
+test at ../../../../tmp/dms-lyrics-settings-20261101-rmccej4d/baseline/tests/compact-lyrics.test.mjs:7:1
+✖ short gap settings disable holding and bound custom durations (1.257527ms)
+  TypeError [Error]: lyrics.shortGapSeconds is not a function
+      at TestContext.<anonymous> (file:///tmp/dms-lyrics-settings-20261101-rmccej4d/baseline/tests/compact-lyrics.test.mjs:9:29)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at ../../../../tmp/dms-lyrics-settings-20261101-rmccej4d/baseline/tests/compact-lyrics.test.mjs:22:1
+✖ custom interlude text preserves an empty choice and literal Unicode content (0.296267ms)
+  TypeError [Error]: lyrics.interludeText is not a function
+      at TestContext.<anonymous> (file:///tmp/dms-lyrics-settings-20261101-rmccej4d/baseline/tests/compact-lyrics.test.mjs:24:29)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at ../../../../tmp/dms-lyrics-settings-20261101-rmccej4d/baseline/tests/compact-lyrics.test.mjs:179:1
+✖ interlude width retention can be disabled and still accommodates custom text (0.967872ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  124 !== 240
+  
+      at TestContext.<anonymous> (file:///tmp/dms-lyrics-settings-20261101-rmccej4d/baseline/tests/compact-lyrics.test.mjs:180:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 124,
+    expected: 240,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

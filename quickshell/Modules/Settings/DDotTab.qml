@@ -301,7 +301,6 @@ Item {
             store: dot
             keyPrefix: "dot"
             docked: false
-            isDot: true
         }
 
         IslandNotificationsCard {

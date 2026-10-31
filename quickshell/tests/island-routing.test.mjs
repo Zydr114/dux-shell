@@ -314,6 +314,38 @@ test("island settings write to the config for islands and to the widget entry fo
     assert.deepEqual(plain(configs[2]), { id: "plain" }, "a bar without the widget takes no island settings");
 });
 
+test("lyric text and gap tuning survive storage and reset independently per island", () => {
+    const settings = hostedSettings([
+        { id: "island", island: true },
+        { id: "bar", islandLyricsInterludeText: "old layout", centerWidgets: ["island"] }
+    ]);
+    const custom = {
+        islandLyricsHoldShortGaps: false,
+        islandLyricsShortGapSeconds: 8,
+        islandLyricsInterludeText: "",
+        islandLyricsKeepInterludeWidth: false
+    };
+    settings.setIslandSettings("island", custom);
+    settings.setIslandSettings("bar", { ...custom, islandLyricsInterludeText: "instrumental" });
+    settings.barConfigs = plain(settings.barConfigs);
+
+    const island = settings.getBarConfig("island");
+    const bar = settings.getBarConfig("bar");
+    for (const [key, value] of Object.entries(custom))
+        assert.equal(settings.islandSetting(island, key), value, `${key} keeps false, empty and numeric values`);
+    assert.equal(settings.islandSetting(bar, "islandLyricsInterludeText"), "instrumental");
+    assert.equal(bar.islandLyricsInterludeText, "old layout", "hosted writes preserve the standalone layout's text");
+
+    const reset = Object.fromEntries(Object.keys(custom).map(key => [key, settings.islandDefaultsFor(bar)[key]]));
+    settings.setIslandSettings("bar", reset);
+    const resetBar = settings.getBarConfig("bar");
+    assert.equal(settings.islandSetting(resetBar, "islandLyricsHoldShortGaps"), true);
+    assert.equal(settings.islandSetting(resetBar, "islandLyricsShortGapSeconds"), 4);
+    assert.equal(settings.islandSetting(resetBar, "islandLyricsInterludeText"), "♪");
+    assert.equal(settings.islandSetting(resetBar, "islandLyricsKeepInterludeWidth"), true);
+    assert.equal(settings.islandSetting(settings.getBarConfig("island"), "islandLyricsInterludeText"), "", "resetting the host keeps the other island's empty text");
+});
+
 test("adding the island widget is exclusive per screen and refused across an island-layout bar", () => {
     const covers = { a: ["internal"], b: ["internal", "external"], c: ["external"], island: ["internal"], other: ["other"] };
     const settings = hostedSettings([{ id: "a", centerWidgets: ["clock"] }, { id: "b", leftWidgets: ["island"] }, { id: "c", rightWidgets: [islandWidget({ islandOuterGap: 2 })] }, { id: "island", island: true, enabled: true }, { id: "other" }], {

@@ -3,6 +3,32 @@ import test from "node:test";
 import { loadScript } from "./qml-script.mjs";
 
 const lyrics = loadScript(new URL("../Common/CompactLyrics.js", import.meta.url));
+
+test("short gap settings disable holding and bound custom durations", () => {
+    for (const value of [1, 4, 10, NaN, Infinity, null])
+        assert.equal(lyrics.shortGapSeconds(false, value), 0);
+    for (const [value, expected] of [[1, 1], [7, 7], [10, 10], [-2, 1], [20, 10], [NaN, 4], [Infinity, 4], [null, 4], ["7", 4]])
+        assert.equal(lyrics.shortGapSeconds(true, value), expected);
+
+    const lines = [
+        { parts: [{ x: "previous", t: 1, e: 2 }] },
+        { parts: [{ x: "next", t: 8, e: 9 }] }
+    ];
+    assert.equal(lyrics.lineText(lines, 0, 5, lyrics.shortGapSeconds(false, 10)), "");
+    assert.equal(lyrics.lineText(lines, 0, 5, lyrics.shortGapSeconds(true, 4)), "");
+    assert.equal(lyrics.lineText(lines, 0, 5, lyrics.shortGapSeconds(true, 6)), "previous");
+});
+
+test("custom interlude text preserves an empty choice and literal Unicode content", () => {
+    for (const value of ["", "   ", "\n\t"])
+        assert.equal(lyrics.interludeText(value), "");
+    assert.equal(lyrics.interludeText("  间奏 🎵  <3  "), "间奏 🎵 <3");
+    assert.equal(lyrics.interludeText("first\nsecond\tpart"), "first second part");
+    assert.equal(lyrics.interludeText("🎵".repeat(129)), "🎵".repeat(64));
+    assert.equal(lyrics.interludeText("a".repeat(127) + "🎵"), "a".repeat(127));
+    for (const value of [null, undefined, false, 42, {}])
+        assert.equal(lyrics.interludeText(value), "♪");
+});
 const part = (x, t, e, background = false) => ({ x, t, e, background });
 const group = (...parts) => ({ t: Math.min(...parts.map(part => part.t)), e: Math.max(...parts.map(part => part.e)), parts });
 
@@ -148,6 +174,17 @@ test("zero threshold tracks exact pixel width without fractional churn", () => {
     assert.equal(lyrics.resolveWidth(100.1, 100.2, 60, 400, 0), 101);
     assert.equal(lyrics.resolveWidth(101, 100.9, 60, 400, 0), 101);
     assert.equal(lyrics.resolveWidth(0, 100.1, 60.1, 400.1, 10.1), 112);
+});
+
+test("interlude width retention can be disabled and still accommodates custom text", () => {
+    assert.equal(lyrics.resolveWidth(240, 100, 60, 400, 24, true), 240);
+    assert.equal(lyrics.resolveWidth(240, 100, 60, 400, 24, false), 124);
+    assert.equal(lyrics.resolveWidth(240, 300, 60, 400, 24, true), 324);
+    assert.equal(lyrics.resolveWidth(324, 100, 60, 400, 24, true), 324);
+    assert.equal(lyrics.resolveWidth(324, 100, 60, 180, 24, true), 180);
+    assert.equal(lyrics.resolveWidth(240, 100, 60, 400, 0, true), 240);
+    assert.equal(lyrics.resolveWidth(240, 100, 60, 400, 0, false), 100);
+    assert.equal(lyrics.resolveWidth(0, 100, 60, 400, 24, true), 124);
 });
 
 test("fractional screen budgets remain hard caps when rounding required pixels", () => {
