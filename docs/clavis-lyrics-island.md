@@ -31,7 +31,7 @@
 
 复用 `LyricsService` 的唯一控制器、已有按 cue 边界唤醒的时轴及可见性订阅。不增加歌词请求进程、固定频率轮询或完整歌词列表；界面仅保存当前及上一条文字。隐藏时释放订阅。
 
-五柱汇聚现有 Cava 的普通六段输出，不为此模式要求 45 段采样。`ordinaryMaximum` 明确当前六段接口的满量程：普通采样为 1000，与封面频谱共享 45 段采样时为 45。新组件先归一化再汇聚，原有消费者的数据不变。可视化关闭、暂停、不可见和减少动态效果时释放采样引用；仍由同一个 Cava 服务管理进程。
+五柱与 Caelestia 封面共享 Cava 的 45 段频谱，按频段取峰值，保留窄频信号。与 Clavis 一致，歌词频谱独立于普通可视化开关；暂停、不可见和减少动态效果时释放订阅。歌词与封面同时显示仍只有一个 Cava 进程。
 
 歌词进入退出的实机检查暴露了 `MediaAccentService` 退出订阅时的空背景窗口，已在计算 HCT 之前增加空集合保护。
 
@@ -53,3 +53,15 @@
 状态与恢复结果见 [states.json](evidence/clavis-lyrics-20261031/states.json) 和 [restoration.json](evidence/clavis-lyrics-20261031/restoration.json)。未进行长期内存/CPU 基准、逐帧动画测量、真实声源的频谱幅值对照、多屏或竖向验收；占位分支以源码检查为主，未声称真实歌词供应商的全部失败路径已覆盖。Open Orpheus 上游问题不在本次范围。
 
 完整临时程序、原始配置备份和运行日志位于 `/tmp/dms-clavis-lyrics-20261031-jswo65k9/`，仓库不收录个人配置和完整桌面截图。
+
+## 频谱修复（2026-10-31）
+
+原来的歌词频谱误用了普通可视化开关与六段采样。本机关闭普通可视化时，歌词五柱因此一直静止。改为独立订阅已有 45 段频谱，统一复用 Caelestia 的数据与订阅生命周期；移除不再使用的六段量纲转换。
+
+在现有桌面通过临时虚拟音频输出的 monitor 输入合成音，截图确认五柱实际变化。测试音不进入扬声器，不改变默认音频输出。10 个实机状态检查通过：普通可视化关闭仍采样、暂停释放、继续恢复、展开封面共享一个进程、收起保留歌词采样、减少动态效果和隐藏时释放、恢复显示后重新订阅。配置文件恢复字节一致，验收窗口日志无 WARN / ERROR。
+
+![频谱采样第一帧](evidence/clavis-media-fixes-20261031/spectrum-live-a.png)
+
+![频谱采样第二帧](evidence/clavis-media-fixes-20261031/spectrum-live-b.png)
+
+对应 [状态记录](evidence/clavis-media-fixes-20261031/spectrum-states.json) 与 [恢复记录](evidence/clavis-media-fixes-20261031/spectrum-restoration.json)。`make lint-qml`、Qt 31、lock 38 与完整 logic 套件、`git diff --check` 通过。本节取代上面初次移植验收中“关闭可视化时零个进程”和六段转换的历史结论。未做真实音源幅值对照或长期性能基准。

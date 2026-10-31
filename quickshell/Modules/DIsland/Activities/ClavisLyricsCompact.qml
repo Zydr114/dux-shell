@@ -14,7 +14,7 @@ Item {
     required property var mediaModel
     readonly property LyricsController lyrics: LyricsService.controller
     readonly property bool live: enabled && visible && (Window.window?.visible ?? false) && mediaModel.available
-    readonly property bool sampling: live && mediaModel.playing && SettingsData.audioVisualizerEnabled && !SettingsData.reduceMotion
+    readonly property bool sampling: live && mediaModel.playing && !SettingsData.reduceMotion
     readonly property bool animationsEnabled: live && !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
     readonly property string lineText: live && lyrics.synced ? CompactLyrics.lineText(lyrics.lines, lyrics.activeIndex, lyrics.sampleTime) : ""
     readonly property string displayText: {
@@ -35,7 +35,8 @@ Item {
         return I18n.tr("No results");
     }
     readonly property real textWidth: Math.max(Theme.clavisLyricsMinTextWidth, Math.min(Theme.clavisLyricsMaxTextWidth, measure.width))
-    readonly property list<real> levels: sampling && CavaService.spectrumAvailable ? Spectrum.normalizedBins(CavaService.values, CavaService.ordinaryMaximum, Theme.clavisLyricsSpectrumCount) : []
+    readonly property list<real> levels: spectrumHeld && CavaService.spectrumAvailable ? Spectrum.peakBins(CavaService.spectrumValues, Theme.clavisLyricsSpectrumCount) : []
+    property bool spectrumHeld: false
     property bool initialized: false
     property real shift: 0
 
@@ -54,9 +55,26 @@ Item {
             outgoing.text = "";
         }
     }
+    onSamplingChanged: syncSpectrum()
     Component.onCompleted: {
         initialized = true;
         turnTo(displayText);
+        syncSpectrum();
+    }
+    Component.onDestruction: {
+        if (spectrumHeld)
+            CavaService.releaseSpectrum(root);
+    }
+
+    function syncSpectrum() {
+        if (sampling === spectrumHeld)
+            return;
+        spectrumHeld = sampling;
+        if (spectrumHeld) {
+            CavaService.acquireSpectrum(root);
+            return;
+        }
+        CavaService.releaseSpectrum(root);
     }
 
     function turnTo(text) {
@@ -71,15 +89,6 @@ Item {
 
     LyricsSubscription {
         active: root.live && LyricsService.available
-    }
-
-    Loader {
-        active: root.sampling
-        sourceComponent: Component {
-            Ref {
-                service: CavaService
-            }
-        }
     }
 
     StyledTextMetrics {

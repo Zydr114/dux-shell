@@ -62,12 +62,6 @@ function peakBins(values, count) {
     return result;
 }
 
-function normalizedBins(values, maximum, count) {
-    if (!Number.isFinite(maximum) || maximum <= 0)
-        return [];
-    return aggregate(values.map(value => Math.max(0, Math.min(1, (Number(value) || 0) / maximum))), count);
-}
-
 function requestedBars(ordinaryRefs, spectrumRefs, ordinaryEnabled, reduceMotion) {
     if (reduceMotion)
         return 0;

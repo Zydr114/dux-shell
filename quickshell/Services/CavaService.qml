@@ -11,7 +11,6 @@ Singleton {
     id: root
 
     property list<int> values: Array(6).fill(0)
-    readonly property real ordinaryMaximum: _activeBars === 45 ? 45 : 1000
     property list<real> spectrumValues: Array(45).fill(0)
     property int refCount: 0
     property bool cavaAvailable: false
