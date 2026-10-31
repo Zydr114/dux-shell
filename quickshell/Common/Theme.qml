@@ -27,6 +27,28 @@ Singleton {
     readonly property string defaultMonoFontFamily: "Fira Code"
     readonly property string defaultDisplayFontFamily: "DM Serif Display"
 
+    readonly property real clavisRoundedWidth: 540
+    readonly property real clavisExpandedWidth: 640
+    readonly property real clavisRoundedHeight: 210
+    readonly property real clavisExpandedHeight: 240
+    readonly property real clavisCoverSize: 170
+    readonly property real clavisSpectrumCoverSize: 190
+    readonly property real clavisBackgroundArtWidthRatio: 0.53
+    readonly property real clavisMetadataWidthRatio: 0.56
+    readonly property int clavisCoverRotationDuration: 24000
+    readonly property int clavisSpectrumCount: 36
+    readonly property int clavisSpectrumSourceCount: 45
+    readonly property real clavisSpectrumMinHeight: 2
+    readonly property real clavisSpectrumMaxHeight: 18
+    readonly property real clavisSpectrumBarWidth: 3
+    readonly property real clavisSpectrumGap: 6
+    readonly property real clavisProgressHeight: 24
+    readonly property real clavisProgressStrokeWidth: 3
+    readonly property real clavisProgressAmplitude: 3
+    readonly property real clavisProgressWavelength: 24
+    readonly property real clavisProgressSpeed: 1.2
+    readonly property real clavisSecondaryAlpha: 0.72
+
     readonly property real popupDistance: {
         if (typeof SettingsData === "undefined")
             return 4;

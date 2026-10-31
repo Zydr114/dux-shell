@@ -21,14 +21,15 @@ Card {
     readonly property bool compact: height < DashMetrics.heightForRows(2)
     readonly property bool narrow: width - pad * 2 < DashMetrics.overviewTransportWidth
     readonly property bool tiny: compact && width - pad * 2 < DashMetrics.overviewTransportWidth + Theme.iconButtonSize
-    readonly property bool showArtwork: !compact && !narrow && height >= DashMetrics.heightForRows(3)
+    readonly property bool clavis: options.visualStyle === "clavis" || options.playerStyle === "clavis"
+    readonly property bool showArtwork: !compact && !narrow && height >= DashMetrics.heightForRows(clavis ? 2 : 3)
     readonly property string titleText: MprisController.stableTitle || I18n.tr("Unknown Track")
     readonly property string artistText: MprisController.stableArtist || I18n.tr("Unknown Artist")
     readonly property string artUrl: TrackArtService.resolvedArtUrl
     readonly property color accent: MediaAccentService.accent
     readonly property bool showSeekbar: options.seekbar !== false && !tiny
     readonly property bool bento: options.playerStyle === "bento"
-    readonly property bool materialIi: options.playerStyle === "material-ii"
+    readonly property bool materialIi: options.playerStyle === "material-ii" || (options.playerStyle === "clavis" && width >= DashMetrics.gridRowUnit * 3 && height >= DashMetrics.heightForRows(2))
     readonly property bool inlineMetadata: compact && titleLabel.implicitHeight + artistLabel.implicitHeight + trackText.spacing > transport.y - Theme.spacingXS
     readonly property var playbackFocusTargets: materialIi ? [materialIiPlayer.item?.focusTarget, materialIiPlayer.item?.previousFocusTarget] : [playButton, previousButton, nextButton].concat(seekbar.canSeek ? [seekbar] : [])
 

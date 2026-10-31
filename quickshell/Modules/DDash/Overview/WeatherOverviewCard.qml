@@ -13,6 +13,7 @@ Card {
     property bool weatherRefHeld: false
 
     readonly property bool available: WeatherService.weather.available
+    readonly property bool clavis: options.visualStyle === "clavis"
     readonly property bool tall: height > width
     readonly property bool narrow: width < DashMetrics.gridRowUnit * 2
     readonly property bool compact: narrow && !tall
@@ -54,6 +55,7 @@ Card {
     entryId: "weather"
     tone: options.tone ?? ""
     clickable: true
+    clipContent: clavis
     pad: compact ? Theme.spacingS : Theme.spacingM
 
     function syncWeatherRef(wanted) {
@@ -74,7 +76,7 @@ Card {
     Column {
         anchors.fill: parent
         spacing: Theme.spacingXS
-        visible: root.compact
+        visible: root.compact && !root.clavis
 
         Row {
             width: parent.width
@@ -133,7 +135,7 @@ Card {
     Item {
         id: stackedLayout
         anchors.fill: parent
-        visible: root.stacked && !root.compact && !root.heroLayout
+        visible: root.stacked && !root.compact && !root.heroLayout && !root.clavis
 
         DMaterialShape {
             id: stackedChip
@@ -226,7 +228,7 @@ Card {
 
     WeatherHero {
         anchors.fill: parent
-        visible: root.heroLayout
+        visible: root.heroLayout && !root.clavis
         showCity: root.showCity
         showSunTimes: root.showReadings
         tone: root.tone
@@ -238,7 +240,7 @@ Card {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingM
-        visible: !root.stacked
+        visible: !root.stacked && !root.clavis
 
         DMaterialShape {
             id: iconChip
@@ -290,6 +292,16 @@ Card {
             font.pixelSize: DashMetrics.weatherTempSize
             font.weight: Theme.fontWeightMedium
             color: root.contentColor
+        }
+    }
+
+    Loader {
+        anchors.fill: parent
+        anchors.margins: -root.pad
+        active: root.clavis
+        sourceComponent: ClavisWeather {
+            showCity: root.showCity
+            available: root.available
         }
     }
 }

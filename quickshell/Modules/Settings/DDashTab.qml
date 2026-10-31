@@ -42,6 +42,55 @@ FocusScope {
                 iconName: "music_note"
                 onClicked: keyboard => root.parentModal?.navigateTo("media_player", keyboard)
             }
+
+            SettingsRow {
+                settingKey: "dashClavisPreset"
+                tab: "dank_dash"
+                tags: ["clavis", "media", "preset", "caelestia"]
+                title: I18n.tr("Clavis reference appearance")
+                subtitle: I18n.tr("Caelestia cover, Material progress and theme colors")
+
+                DActionButton {
+                    iconName: "auto_awesome"
+                    tooltipText: I18n.tr("Apply")
+                    onClicked: ClavisPreferences.applyReference()
+                }
+            }
+
+            SettingsToggleRow {
+                settingKey: "audioVisualizerEnabled"
+                tab: "dank_dash"
+                tags: ["clavis", "media", "spectrum", "visualizer", "caelestia"]
+                text: I18n.tr("Audio visualizer")
+                description: I18n.tr("Enable the Caelestia spectrum and cover motion; reduced motion keeps the cover still")
+                checked: SettingsData.audioVisualizerEnabled
+                onToggled: checked => SettingsData.set("audioVisualizerEnabled", checked)
+            }
+
+            SettingsRow {
+                settingKey: "dashClavisImport"
+                tab: "dank_dash"
+                tags: ["clavis", "media", "import", "cover", "progress", "color"]
+                title: I18n.tr("Import Clavis media appearance")
+                subtitle: ClavisPreferences.loading ? I18n.tr("Loading…")
+                    : ClavisPreferences.available ? I18n.tr("Cover: %1 · Progress: %2 · Color: %3").arg(ClavisPreferences.preview.clavisCoverStyle).arg(ClavisPreferences.preview.clavisProgressStyle).arg(ClavisPreferences.preview.albumArtAccent ? I18n.tr("Album art") : I18n.tr("Theme"))
+                    : ClavisPreferences.error !== "" ? I18n.tr("Unable to read valid Clavis media settings")
+                    : I18n.tr("Read the local Clavis configuration and preview its three appearance options")
+
+                DActionButton {
+                    iconName: "refresh"
+                    tooltipText: I18n.tr("Read Clavis settings")
+                    enabled: !ClavisPreferences.loading
+                    onClicked: ClavisPreferences.refresh()
+                }
+
+                DActionButton {
+                    iconName: "check"
+                    tooltipText: I18n.tr("Apply")
+                    enabled: ClavisPreferences.available && !ClavisPreferences.loading
+                    onClicked: ClavisPreferences.apply()
+                }
+            }
         }
 
         SettingsCard {
@@ -54,6 +103,24 @@ FocusScope {
                 hint: I18n.tr("Screen time and app limits", "settings sidebar hint and dashboard tab description for digital wellbeing")
                 iconName: "digital_wellbeing"
                 onClicked: root.parentModal?.navigateTo("wellbeing")
+            }
+        }
+
+        SettingsCard {
+            title: I18n.tr("Clavis dashboard cards")
+
+            SettingsRow {
+                settingKey: "dashClavisCards"
+                tab: "dank_dash"
+                tags: ["clavis", "cards", "cookie", "weather", "battery", "cpu", "memory", "network", "disk"]
+                title: I18n.tr("Apply Clavis card styles")
+                subtitle: I18n.tr("Keep the current card positions and sizes")
+
+                DActionButton {
+                    iconName: "palette"
+                    tooltipText: I18n.tr("Apply")
+                    onClicked: DashRegistry.applyClavisCardStyles()
+                }
             }
         }
 

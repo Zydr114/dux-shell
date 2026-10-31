@@ -14,4 +14,10 @@ QtObject {
     readonly property string artist: MprisController.stableArtist || player?.trackArtist || player?.identity || I18n.tr("Unknown Artist", "island media face: fallback artist")
     readonly property string artUrl: TrackArtService.resolvedArtUrl
     readonly property bool playing: !!player?.isPlaying
+    readonly property string lyricText: {
+        const lyrics = LyricsService.controller;
+        if (!lyrics.enabled || !lyrics.synced)
+            return "";
+        return (lyrics.lines[lyrics.activeIndex]?.parts ?? []).map(part => part.x.trim()).filter(text => text.length > 0).join(" · ");
+    }
 }

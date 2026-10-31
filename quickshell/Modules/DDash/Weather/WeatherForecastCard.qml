@@ -11,6 +11,8 @@ Rectangle {
     property bool daily: true
     property var forecastData: null
     property bool dense: false
+    property string visualStyle: "inherit"
+    readonly property string effectiveVisualStyle: !visualStyle || visualStyle === "inherit" ? (DashRegistry.option("weather", "visualStyle") ?? "default") : visualStyle
 
     property bool isCurrent: {
         if (!date)
@@ -55,11 +57,11 @@ Rectangle {
             }
         ];
     }
-    readonly property color foreground: isCurrent ? Theme.onPrimaryContainer : Theme.surfaceText
-    readonly property color muted: isCurrent ? Theme.withAlpha(Theme.onPrimaryContainer, DashMetrics.mutedAlpha) : Theme.onSurfaceVariant
+    readonly property color foreground: effectiveVisualStyle === "clavis" ? (isCurrent ? Theme.onPrimaryContainer : Theme.onSecondaryContainer) : (isCurrent ? Theme.onPrimaryContainer : Theme.surfaceText)
+    readonly property color muted: effectiveVisualStyle === "clavis" ? Theme.withAlpha(foreground, DashMetrics.mutedAlpha) : (isCurrent ? Theme.withAlpha(Theme.onPrimaryContainer, DashMetrics.mutedAlpha) : Theme.onSurfaceVariant)
 
     radius: Theme.cornerRadiusL
-    color: isCurrent ? Theme.foregroundColor(Theme.primaryContainer, false) : DashMetrics.chipColor
+    color: effectiveVisualStyle === "clavis" ? (isCurrent ? Theme.primaryContainer : Theme.secondaryContainer) : (isCurrent ? Theme.foregroundColor(Theme.primaryContainer, false) : DashMetrics.chipColor)
 
     Column {
         anchors.centerIn: parent
@@ -80,7 +82,7 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             name: root.forecastData ? WeatherService.getWeatherIcon(root.forecastData.wCode || 0, root.forecastData.isDay ?? true) : "cloud"
             size: Theme.iconSizeLarge
-            color: root.isCurrent ? root.foreground : Theme.primary
+            color: root.effectiveVisualStyle === "clavis" || root.isCurrent ? root.foreground : Theme.primary
             visible: root.forecastData !== null
         }
 

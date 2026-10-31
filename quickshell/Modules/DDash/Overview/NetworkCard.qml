@@ -9,9 +9,9 @@ MetricCard {
     dgopModules: ["network"]
     label: I18n.tr("Network")
     iconName: "download"
-    valueText: Format.formatRate(DgopService.networkRxRate || 0)
+    valueText: options.visualStyle === "clavis" && DgopService.networkHistory.rx.length === 0 ? "--" : Format.formatRate(DgopService.networkRxRate || 0)
     supportingText: NetworkService.primaryConnection
-    badgeText: Format.formatRate(DgopService.networkTxRate || 0)
+    badgeText: options.visualStyle === "clavis" && DgopService.networkHistory.tx.length === 0 ? "--" : Format.formatRate(DgopService.networkTxRate || 0)
     badgeIcon: "upload"
     trendMaximum: 0
     showTrend: options.trend === true

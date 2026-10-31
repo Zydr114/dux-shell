@@ -37,7 +37,21 @@ Item {
     ]
     readonly property bool blocksTabNavigation: widgets.blocksTabNavigation
     readonly property bool cardInteracting: widgets.cardInteracting
-    readonly property var forecastOptions: [DashRegistry.choice("forecast", I18n.tr("Forecast", "weather widget option label for forecast display type"), "chart", [
+    readonly property var visualStyleOption: DashRegistry.choice("visualStyle", I18n.tr("Style"), "inherit", [
+        {
+            "value": "inherit",
+            "text": I18n.tr("Inherit")
+        },
+        {
+            "value": "default",
+            "text": I18n.tr("Default")
+        },
+        {
+            "value": "clavis",
+            "text": "Clavis"
+        }
+    ])
+    readonly property var forecastOptions: [root.visualStyleOption, DashRegistry.choice("forecast", I18n.tr("Forecast", "weather widget option label for forecast display type"), "chart", [
             {
                 "value": "chart",
                 "text": I18n.tr("Chart", "noun, weather forecast display option")
@@ -105,7 +119,7 @@ Item {
                 minH: 2,
                 maxW: 4,
                 maxH: 3,
-                options: [DashRegistry.toneOption("primary"), DashRegistry.toggle("city", I18n.tr("Show city"), false)]
+                options: [root.visualStyleOption, DashRegistry.toneOption("primary"), DashRegistry.toggle("city", I18n.tr("Show city"), false)]
             },
             {
                 id: "hourly",

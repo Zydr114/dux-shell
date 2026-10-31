@@ -3,6 +3,7 @@ pragma Singleton
 import Quickshell
 import qs.Common
 import qs.Services
+import "MediaGeometry.js" as MediaGeometry
 
 Singleton {
     id: root
@@ -31,23 +32,47 @@ Singleton {
         {
             "value": "material-ii",
             "text": "Material II"
+        },
+        {
+            "value": "clavis",
+            "text": "Clavis"
         }
     ]
 
     readonly property var titleFontDefaults: ({
             bento: "Notable",
             material: "ui",
-            "material-ii": "ui"
+            "material-ii": "ui",
+            clavis: "ui"
         })
 
     readonly property var stored: SettingsData.dashOptions?.media ?? ({})
     readonly property string playerStyle: stored.playerStyle ?? defaultPlayerStyle
     readonly property bool materialIi: playerStyle === "material-ii"
+    readonly property bool clavis: playerStyle === "clavis"
+    readonly property bool borderless: materialIi || clavis
+    readonly property string clavisCoverStyle: normalizeClavisCoverStyle(stored.clavisCoverStyle)
+    readonly property string clavisProgressStyle: normalizeClavisProgressStyle(stored.clavisProgressStyle)
     readonly property string defaultTitleFont: titleFontDefaults[playerStyle] ?? "ui"
     readonly property bool waveProgress: stored.waveProgress ?? defaults.waveProgress
     readonly property bool albumArtBackdrop: stored.albumArtBackdrop ?? defaults.albumArtBackdrop
     readonly property bool albumArtAccent: stored.albumArtAccent ?? defaults.albumArtAccent
     readonly property bool animatedArt: stored.animatedArt ?? defaults.animatedArt
+
+    function popupSize(availableWidth, availableHeight, chromeHeight, legacyWidth, legacyHeight) {
+        const rounded = clavisCoverStyle === "rounded";
+        return MediaGeometry.fitBody(clavis ? (rounded ? Theme.clavisRoundedWidth : Theme.clavisExpandedWidth) : legacyWidth, clavis ? (rounded ? Theme.clavisRoundedHeight : Theme.clavisExpandedHeight) : legacyHeight, availableWidth, availableHeight, chromeHeight);
+    }
+
+    function normalizeClavisCoverStyle(value) {
+        if (value === "spectrum")
+            return "caelestia";
+        return ["rounded", "caelestia", "background"].includes(value) ? value : "rounded";
+    }
+
+    function normalizeClavisProgressStyle(value) {
+        return value === "material" ? "material" : "wave";
+    }
 
     readonly property var builtinLyricsProviders: [
         {

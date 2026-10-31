@@ -23,6 +23,7 @@ Item {
     property real borderWidth: Theme.layerOutlineWidth
     property real padding: DashMetrics.mediaCardMargin
     property Component backdropContent: null
+    property bool artworkBackdropEnabled: true
 
     readonly property var activePlayer: root.player.activePlayer
     readonly property var presentation: root.player.presentation
@@ -68,7 +69,7 @@ Item {
         Loader {
             anchors.fill: parent
             anchors.margins: root.borderWidth
-            active: root.player.wallpaperEnabled && !!root.presentation
+            active: root.artworkBackdropEnabled && root.player.wallpaperEnabled && !!root.presentation
 
             sourceComponent: MediaArtBackdrop {
                 radius: Math.max(0, root.backdropRadius - root.borderWidth)

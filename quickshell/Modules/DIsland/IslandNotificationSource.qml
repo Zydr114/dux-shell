@@ -14,6 +14,7 @@ QtObject {
     property bool enabled: true
 
     property var currentWrapper: null
+    property bool releasingTimeout: false
     property string appName: ""
     property string summary: ""
     property string body: ""
@@ -26,7 +27,25 @@ QtObject {
     property bool important: false
 
     readonly property bool hasAction: actionLabel.length > 0
-    readonly property bool wrapperTimeoutHeld: (controller.notificationActive && controller.timeoutSuspended) || controller.notificationHeldForSystem
+    readonly property bool ownsTimeout: (controller?.notificationActive ?? false) || (controller?.notificationHeldForSystem ?? false)
+    readonly property int wrapperTimeoutDuration: wrapperTimeout(currentWrapper)
+    readonly property string wrapperPresentationKey: currentWrapper ? JSON.stringify([currentWrapper.appName, currentWrapper.summary, currentWrapper.body, currentWrapper.displayImage, currentWrapper.fallbackIconName, currentWrapper.urgency, (currentWrapper.actions || []).map(action => action.text)]) : ""
+    onWrapperPresentationKeyChanged: {
+        if (!currentWrapper)
+            return;
+        updateDisplayFields();
+        controller.refreshNotification();
+    }
+    readonly property string visibleNotificationIds: NotificationService.visibleNotifications.map(wrapper => wrapper.seq).join(",")
+    onOwnsTimeoutChanged: applyWrapperTimeoutHold()
+    onWrapperTimeoutDurationChanged: {
+        if (currentWrapper)
+            controller.notificationTimeout = wrapperTimeoutDuration;
+    }
+    onVisibleNotificationIdsChanged: {
+        if (enabled)
+            syncVisibleNotifications();
+    }
 
     function scheduleDisplayFieldClear() {
         displayFieldClearTimer.restart();
@@ -56,7 +75,7 @@ QtObject {
         const timer = currentWrapper?.timer;
         if (!timer)
             return;
-        if (wrapperTimeoutHeld) {
+        if (ownsTimeout) {
             timer.stop();
             return;
         }
@@ -68,7 +87,9 @@ QtObject {
         const timer = currentWrapper?.timer;
         if (!timer || !currentWrapper.popup || timer.interval <= 0)
             return;
+        releasingTimeout = true;
         timer.restart();
+        releasingTimeout = false;
     }
 
     function adopt(wrapper) {
@@ -82,6 +103,17 @@ QtObject {
         releaseWrapperTimeoutHold();
         displayFieldClearTimer.stop();
         currentWrapper = wrapper;
+        updateDisplayFields();
+        controller.notificationTimeout = wrapperTimeout(wrapper);
+        const accepted = controller.requestNotification(isCritical);
+        applyWrapperTimeoutHold();
+        return accepted;
+    }
+
+    function updateDisplayFields() {
+        const wrapper = currentWrapper;
+        if (!wrapper)
+            return;
         appName = wrapper.appName || I18n.tr("Notification", "island notification face: fallback app name");
         summary = HtmlElide.plainText(wrapper.summary) || appName;
         body = HtmlElide.plainText(wrapper.body);
@@ -89,14 +121,10 @@ QtObject {
         imageSource = wrapper.displayImage;
         fallbackIcon = wrapper.fallbackIconName || "material:notifications";
         fallbackText = appName.charAt(0).toUpperCase();
-        critical = isCritical;
-        important = !isCritical && wrapper.urgency === NotificationUrgency.Normal && fallbackIcon.startsWith("material:battery");
+        critical = wrapper.urgency === NotificationUrgency.Critical;
+        important = !critical && wrapper.urgency === NotificationUrgency.Normal && fallbackIcon.startsWith("material:battery");
         const actions = wrapper.actions || [];
         actionLabel = actions.length > 0 ? (actions[0].text || I18n.tr("Open", "island notification face: default action button")) : "";
-        controller.notificationTimeout = wrapperTimeout(wrapper);
-        const accepted = controller.requestNotification(isCritical);
-        applyWrapperTimeoutHold();
-        return accepted;
     }
 
     function refreshDeduplicated(wrapper) {
@@ -106,7 +134,13 @@ QtObject {
         applyWrapperTimeoutHold();
     }
 
-    onWrapperTimeoutHeldChanged: applyWrapperTimeoutHold()
+    function expirePopup() {
+        const wrapper = currentWrapper;
+        currentWrapper = null;
+        scheduleDisplayFieldClear();
+        if (wrapper)
+            wrapper.popup = false;
+    }
 
     function syncVisibleNotifications() {
         const visible = NotificationService.visibleNotifications || [];
@@ -127,6 +161,7 @@ QtObject {
         }
         if (!currentWrapper)
             return;
+        releaseWrapperTimeoutHold();
         currentWrapper = null;
         controller.completeNotification();
         scheduleDisplayFieldClear();
@@ -152,12 +187,24 @@ QtObject {
         target: NotificationService
         enabled: root.enabled
 
-        function onVisibleNotificationsChanged() {
-            root.syncVisibleNotifications();
-        }
-
         function onNotificationDeduplicated(wrapper) {
             root.refreshDeduplicated(wrapper);
+        }
+    }
+
+    property Connections controllerConnections: Connections {
+        target: root.controller
+        function onNotificationExpired() {
+            root.expirePopup();
+        }
+    }
+
+    // NotificationService starts this timer after publishing a new wrapper; Island owns its deadline.
+    property Connections wrapperTimerConnections: Connections {
+        target: root.currentWrapper?.timer ?? null
+        function onRunningChanged() {
+            if (root.enabled && root.ownsTimeout && !root.releasingTimeout && root.currentWrapper?.timer?.running)
+                root.currentWrapper.timer.stop();
         }
     }
 
@@ -167,4 +214,5 @@ QtObject {
     }
 
     Component.onCompleted: syncVisibleNotifications()
+    Component.onDestruction: releaseWrapperTimeoutHold()
 }

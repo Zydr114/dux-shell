@@ -37,6 +37,18 @@ Item {
         cacheImages: false
     }
 
+    NotificationExpiryBar {
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+            leftMargin: Theme.spacingM
+            rightMargin: Theme.spacingM
+            bottomMargin: Theme.spacingXS
+        }
+        controller: root.controller
+    }
+
     Row {
         visible: !root.isVertical
         anchors {

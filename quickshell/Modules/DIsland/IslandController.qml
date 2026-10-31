@@ -7,6 +7,7 @@ import qs.Modals.DLauncherV2.Components
 import qs.Modules.ControlCenter
 import qs.Modules.DBar
 import qs.Modules.DDash
+import "../../Common/TransientExpiry.js" as TransientExpiry
 
 QtObject {
     id: root
@@ -67,6 +68,21 @@ QtObject {
     property real compactThickness: 38
     property string batteryStyle: "duo"
     property bool mediaClockVisible: true
+    readonly property string mediaTextMode: SettingsData.islandSetting(barConfig, "islandMediaTextMode") || "title"
+    readonly property real mediaMaximumWidth: Math.max(360, Math.min(560, Number(SettingsData.islandSetting(barConfig, "islandMediaMaxWidth")) || 560))
+    readonly property bool osdAccessoryEnabled: SettingsData.islandSetting(barConfig, "islandOsdPresentation") === "accessory" && !dotMode
+    readonly property bool notificationCountdown: SettingsData.islandSetting(barConfig, "islandNotificationCountdown") !== false
+    property string accessoryActivity: ""
+    readonly property bool accessoryActive: accessoryActivity !== ""
+    readonly property real accessoryLength: accessoryActive && !expanded ? (isVertical ? compactFaceThickness + Theme.spacingS : Theme.iconSize + Theme.spacingL * 4 + Theme.spacingS) : 0
+    property real notificationStartedAt: 0
+    property real notificationExpiresAt: 0
+    property real notificationPausedProgress: 1
+    readonly property bool notificationCounting: notificationActive && notificationTimer.running
+    onOsdAccessoryEnabledChanged: {
+        if (!osdAccessoryEnabled)
+            clearAccessory();
+    }
     property int transientTimeout: 2200
     property int notificationTimeout: 5000
     property string transientReturnActivity: ""
@@ -109,13 +125,14 @@ QtObject {
     readonly property real editSurfaceHeight: editRoom <= 0 ? 0 : editingActivity === "controlcenter" ? controlCenterHeightFor(true) : dashboardHeightFor(editingActivity, true)
     readonly property real dashboardHeight: Math.min(dashboardAvailableHeight, Math.max(DashMetrics.tabDefaultHeight + root.dashChromeHeight, ...Object.values(dashboardContentHeights)))
     readonly property int dashboardRowBudget: Math.max(DashMetrics.minimumTabRows, Math.floor((dashboardAvailableHeight - DashMetrics.islandEditChromeHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)))
-    readonly property real mediaCompactMaxLength: 360
+    readonly property real mediaCompactMaxLength: Math.max(1, Math.min(mediaMaximumWidth, dashboardAvailableWidth))
     property real notificationContentLength: 0
     property real notificationExpandedHeight: Theme.iconSizeLarge + Theme.spacingXL * 4
     readonly property real notificationCompactMinLength: isVertical ? compactFaceThickness : (compactDense ? 200 : 240)
     readonly property real notificationCompactMaxLength: mediaCompactMaxLength
 
     signal sessionStarted(string activityId)
+    signal notificationExpired
 
     function setHomeContentLength(length) {
         const next = Math.ceil(length);
@@ -176,7 +193,7 @@ QtObject {
     }
 
     function setMediaContentLength(length) {
-        const next = Math.ceil(Math.min(root.mediaCompactMaxLength, length));
+        const next = Math.ceil(length);
         if (!isFinite(next) || next <= 0 || Math.abs(next - mediaContentLength) < 2)
             return;
         mediaContentLength = next;
@@ -486,10 +503,12 @@ QtObject {
     function usesDotFace(activityId) {
         return root.dotMode && root.dotTransientActivities.indexOf(activityId) === -1;
     }
-    readonly property var homeCompactTarget: pillTarget(homeCompactLength, compactFaceThickness)
-    readonly property var mediaCompactTarget: pillTarget(mediaCompactLength, compactFaceThickness)
+    readonly property var homeCompactTarget: pillTarget(Math.min(dashboardAvailableWidth, homeCompactLength + accessoryLength), compactFaceThickness)
+    readonly property var mediaCompactTarget: pillTarget(Math.min(mediaCompactMaxLength, mediaCompactLength + accessoryLength), compactFaceThickness)
     readonly property var homeExpandedTarget: dashboardTargetFor("home")
-    readonly property var mediaExpandedTarget: dashboardTargetFor("media")
+    readonly property real legacyMediaWidth: dashboardWidthFor("media") * DashMetrics.mediaPopupScale
+    readonly property var mediaPopupSize: MediaOptions.popupSize(dashboardAvailableWidth, dashboardAvailableHeight, DashMetrics.islandHandleHeight, legacyMediaWidth, DashMetrics.mediaPopupHeightFor(legacyMediaWidth))
+    readonly property var mediaExpandedTarget: MediaOptions.borderless && editingActivity !== "media" ? sheetTarget(mediaPopupSize.width, mediaPopupSize.height) : dashboardTargetFor("media")
     readonly property var launcherExpandedTarget: sheetTarget(Math.min(dashboardAvailableWidth, LauncherMetrics.sizeWidth(SettingsData.dankLauncherV2Size)), Math.min(dashboardAvailableHeight, LauncherMetrics.sizeHeight(SettingsData.dankLauncherV2Size)))
     readonly property var controlCenterExpandedTarget: sheetTarget(controlCenterSheetWidth + controlCenterSheetInset, controlCenterHeight)
     readonly property var systemCompactTarget: pillTarget(root.isVertical ? 240 : (SettingsData.osdAlwaysShowValue ? 330 : 282), compactFaceThickness)
@@ -553,13 +572,26 @@ QtObject {
     readonly property var expandedTarget: expandedTargetFor(activeActivity)
     readonly property var targetDescriptor: expanded ? expandedTarget : compactTarget
 
+    function stopNotificationTimeout() {
+        if (notificationTimer.running)
+            notificationPausedProgress = TransientExpiry.remainingRatio(notificationStartedAt, notificationExpiresAt, Date.now());
+        notificationTimer.stop();
+        notificationExpiresAt = 0;
+    }
+
     function syncNotificationTimeout(restart) {
         if (!notificationActive || timeoutSuspended || notificationTimeout <= 0) {
-            notificationTimer.stop();
+            stopNotificationTimeout();
+            if (restart === true && notificationActive && notificationTimeout > 0)
+                notificationPausedProgress = 1;
             return;
         }
-        if (restart === true || !notificationTimer.running)
-            notificationTimer.restart();
+        if (restart !== true && notificationTimer.running)
+            return;
+        notificationStartedAt = Date.now();
+        notificationExpiresAt = notificationStartedAt + notificationTimeout;
+        notificationPausedProgress = 1;
+        notificationTimer.restart();
     }
 
     onNotificationTimeoutChanged: syncNotificationTimeout(true)
@@ -609,6 +641,7 @@ QtObject {
     onInputSuspendedChanged: {
         if (!inputSuspended)
             return;
+        clearAccessory();
         hoverExpanded = false;
         hoverOpenTimer.stop();
         hoverCloseTimer.stop();
@@ -645,7 +678,7 @@ QtObject {
             keyboardDismissRequested = false;
             expanded = true;
             hoverCloseTimer.stop();
-            notificationTimer.stop();
+            stopNotificationTimeout();
             return true;
         }
         if (!requestExpand(false))
@@ -682,7 +715,7 @@ QtObject {
         clearPendingRequests("");
         hoverCloseTimer.stop();
         transientTimer.stop();
-        notificationTimer.stop();
+        stopNotificationTimeout();
         keyboardDismissRequested = requestKeyboardFocus === true;
         expanded = true;
         return true;
@@ -692,7 +725,7 @@ QtObject {
         hoverExpanded = false;
         hoverOpenTimer.stop();
         transientTimer.stop();
-        notificationTimer.stop();
+        stopNotificationTimeout();
         keyboardDismissRequested = false;
         keyboardYielded = false;
         expanded = false;
@@ -876,10 +909,23 @@ QtObject {
         systemStateContentLength = next;
     }
 
-    function requestSystemActivity(activityId) {
+    function clearAccessory() {
+        accessoryTimer.stop();
+        accessoryActivity = "";
+    }
+
+    function requestSystemActivity(activityId, allowAccessory = true) {
         if (!isSystemActivity(activityId))
             return false;
+        if (allowAccessory && osdAccessoryEnabled) {
+            if (inputSuspended)
+                return false;
+            accessoryActivity = activityId;
+            accessoryTimer.restart();
+            return true;
+        }
 
+        clearAccessory();
         launcherSessionActive = false;
         clearPendingRequests("");
 
@@ -891,7 +937,7 @@ QtObject {
         }
 
         if (notificationActive) {
-            notificationTimer.stop();
+            stopNotificationTimeout();
             hoverExpanded = false;
             hoverOpenTimer.stop();
             hoverCloseTimer.stop();
@@ -915,7 +961,7 @@ QtObject {
             transientReturnActivity = "";
         if (!notificationActive)
             return;
-        notificationTimer.stop();
+        stopNotificationTimeout();
         suspendedActivity = "";
         suspendedExpanded = false;
         suspendedKeyboardDismissRequested = false;
@@ -928,6 +974,7 @@ QtObject {
         if (notificationActive)
             return refreshNotification();
 
+        notificationPausedProgress = 1;
         clearPendingRequests("");
         transientTimer.stop();
         suspendedActivity = activeActivity;
@@ -952,7 +999,7 @@ QtObject {
         if (!notificationActive)
             return;
 
-        notificationTimer.stop();
+        stopNotificationTimeout();
         const nextExpanded = restoreExpanded === true && suspendedExpanded;
         const suspendedFace = suspendedActivity === "home" || suspendedActivity === "media";
         const nextActivity = !suspendedActivity || (suspendedFace && !nextExpanded) ? idleActivity() : suspendedActivity === "media" && !mediaAvailable ? "home" : suspendedActivity;
@@ -1061,9 +1108,19 @@ QtObject {
         }
     }
 
+    property Timer accessoryTimer: Timer {
+        interval: root.transientTimeout
+        onTriggered: root.clearAccessory()
+    }
+
     property Timer notificationTimer: Timer {
         interval: root.notificationTimeout
-        onTriggered: root.completeNotification()
+        onTriggered: {
+            root.notificationPausedProgress = 0;
+            root.notificationExpiresAt = 0;
+            root.completeNotification();
+            root.notificationExpired();
+        }
     }
 
     property Timer visualsReleaseTimer: Timer {

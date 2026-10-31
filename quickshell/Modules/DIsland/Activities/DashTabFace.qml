@@ -18,13 +18,14 @@ FocusScope {
     property QtObject resizeGeometry: null
     property bool editMode: false
     property bool contentStaged: false
+    property bool fitMediaContent: false
     readonly property bool live: root.controller.expanded && root.controller.activeActivity === root.activityId
     readonly property var tab: tabLoader.item
     readonly property real tabHeight: tab?.implicitHeight ?? 0
-    readonly property real contentHeight: DashMetrics.panelHeightFor(entryId, tabHeight)
+    readonly property real contentHeight: fitMediaContent && !editMode ? tabHeight : DashMetrics.panelHeightFor(entryId, tabHeight)
     readonly property bool handleHeader: !root.editMode
     readonly property real pillOverhang: editMode ? DashMetrics.islandPillOverhang : 0
-    readonly property bool materialIi: entryId === "media" && MediaOptions.materialIi && !editMode
+    readonly property bool borderlessMedia: entryId === "media" && MediaOptions.borderless && !editMode
     readonly property int panelColumns: DashMetrics.panelColumnsFor(entryId)
     readonly property int contentRows: DashMetrics.rowsForHeight(tabHeight)
     readonly property int panelRows: Math.max(DashMetrics.panelFloorRowsFor(entryId), contentRows)
@@ -190,9 +191,9 @@ FocusScope {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            leftMargin: root.materialIi ? 0 : DashMetrics.contentPadding
-            rightMargin: root.materialIi ? 0 : DashMetrics.contentPadding
-            bottomMargin: root.editMode ? DashMetrics.islandEditBottomInset : root.materialIi ? 0 : DashMetrics.contentPadding
+            leftMargin: root.borderlessMedia ? 0 : DashMetrics.contentPadding
+            rightMargin: root.borderlessMedia ? 0 : DashMetrics.contentPadding
+            bottomMargin: root.editMode ? DashMetrics.islandEditBottomInset : root.borderlessMedia ? 0 : DashMetrics.contentPadding
         }
         contentHeight: tabLoader.y + tabLoader.height
         clip: contentHeight > height

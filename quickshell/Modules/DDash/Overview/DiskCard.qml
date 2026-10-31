@@ -20,9 +20,9 @@ MetricCard {
     usage: mount ? percent / 100 : -1
     warnUsage: DashMetrics.diskWarnPercent / 100
     criticalUsage: DashMetrics.diskCriticalPercent / 100
-    valueText: mount ? Math.round(percent) + "%" : "--"
+    valueText: options.visualStyle === "clavis" ? (DgopService.diskHistory.read.length > 0 ? Format.formatRate(DgopService.diskReadRate || 0) : "--") : (mount ? Math.round(percent) + "%" : "--")
     supportingText: mount ? (mount.used && mount.size ? mount.used + " / " + mount.size : mount.mount) : ""
-    badgeText: options.io === true ? Format.formatRate(DgopService.diskReadRate || 0) : ""
+    badgeText: options.visualStyle === "clavis" ? (DgopService.diskHistory.write.length > 0 ? Format.formatRate(DgopService.diskWriteRate || 0) : "--") : (options.io === true ? Format.formatRate(DgopService.diskReadRate || 0) : "")
     badgeIcon: "swap_vert"
     trendMaximum: 0
     showTrend: options.trend === true

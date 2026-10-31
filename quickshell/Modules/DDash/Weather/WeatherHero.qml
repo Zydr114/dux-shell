@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
+import qs.Modules.DDash
 import "WeatherVisuals.js" as Visuals
 
 Rectangle {
@@ -12,6 +13,8 @@ Rectangle {
     property var widgetOptions: ({})
     property string tone: widgetOptions.tone ?? "primary"
     property bool flat: false
+    readonly property string visualStyle: !widgetOptions.visualStyle || widgetOptions.visualStyle === "inherit" ? (DashRegistry.option("weather", "visualStyle") ?? "default") : widgetOptions.visualStyle
+    readonly property bool clavis: visualStyle === "clavis"
     readonly property bool wide: width >= Theme.smallBreakpoint
     readonly property var weather: WeatherService.weather
     readonly property string cityText: [weather.city, weather.country].filter(s => !!s).join(", ")
@@ -30,6 +33,7 @@ Rectangle {
 
     Column {
         id: details
+        visible: !root.clavis
         anchors.left: parent.left
         anchors.leftMargin: root.wide ? Theme.fontSizeDisplay * 3 + Theme.spacingL * 2 : Theme.spacingL
         anchors.right: parent.right
@@ -125,6 +129,7 @@ Rectangle {
 
     StyledText {
         id: temperature
+        visible: !root.clavis
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacingL
         y: root.wide ? (root.height - height) / 2 : details.y + (root.showCity && root.cityText !== "" ? city.height + Theme.spacingXS : 0)
@@ -142,6 +147,7 @@ Rectangle {
 
     DMaterialShape {
         id: emblem
+        visible: !root.clavis
         anchors.right: parent.right
         anchors.rightMargin: Theme.spacingL
         anchors.top: parent.top
@@ -156,6 +162,15 @@ Rectangle {
             name: WeatherService.getWeatherIcon(root.weather.wCode, root.weather.isDay)
             size: parent.width / 2
             color: Theme.onPrimary
+        }
+    }
+
+    Loader {
+        anchors.fill: parent
+        active: root.clavis
+        sourceComponent: ClavisWeather {
+            showCity: root.showCity
+            available: root.weather.available
         }
     }
 }

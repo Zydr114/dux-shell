@@ -191,4 +191,33 @@ SettingsCard {
         checked: root.store.setting("islandMediaAutoSwitch")
         onToggled: checked => root.store.apply("islandMediaAutoSwitch", checked)
     }
+
+    SettingsButtonGroupRow {
+        settingKey: root.keyPrefix + "MediaTextMode"
+        tags: ["island", "media", "lyrics", "title", "track"]
+        visible: !root.isDot
+        resetStore: root.store
+        resetKeys: ["islandMediaTextMode"]
+        text: I18n.tr("Media text")
+        model: [I18n.tr("Track title"), I18n.tr("Lyrics"), I18n.tr("Title and lyrics")]
+        values: ["title", "lyrics", "title-lyrics"]
+        value: root.store.setting("islandMediaTextMode")
+        fallbackValue: "title"
+        onValueSelected: value => root.store.apply("islandMediaTextMode", value)
+    }
+
+    SettingsSliderRow {
+        settingKey: root.keyPrefix + "MediaMaxWidth"
+        tags: ["island", "media", "lyrics", "width"]
+        visible: !root.isDot
+        resetStore: root.store
+        resetKeys: ["islandMediaMaxWidth"]
+        text: I18n.tr("Maximum media width")
+        unit: "px"
+        minimum: 360
+        maximum: 560
+        step: 10
+        value: root.store.setting("islandMediaMaxWidth")
+        onSliderDragFinished: value => root.store.apply("islandMediaMaxWidth", value)
+    }
 }

@@ -37,7 +37,10 @@ DPopout {
 
     property bool dashVisible: false
     property bool mediaBarPopout: false
-    readonly property bool compactMedia: MediaOptions.materialIi && mediaBarPopout && (activeTabId === "media" || isClosing)
+    readonly property bool compactMedia: MediaOptions.borderless && mediaBarPopout && !editMode && (activeTabId === "media" || isClosing)
+    readonly property real legacyMediaWidth: panelWidthFor(DashMetrics.panelColumnsFor("media")) * DashMetrics.mediaPopupScale
+    readonly property var mediaPopupSize: MediaOptions.popupSize(maxBodyWidth > 0 ? maxBodyWidth : screen ? screen.width - Theme.spacingL * 2 : undefined,
+        maxBodyHeight > 0 ? maxBodyHeight : screen ? screen.height - Theme.spacingL * 2 : undefined, 0, legacyMediaWidth, DashMetrics.mediaPopupHeightFor(legacyMediaWidth))
     property var triggerScreen: null
     property string currentTabId: DashRegistry.defaultTabId
     property string detailTabId: ""
@@ -85,9 +88,9 @@ DPopout {
     readonly property int columnCap: DashMetrics.columnCapFor(screen ? screen.width - navigationWidth : undefined, SettingsData.showWeekNumber)
     readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
 
-    popupWidth: panelWidthFor(DashMetrics.panelColumnsFor(activeTabId)) * (compactMedia ? DashMetrics.mediaPopupScale : 1)
+    popupWidth: compactMedia ? mediaPopupSize.width : panelWidthFor(DashMetrics.panelColumnsFor(activeTabId))
     minimumSurfaceWidth: compactMedia ? popupWidth : panelWidthFor(editMode ? columnCap : DashRegistry.widestPanelColumns)
-    surfaceBorderEnabled: !(MediaOptions.materialIi && activeTabId === "media")
+    surfaceBorderEnabled: !(MediaOptions.borderless && activeTabId === "media")
     popupHeight: contentLoader.item?.implicitHeight ?? (DashMetrics.tabDefaultHeight + Theme.navigationHeight + DashMetrics.contentGap + DashMetrics.contentPadding * 2)
     triggerWidth: DashMetrics.triggerWidth
     screen: triggerScreen
@@ -261,7 +264,7 @@ DPopout {
             id: mediaPopup
 
             implicitWidth: root.popupWidth
-            implicitHeight: DashMetrics.mediaPopupHeightFor(root.popupWidth)
+            implicitHeight: root.mediaPopupSize.height
             readonly property bool ready: true
             readonly property bool navigationFocused: false
             focus: true
@@ -293,11 +296,18 @@ DPopout {
                 event.accepted = true;
             }
 
-            MediaPlayerTab {
-                id: mediaPlayer
+            DFlickable {
                 anchors.fill: parent
-                live: root.dashVisible || root.isClosing
-                contentViewport: mediaPopup
+                contentHeight: mediaPlayer.height
+                clip: contentHeight > height
+
+                MediaPlayerTab {
+                    id: mediaPlayer
+                    width: parent.width
+                    height: Math.max(mediaPopup.height, implicitHeight)
+                    live: root.dashVisible || root.isClosing
+                    contentViewport: mediaPopup
+                }
             }
         }
     }
@@ -735,7 +745,7 @@ DPopout {
                         readonly property real targetHeight: root.activeTabId === "" ? emptyContent.implicitHeight : currentSettled && currentHost.isCurrent ? DashMetrics.panelHeightFor(root.activeTabId, currentHostImplicitHeight) : -1
                         readonly property real bodyHeight: root.activeTabId === "" ? emptyContent.implicitHeight : Math.max(settledHeight, currentHostImplicitHeight)
                         readonly property bool ready: targetHeight >= 0 && settledHeight === targetHeight
-                        readonly property real mediaBleed: MediaOptions.materialIi && root.activeTabId === "media" && !root.editMode ? DashMetrics.contentPadding : 0
+                        readonly property real mediaBleed: MediaOptions.borderless && root.activeTabId === "media" && !root.editMode ? DashMetrics.contentPadding : 0
                         readonly property real availableHeight: root.screen ? root.screen.height - mainContainer.horizontalChromeHeight - DashMetrics.contentPadding * 2 - Theme.barHeight - Theme.spacingL * 2 : contentHeight
                         readonly property int rowBudget: DashMetrics.rowCapFor(availableHeight)
                         // Growing a panel not hung from a top bar moves the grid under a held card, which retargets the drop.

@@ -14,6 +14,7 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     property bool daily: false
+    property string visualStyle: DashRegistry.option("weather", "visualStyle") ?? "default"
     property int startIndex: 0
     property int visibleCount: daily ? DashMetrics.dailyVisibleCount : DashMetrics.chartHourlyCount
 
@@ -80,7 +81,7 @@ Item {
         width: root.columnWidth
         height: parent.height - Theme.spacingS * 2
         radius: Theme.cornerRadiusM
-        color: Theme.withAlpha(Theme.primary, Theme.stateLayerHover)
+        color: root.visualStyle === "clavis" ? Theme.secondaryContainer : Theme.withAlpha(Theme.primary, Theme.stateLayerHover)
         visible: root.nowIndex >= 0 && root.nowIndex < root.slice.length
     }
 
@@ -113,7 +114,7 @@ Item {
                     text: root.labelFor(column.modelData, column.index)
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: column.current ? Theme.fontWeightBold : Theme.fontWeightMedium
-                    color: column.current ? Theme.primary : Theme.onSurfaceVariant
+                    color: column.current ? (root.visualStyle === "clavis" ? Theme.onSecondaryContainer : Theme.primary) : Theme.onSurfaceVariant
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
                 }
@@ -122,7 +123,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     name: WeatherService.getWeatherIcon(column.modelData.wCode || 0, column.modelData.isDay ?? true)
                     size: Theme.iconSize
-                    color: column.current ? Theme.primary : Theme.onSurfaceVariant
+                    color: column.current ? (root.visualStyle === "clavis" ? Theme.onSecondaryContainer : Theme.primary) : Theme.onSurfaceVariant
                 }
 
                 StyledText {
@@ -133,7 +134,7 @@ Item {
                     font.features: ({
                             "tnum": 1
                         })
-                    color: column.current ? Theme.primary : Theme.surfaceText
+                    color: column.current ? (root.visualStyle === "clavis" ? Theme.onSecondaryContainer : Theme.primary) : Theme.surfaceText
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
                 }
@@ -152,7 +153,7 @@ Item {
         showDots: true
         dotRadius: DashMetrics.chartDotRadius
         lineWidth: Theme.outlineWidthFocused
-        lineColor: Theme.primary
+        lineColor: root.visualStyle === "clavis" ? Theme.secondary : Theme.primary
         secondaryLineColor: Theme.tertiary
         fillOpacity: 0
         edgeExtension: root.columnWidth / 2
@@ -196,7 +197,7 @@ Item {
                         text: root.daily ? (WeatherService.formatTemp(footerColumn.modelData.tempMin) ?? "--") : (WeatherService.formatPercent(footerColumn.modelData.precipitationProbability) ?? "--")
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: footerColumn.index === root.nowIndex ? Theme.fontWeightBold : Theme.fontWeightMedium
-                        color: footerColumn.index === root.nowIndex ? Theme.primary : Theme.onSurfaceVariant
+                        color: footerColumn.index === root.nowIndex ? (root.visualStyle === "clavis" ? Theme.onSecondaryContainer : Theme.primary) : Theme.onSurfaceVariant
                     }
                 }
             }

@@ -10,6 +10,7 @@ MediaActivityFace {
     isVertical: controller.isVertical
     artworkSize: controller.compactIconSize
     clockVisible: controller.mediaClockVisible
+    textMode: controller.mediaTextMode
     function updateLength() {
         controller.setMediaContentLength(isVertical ? implicitHeight : implicitWidth);
     }

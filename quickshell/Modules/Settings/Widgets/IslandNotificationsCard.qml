@@ -42,6 +42,29 @@ SettingsCard {
         onToggled: checked => root.store.apply("islandChargingPulse", checked)
     }
 
+    SettingsButtonGroupRow {
+        settingKey: root.keyPrefix + "OsdPresentation"
+        tags: ["island", "osd", "volume", "brightness", "media"]
+        visible: root.store.setting("islandSystemOsd")
+        resetStore: root.store
+        resetKeys: ["islandOsdPresentation"]
+        text: I18n.tr("OSD presentation")
+        model: [I18n.tr("Replace current face"), I18n.tr("Keep current activity")]
+        values: ["replace", "accessory"]
+        value: root.store.setting("islandOsdPresentation")
+        fallbackValue: "replace"
+        onValueSelected: value => root.store.apply("islandOsdPresentation", value)
+    }
+
+    SettingsToggleRow {
+        settingKey: root.keyPrefix + "NotificationCountdown"
+        tags: ["island", "notification", "countdown", "progress"]
+        text: I18n.tr("Notification countdown")
+        description: I18n.tr("Show the remaining popup time")
+        checked: root.store.setting("islandNotificationCountdown")
+        onToggled: checked => root.store.apply("islandNotificationCountdown", checked)
+    }
+
     SettingsToggleRow {
         settingKey: root.keyPrefix + "NotificationExpand"
         tags: ["island", "notifications", "expand", "arrival", "size"]

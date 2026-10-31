@@ -77,6 +77,21 @@ Singleton {
         });
     }
 
+    function visualStyleOption() {
+        return choice("visualStyle", I18n.tr("Card style"), "default", [
+            { "value": "default", "text": I18n.tr("Default") },
+            { "value": "clavis", "text": "Clavis" }
+        ]);
+    }
+
+    function applyClavisCardStyles() {
+        const next = Object.assign({}, SettingsData.dashOptions ?? {});
+        for (const id of ["media", "weather", "cpu", "memory", "network", "disk", "battery"])
+            next[id] = Object.assign({}, next[id] ?? {}, { "visualStyle": "clavis" });
+        next.clock = Object.assign({}, next.clock ?? {}, { "style": "cookie" });
+        SettingsData.set("dashOptions", next);
+    }
+
     function panelOptions(tab) {
         return [Object.assign(number("panelColumns", I18n.tr("Panel width (columns)"), DashMetrics.defaultGridColumns, DashMetrics.minimumGridColumns, DashMetrics.maximumGridColumns), {
                 "settingsOnly": true
@@ -112,7 +127,15 @@ Singleton {
                 "minW": 1,
                 "minH": 1
             },
-            "options": [choice("playerStyle", I18n.tr("Player style"), MediaOptions.defaultPlayerStyle, MediaOptions.playerStyles), choice("artStyle", I18n.tr("Artwork"), "rounded", [
+            "options": [choice("playerStyle", I18n.tr("Player style"), MediaOptions.defaultPlayerStyle, MediaOptions.playerStyles),
+                choice("clavisCoverStyle", I18n.tr("Clavis cover style"), "rounded", [
+                    { "value": "rounded", "text": I18n.tr("Rounded") },
+                    { "value": "caelestia", "text": I18n.tr("Caelestia spectrum") },
+                    { "value": "background", "text": I18n.tr("Background") }
+                ]), choice("clavisProgressStyle", I18n.tr("Clavis progress style"), "wave", [
+                    { "value": "wave", "text": I18n.tr("Wave") },
+                    { "value": "material", "text": "Material" }
+                ]), cardOnly(visualStyleOption()), choice("artStyle", I18n.tr("Artwork"), "rounded", [
                     {
                         "value": "rounded",
                         "text": I18n.tr("Rounded")
@@ -174,7 +197,7 @@ Singleton {
                 "minW": 1,
                 "minH": 1
             },
-            "options": [cardOnly(toggle("city", I18n.tr("Show city"), false)), cardOnly(toggle("readings", I18n.tr("Show readings"), true)), cardOnly(toneOption())]
+            "options": [visualStyleOption(), cardOnly(toggle("city", I18n.tr("Show city"), false)), cardOnly(toggle("readings", I18n.tr("Show readings"), true)), cardOnly(toneOption())]
         },
         {
             "id": "wellbeing",
@@ -230,8 +253,48 @@ Singleton {
                     {
                         "value": "analog",
                         "text": I18n.tr("Analog", "clock style option")
+                    },
+                    {
+                        "value": "cookie",
+                        "text": I18n.tr("Cookie clock")
                     }
-                ]), toggle("seconds", I18n.tr("Show seconds"), false), toggle("date", I18n.tr("Show date"), false), toggle("numbers", I18n.tr("Show hour numbers"), false), choice("tone", I18n.tr("Tone"), "primary", toneChoices)]
+                ]), toggle("seconds", I18n.tr("Show seconds"), false), toggle("date", I18n.tr("Show date"), false), toggle("numbers", I18n.tr("Show hour numbers"), false), choice("tone", I18n.tr("Tone"), "primary", toneChoices),
+                number("cookieSides", I18n.tr("Cookie sides"), 14, 0, 40),
+                toggle("cookieRotate", I18n.tr("Rotate cookie"), false),
+                choice("cookieDial", I18n.tr("Clock dial"), "full", [
+                    { "value": "full", "text": I18n.tr("Full") },
+                    { "value": "dots", "text": I18n.tr("Dots") },
+                    { "value": "numbers", "text": I18n.tr("Numbers") },
+                    { "value": "none", "text": I18n.tr("None") }
+                ]), choice("cookieHourHand", I18n.tr("Hour hand"), "fill", [
+                    { "value": "fill", "text": I18n.tr("Filled") },
+                    { "value": "hollow", "text": I18n.tr("Hollow") },
+                    { "value": "classic", "text": I18n.tr("Classic") },
+                    { "value": "hide", "text": I18n.tr("Hidden") }
+                ]), choice("cookieMinuteHand", I18n.tr("Minute hand"), "medium", [
+                    { "value": "thin", "text": I18n.tr("Thin") },
+                    { "value": "medium", "text": I18n.tr("Medium") },
+                    { "value": "bold", "text": I18n.tr("Bold") },
+                    { "value": "classic", "text": I18n.tr("Classic") },
+                    { "value": "hide", "text": I18n.tr("Hidden") }
+                ]), choice("cookieSecondHand", I18n.tr("Second hand"), "dot", [
+                    { "value": "dot", "text": I18n.tr("Dot") },
+                    { "value": "thin", "text": I18n.tr("Thin") },
+                    { "value": "classic", "text": I18n.tr("Classic") },
+                    { "value": "hide", "text": I18n.tr("Hidden") }
+                ]), choice("cookieDate", I18n.tr("Cookie date style"), "bubble", [
+                    { "value": "bubble", "text": I18n.tr("Bubble") },
+                    { "value": "rect", "text": I18n.tr("Rounded") },
+                    { "value": "border", "text": I18n.tr("Outline") },
+                    { "value": "hide", "text": I18n.tr("Hidden") }
+                ])]
+        },
+        {
+            "id": "date",
+            "text": I18n.tr("Date"),
+            "icon": "today",
+            "card": { "component": dateCard, "w": 1, "h": 1, "minW": 1, "minH": 1 },
+            "options": [toneOption("primary")]
         },
         {
             "id": "calendar",
@@ -286,7 +349,7 @@ Singleton {
                 "minH": 1,
                 "maxH": 3
             },
-            "options": [toggle("trend", I18n.tr("Show trend"), true), toggle("temperature", I18n.tr("Show temperature"), true), toneOption()]
+            "options": [visualStyleOption(), toggle("trend", I18n.tr("Show trend"), true), toggle("temperature", I18n.tr("Show temperature"), true), toneOption()]
         },
         {
             "id": "memory",
@@ -300,7 +363,7 @@ Singleton {
                 "minH": 1,
                 "maxH": 3
             },
-            "options": [toggle("trend", I18n.tr("Show trend"), true), toggle("swap", I18n.tr("Show swap"), false), toneOption()]
+            "options": [visualStyleOption(), toggle("trend", I18n.tr("Show trend"), true), toggle("swap", I18n.tr("Show swap"), false), toneOption()]
         },
         {
             "id": "network",
@@ -314,7 +377,7 @@ Singleton {
                 "minH": 1,
                 "maxH": 3
             },
-            "options": [toggle("trend", I18n.tr("Show trend"), true), toneOption()]
+            "options": [visualStyleOption(), toggle("trend", I18n.tr("Show trend"), true), toneOption()]
         },
         {
             "id": "disk",
@@ -328,7 +391,7 @@ Singleton {
                 "minH": 1,
                 "maxH": 3
             },
-            "options": [toggle("trend", I18n.tr("Show trend"), true), toggle("io", I18n.tr("Show I/O"), false), toneOption()]
+            "options": [visualStyleOption(), toggle("trend", I18n.tr("Show trend"), true), toggle("io", I18n.tr("Show I/O"), false), toneOption()]
         },
         {
             "id": "battery",
@@ -344,7 +407,7 @@ Singleton {
                 "minH": 1,
                 "maxH": 3
             },
-            "options": [choice("style", I18n.tr("Style"), "solid", [
+            "options": [visualStyleOption(), choice("style", I18n.tr("Style"), "solid", [
                     {
                         "value": "solid",
                         "text": I18n.tr("Solid")
@@ -762,6 +825,11 @@ Singleton {
     Component {
         id: clockCard
         ClockCard {}
+    }
+
+    Component {
+        id: dateCard
+        DateCard {}
     }
 
     Component {

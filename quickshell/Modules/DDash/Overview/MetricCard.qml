@@ -32,6 +32,7 @@ Card {
     readonly property bool compact: !wide && !tall
     readonly property bool trendVisible: showTrend && trend.length > 1 && !compact
     readonly property bool hasBadge: badgeText !== ""
+    readonly property bool clavis: options.visualStyle === "clavis"
     readonly property real gaugeSize: hero ? DashMetrics.gaugeSizeHero : DashMetrics.gaugeSize
     readonly property real gaugeIconSize: hero ? Theme.iconSize : (compact ? Theme.iconSizeSmall : Theme.iconSizeMedium)
     readonly property color levelColor: {
@@ -87,9 +88,9 @@ Card {
         anchors.leftMargin: root.wide ? Theme.spacingM : -root.pad
         anchors.right: parent.right
         anchors.rightMargin: root.wide ? 0 : -root.pad
-        y: root.wide ? parent.height + root.pad - height : (narrowBadge.visible ? narrowBadge.y + narrowBadge.height : header.height) + Theme.spacingS
-        height: root.wide ? root.height * DashMetrics.tileTrendRatio : Math.max(0, valueText.y - Theme.spacingXS - y)
-        visible: root.trendVisible
+        y: root.clavis ? 0 : (root.wide ? parent.height + root.pad - height : (narrowBadge.visible ? narrowBadge.y + narrowBadge.height : header.height) + Theme.spacingS)
+        height: root.clavis ? 0 : (root.wide ? root.height * DashMetrics.tileTrendRatio : Math.max(0, valueText.y - Theme.spacingXS - y))
+        visible: !root.clavis && root.trendVisible
         values: root.trend
         secondaryValues: root.secondaryTrend
         maximum: root.trendMaximum
@@ -107,6 +108,7 @@ Card {
         anchors.right: parent.right
         anchors.top: parent.top
         height: gauge.height
+        visible: !root.clavis
 
         MetricGauge {
             id: gauge
@@ -152,7 +154,7 @@ Card {
         anchors.left: parent.left
         anchors.top: header.bottom
         anchors.topMargin: Theme.spacingXS
-        visible: root.hasBadge && root.tall && !root.wide
+        visible: !root.clavis && root.hasBadge && root.tall && !root.wide
     }
 
     StyledText {
@@ -164,7 +166,7 @@ Card {
         font.pixelSize: Theme.fontSizeSmall
         color: root.mutedColor
         elide: Text.ElideRight
-        visible: root.hero && text !== ""
+        visible: !root.clavis && root.hero && text !== ""
     }
 
     TextMetrics {
@@ -176,6 +178,8 @@ Card {
 
     StyledText {
         id: valueText
+
+        visible: !root.clavis
 
         anchors.left: parent.left
         anchors.bottom: parent.bottom
@@ -191,5 +195,24 @@ Card {
             })
         color: root.contentColor
         elide: Text.ElideRight
+    }
+
+    Loader {
+        anchors.fill: parent
+        anchors.margins: -root.pad
+        active: root.clavis
+        sourceComponent: ClavisMetric {
+            metricId: root.entryId
+            label: root.label
+            iconName: root.iconName
+            valueText: root.valueText
+            supportingText: root.supportingText
+            badgeText: root.badgeText
+            usage: root.usage
+            trend: root.trend
+            trendVisible: root.trendVisible
+            accent: root.accentColor
+            foreground: root.onAccentColor
+        }
     }
 }

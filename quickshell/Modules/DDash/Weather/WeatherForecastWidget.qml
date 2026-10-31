@@ -13,6 +13,7 @@ Rectangle {
     property bool chartMode: true
     property var widgetOptions: ({})
     property bool live: false
+    readonly property string visualStyle: !widgetOptions.visualStyle || widgetOptions.visualStyle === "inherit" ? (DashRegistry.option("weather", "visualStyle") ?? "default") : widgetOptions.visualStyle
     readonly property int visibleCount: Math.max(1, Math.min(daily ? DashMetrics.dailyVisibleCount : DashMetrics.chartHourlyCount, Math.floor(width / DashMetrics.gridRowUnit)))
     property int startIndex: daily ? 0 : (WeatherService.weather.currentHourIndex ?? new Date().getHours())
     readonly property var forecasts: (daily ? WeatherService.weather.forecast : WeatherService.weather.hourlyForecast) ?? []
@@ -20,7 +21,7 @@ Rectangle {
     readonly property int start: Math.max(0, Math.min(maxStart, startIndex))
 
     radius: Theme.cornerRadiusXL
-    color: DashMetrics.cardColor
+    color: visualStyle === "clavis" ? Theme.surfaceContainerLow : DashMetrics.cardColor
     border.width: Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
 
@@ -113,6 +114,7 @@ Rectangle {
         id: chart
         WeatherForecastChart {
             daily: root.daily
+            visualStyle: root.visualStyle
             visibleCount: root.visibleCount
             startIndex: root.start
             onPageRequested: delta => root.step(delta)
@@ -138,6 +140,7 @@ Rectangle {
                         width: (cardRow.width - cardRow.spacing * (root.visibleCount - 1)) / root.visibleCount
                         height: cardRow.height
                         daily: root.daily
+                        visualStyle: root.visualStyle
                         dense: true
                         forecastData: modelData
                         isCurrent: root.start + index === (root.daily ? 0 : (WeatherService.weather.currentHourIndex ?? new Date().getHours()))

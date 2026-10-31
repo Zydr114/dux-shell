@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell.Services.Mpris
 import qs.Common
@@ -29,7 +31,8 @@ Item {
     property bool wallpaperEnabled: MediaOptions.albumArtBackdrop
     property string panel: ""
     property Item contentViewport: null
-    readonly property bool blocksTabNavigation: panel !== ""
+    readonly property ClavisChrome clavisPlayerChrome: mediaChrome.item as ClavisChrome
+    readonly property bool blocksTabNavigation: panel !== "" || (clavisPlayerChrome?.sourceSelectorOpen ?? false)
     property bool isSeeking: false
     property real previousVolume: 0.0
 
@@ -252,9 +255,13 @@ Item {
     }
 
     function handleKeyEvent(event) {
+        if (clavisPlayerChrome?.sourceSelectorOpen && event.key !== Qt.Key_Escape)
+            return clavisPlayerChrome.handleSourceSelectorKey(event);
         if (event.key === Qt.Key_F6)
             return cycleFocus(!!(event.modifiers & Qt.ShiftModifier));
         if (event.key === Qt.Key_Escape) {
+            if (clavisPlayerChrome?.dismissSourceSelector())
+                return true;
             if (panel === "")
                 return false;
             const panelId = panel;
@@ -268,7 +275,7 @@ Item {
             return false;
 
         if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
-            if (!activePlayer.canSeek || stableLength <= 0)
+            if (!activePlayer.canControl || !activePlayer.canSeek || stableLength <= 0)
                 return false;
             const targetPosition = (event.key - Qt.Key_0) * 0.1 * stableLength;
             activePlayer.position = Math.max(0.1, Math.min(targetPosition, stableLength * 0.99));
@@ -278,13 +285,13 @@ Item {
         switch (event.key) {
         case Qt.Key_Left:
         case Qt.Key_H:
-            if (!activePlayer.canSeek)
+            if (!activePlayer.canControl || !activePlayer.canSeek)
                 return false;
             activePlayer.position = Math.max(0.1, activePlayer.position - 5);
             return true;
         case Qt.Key_Right:
         case Qt.Key_L:
-            if (!activePlayer.canSeek || stableLength <= 0)
+            if (!activePlayer.canControl || !activePlayer.canSeek || stableLength <= 0)
                 return false;
             activePlayer.position = Math.max(0.1, Math.min(stableLength - 1, activePlayer.position + 5));
             return true;
@@ -303,7 +310,7 @@ Item {
             revealVolume();
             return true;
         case Qt.Key_Space:
-            if (!activePlayer.canTogglePlaying)
+            if (!activePlayer.canControl || !activePlayer.canTogglePlaying)
                 return false;
             activePlayer.togglePlaying();
             return true;
@@ -321,7 +328,7 @@ Item {
         id: mediaChrome
         anchors.fill: parent
         active: !root.idle
-        sourceComponent: root.playerStyle === "material-ii" ? materialIiChrome : root.playerStyle === "material" ? materialChrome : bentoChrome
+        sourceComponent: root.playerStyle === "clavis" ? clavisChrome : root.playerStyle === "material-ii" ? materialIiChrome : root.playerStyle === "material" ? materialChrome : bentoChrome
     }
 
     Loader {
@@ -340,6 +347,13 @@ Item {
     Component {
         id: materialIiChrome
         MaterialIiChrome {
+            player: root
+        }
+    }
+
+    Component {
+        id: clavisChrome
+        ClavisChrome {
             player: root
         }
     }

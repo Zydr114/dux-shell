@@ -27,6 +27,7 @@ Item {
     property bool freeMode: false
     property bool reducedMotion: false
     property Component compactFaceOverride: null
+    property Component systemAccessoryComponent: null
     // Hosted islands fold the slot anchor into every target; the face must pin to the same resolved slot.
     property var resolveTarget: target => target
     // Embedded sheets grow by this on the near edge; the face keeps its content size below the fold.
@@ -211,10 +212,11 @@ Item {
         readonly property real alongPos: !active || root.freeMode ? 0 : Math.round(root.slotAlong(target)) - Math.round(isVertical ? root.islandY : root.islandX)
         readonly property real crossPos: !active || root.freeMode ? 0 : Math.round(root.slotCross(target)) - Math.round(isVertical ? root.islandX : root.islandY)
 
-        x: root.freeMode ? Math.round((parent.width - width) / 2) : (isVertical ? crossPos : alongPos)
-        y: root.freeMode ? Math.round((parent.height - height) / 2) : (isVertical ? alongPos : crossPos)
-        width: target.width
-        height: target.height
+        x: root.freeMode ? Math.round((parent.width - (isVertical ? width : target.width)) / 2) : (isVertical ? crossPos : alongPos)
+        y: root.freeMode ? Math.round((parent.height - (isVertical ? target.height : height)) / 2) : (isVertical ? alongPos : crossPos)
+        readonly property real accessoryInset: (activity === "home" || activity === "media") ? root.controller.accessoryLength : 0
+        width: Math.max(0, target.width - (isVertical ? 0 : accessoryInset))
+        height: Math.max(0, target.height - (isVertical ? accessoryInset : 0))
         asynchronous: false
         sourceComponent: root.compactFaceOverride && root.controller.usesDotFace(activity) ? root.compactFaceOverride : face
         opacity: !active ? 0 : root.controller.isSystemActivity(activity) ? root.systemOpacity(root.compactOpacity) : root.compactOpacity(activity)
@@ -244,6 +246,26 @@ Item {
         enabled: opacity >= 0.5
         scale: root.reducedMotion ? 1 : 1 - (1 - opacity) * Theme.spacingM / Math.max(1, Math.min(width, height))
         transformOrigin: isVertical ? (root.controller.farEdge ? Item.Right : Item.Left) : (root.controller.farEdge ? Item.Bottom : Item.Top)
+    }
+
+    Loader {
+        readonly property bool vertical: root.controller.isVertical
+        readonly property bool compactHost: root.activityId === "home" || root.activityId === "media"
+        readonly property Item expandedHost: root.activityId === "media" ? mediaExpandedLoader : root.activityId === "home" ? homeExpandedLoader : null
+        readonly property bool headerHost: root.expanded && expandedHost !== null
+        readonly property real inset: root.expanded ? Theme.spacingM : Theme.spacingXS
+        readonly property real naturalWidth: Theme.iconSize + Theme.spacingL * 4
+        readonly property real headerSpace: headerHost ? (expandedHost.width - Theme.bottomSheetHandleWidth - Theme.spacingL * 2) / 2 - inset - Theme.spacingS : naturalWidth
+        active: root.controller.accessoryActive && (root.expanded || compactHost) && root.controller.editingActivity === ""
+        visible: active
+        opacity: root.expanded ? root.expandedFade : root.compactFade
+        sourceComponent: root.systemAccessoryComponent
+        asynchronous: false
+        width: headerHost ? Math.max(0, Math.min(naturalWidth, headerSpace)) : vertical && !root.expanded ? root.width : naturalWidth
+        height: headerHost ? Theme.spacingXL : vertical && !root.expanded ? root.controller.compactFaceThickness : (root.expanded ? Theme.buttonHeightS + Theme.spacingXS : root.height)
+        x: headerHost ? expandedHost.x + expandedHost.width - width - inset : Math.max(0, root.width - width - inset)
+        y: headerHost ? expandedHost.y : root.expanded ? root.height - height - inset : vertical ? root.height - height : 0
+        z: 1
     }
 
     CompactFace {

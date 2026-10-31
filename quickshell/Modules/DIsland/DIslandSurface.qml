@@ -73,7 +73,7 @@ Item {
         return root.surfaceBase;
     }
     readonly property bool popupStyled: root.controller.expanded
-    readonly property bool materialIi: popupStyled && root.controller.activeActivity === "media" && MediaOptions.materialIi
+    readonly property bool borderlessMedia: popupStyled && root.controller.activeActivity === "media" && MediaOptions.borderless
     readonly property real islandOpacity: Math.max(0, Math.min(1, root.transparency))
     readonly property color effectiveSurfaceColor: root.embedded ? root.bandColor : root.highContrast ? Theme.surfaceContainerHighest : Theme.withAlpha(root.surfaceColor, root.islandOpacity)
     readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
@@ -387,7 +387,7 @@ Item {
         height: root.currentVisualHeight
         // Embedded, the band already paints the in-band strip; overhangFill draws the rest, so a translucent band never double-alphas.
         color: root.embedded ? "transparent" : root.effectiveSurfaceColor
-        border.width: root.notificationAccentColor !== "transparent" ? Theme.outlineWidthFocused : root.embedded ? 0 : root.highContrast ? Theme.outlineWidthFocused : root.materialIi || root.notch ? 0 : root.popupStyled ? BlurService.borderWidth : Theme.outlineWidth
+        border.width: root.notificationAccentColor !== "transparent" ? Theme.outlineWidthFocused : root.embedded ? 0 : root.highContrast ? Theme.outlineWidthFocused : root.borderlessMedia || root.notch ? 0 : root.popupStyled ? BlurService.borderWidth : Theme.outlineWidth
         border.color: root.notificationAccentColor !== "transparent" ? root.notificationAccentColor : root.highContrast ? Theme.outlineStrong : root.popupStyled ? BlurService.borderColor : Theme.outlineLight
 
         Behavior on color {
@@ -462,6 +462,7 @@ Item {
             wallpaperExpandedComponent: expandedWallpaperComponent
             weatherCompactComponent: compactWeatherComponent
             weatherExpandedComponent: expandedWeatherComponent
+            systemAccessoryComponent: accessorySystemComponent
             systemCompactComponent: compactSystemComponent
             systemExpandedComponent: expandedSystemComponent
             notificationCompactComponent: compactNotificationComponent
@@ -610,6 +611,16 @@ Item {
             topRightRadius: island.topRightRadius
             bottomLeftRadius: island.bottomLeftRadius
             bottomRightRadius: island.bottomRightRadius
+        }
+    }
+
+    Component {
+        id: accessorySystemComponent
+
+        SystemAccessory {
+            systemModel: root.systemModel
+            vertical: root.controller.isVertical && !root.controller.expanded
+            expanded: root.controller.expanded
         }
     }
 

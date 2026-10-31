@@ -11,6 +11,8 @@ Item {
 
     property bool vertical: false
     property bool live: visible && enabled
+    property bool showSeconds: true
+    readonly property bool effectiveShowSeconds: showSeconds && SettingsData.showSeconds
     property string displayMode: "both"
     property bool dateFirst: false
     property real fontSize: Theme.fontSizeMedium
@@ -22,7 +24,7 @@ Item {
     property var locale: I18n.locale()
     property date date: systemClock.date
 
-    readonly property string timeText: date.toLocaleTimeString(locale, SettingsData.getEffectiveTimeFormat())
+    readonly property string timeText: date.toLocaleTimeString(locale, effectiveShowSeconds ? SettingsData.getEffectiveTimeFormat() : SettingsData.getEffectiveTimeFormat().replace(":ss", ""))
     readonly property string dateText: date.toLocaleDateString(locale, SettingsData.getEffectiveDateFormat())
     readonly property var timeLines: vertical ? stackedTime() : [timeText]
     readonly property var dateLines: vertical ? stackedDate() : [dateText]
@@ -41,7 +43,7 @@ Item {
     function stackedTime() {
         const hours = date.getHours();
         const lines = [pad(SettingsData.use24HourClock ? hours : (hours % 12 || 12)), pad(date.getMinutes())];
-        if (SettingsData.showSeconds)
+        if (root.effectiveShowSeconds)
             lines.push(pad(date.getSeconds()));
         if (!SettingsData.use24HourClock)
             lines.push(hours >= 12 ? locale.pmText : locale.amText);
@@ -177,7 +179,7 @@ Item {
     SystemClock {
         id: systemClock
         enabled: root.live
-        precision: SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
+        precision: root.effectiveShowSeconds ? SystemClock.Seconds : SystemClock.Minutes
     }
 
     Connections {

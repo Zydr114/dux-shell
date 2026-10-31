@@ -12,7 +12,23 @@ QtObject {
     property string kind: "volume"
     // Off: system levels and state changes keep their OSDs and only the face's own controls open this activity.
     property bool enabled: true
+    onEnabledChanged: {
+        if (!enabled)
+            controller?.clearAccessory();
+    }
     property bool chargingPulseEnabled: true
+    property bool sourceReady: false
+    readonly property bool capsLocked: DMSService.capsLockState
+    readonly property bool pluggedIn: BatteryService.isPluggedIn
+    onCapsLockedChanged: {
+        if (sourceReady && SettingsData.osdCapsLockEnabled)
+            show("capslock");
+    }
+    onPluggedInChanged: {
+        if (sourceReady && chargingPulseEnabled && BatteryService.batteryAvailable)
+            show("charging");
+    }
+    Component.onCompleted: sourceReady = true
 
     readonly property bool volumeActivity: kind === "volume"
     readonly property bool micActivity: kind === "mic"
@@ -122,11 +138,11 @@ QtObject {
     function show(activityKind) {
         if (!enabled || SessionData.suppressOSD)
             return;
-        open(activityKind);
+        open(activityKind, true);
     }
 
-    function open(activityKind) {
-        if (controller.requestSystemActivity(activityKind))
+    function open(activityKind, allowAccessory = false) {
+        if (controller.requestSystemActivity(activityKind, allowAccessory))
             kind = activityKind;
     }
 
@@ -202,16 +218,6 @@ QtObject {
         }
     }
 
-    property Connections capsLockConnection: Connections {
-        target: DMSService
-        enabled: root.enabled
-
-        function onCapsLockStateChanged() {
-            if (SettingsData.osdCapsLockEnabled)
-                root.show("capslock");
-        }
-    }
-
     property Connections powerProfileConnection: Connections {
         target: PowerProfileWatcher
         enabled: root.enabled
@@ -229,16 +235,6 @@ QtObject {
         function onInhibitorChanged() {
             if (SettingsData.osdIdleInhibitorEnabled)
                 root.show("idleinhibitor");
-        }
-    }
-
-    property Connections batteryConnection: Connections {
-        target: BatteryService
-        enabled: root.enabled
-
-        function onIsPluggedInChanged() {
-            if (root.chargingPulseEnabled && BatteryService.batteryAvailable)
-                root.show("charging");
         }
     }
 }

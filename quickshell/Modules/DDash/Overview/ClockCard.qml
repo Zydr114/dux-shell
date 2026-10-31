@@ -28,10 +28,28 @@ Card {
     entryId: "clock"
     tone: options.tone ?? ""
     pad: Theme.spacingL
+    clipContent: options.style === "cookie"
 
     Loader {
         anchors.fill: parent
-        sourceComponent: root.options.style === "analog" ? analogFace : digitalFace
+        sourceComponent: root.options.style === "cookie" ? cookieFace : (root.options.style === "analog" ? analogFace : digitalFace)
+    }
+
+    Component {
+        id: cookieFace
+
+        CookieClock {
+            clockDate: systemClock.date
+            hourText: root.hourText
+            minuteText: root.minuteText
+            dateText: root.dateText
+            showSeconds: root.showSeconds
+            live: root.live
+            clockOptions: root.options
+            accent: root.accentColor
+            foreground: root.onAccentColor
+            supportingColor: root.supportingColor
+        }
     }
 
     Component {
