@@ -10,7 +10,9 @@ Item {
     readonly property MprisPlayer activePlayer: MprisController.activePlayer
     readonly property bool isPlaying: activePlayer !== null && activePlayer.playbackState === MprisPlaybackState.Playing
     readonly property bool live: visible && enabled && (Window.window?.visible ?? false) && isPlaying
-    readonly property bool available: CavaService.cavaAvailable && SettingsData.audioVisualizerEnabled
+    readonly property bool sampling: live && SettingsData.audioVisualizerEnabled && !SettingsData.reduceMotion
+    readonly property bool available: CavaService.cavaAvailable && SettingsData.audioVisualizerEnabled && !SettingsData.reduceMotion
+    readonly property list<int> bands: CavaService.values
     readonly property bool showBars: idleIconName === "" || (available && live)
 
     property real maxBarHeight: Theme.iconSize - 2
@@ -21,40 +23,38 @@ Item {
     width: 20
     height: Theme.iconSize
 
-    onLiveChanged: {
-        if (!live) {
+    onSamplingChanged: {
+        if (!sampling) {
             bars.bandsA = Qt.vector4d(0, 0, 0, 0);
             bars.bandsB = Qt.vector2d(0, 0);
+        } else {
+            updateBands();
         }
+    }
+    onBandsChanged: updateBands()
+
+    function updateBands() {
+        if (!sampling || bands.length < 6)
+            return;
+        const n = i => {
+            const x = bands[i];
+            const level = x <= 0 ? 0 : x >= 100 ? 1 : Math.sqrt(x * 0.01);
+            return Math.round(level * 32) / 32;
+        };
+        const a = Qt.vector4d(n(0), n(1), n(2), n(3));
+        const b = Qt.vector2d(n(4), n(5));
+        if (a == bars.bandsA && b == bars.bandsB)
+            return;
+        bars.bandsA = a;
+        bars.bandsB = b;
     }
 
     Loader {
-        active: root.live
+        active: root.sampling
         sourceComponent: Component {
             Ref {
                 service: CavaService
             }
-        }
-    }
-
-    Connections {
-        target: CavaService
-        enabled: root.live
-        function onValuesChanged() {
-            const v = CavaService.values;
-            if (v.length < 6)
-                return;
-            const n = i => {
-                const x = v[i];
-                const level = x <= 0 ? 0 : x >= 100 ? 1 : Math.sqrt(x * 0.01);
-                return Math.round(level * 32) / 32;
-            };
-            const a = Qt.vector4d(n(0), n(1), n(2), n(3));
-            const b = Qt.vector2d(n(4), n(5));
-            if (a == bars.bandsA && b == bars.bandsB)
-                return;
-            bars.bandsA = a;
-            bars.bandsB = b;
         }
     }
 

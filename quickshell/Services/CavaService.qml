@@ -1,22 +1,71 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
 
-import QtCore
 import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import "../Common/Spectrum.js" as Spectrum
 
 Singleton {
     id: root
 
-    property list<int> values: Array(6)
+    property list<int> values: Array(6).fill(0)
+    property list<real> spectrumValues: Array(45).fill(0)
     property int refCount: 0
     property bool cavaAvailable: false
     property bool _cavaChecked: false
-    readonly property bool cavaWanted: SettingsData.audioVisualizerEnabled || refCount > 0
-    onCavaWantedChanged: _checkCava()
-    readonly property string _confPath: `${Paths.strip(StandardPaths.writableLocation(StandardPaths.TempLocation))}/dms-cava-${Date.now()}-${Math.floor(Math.random() * 1000000)}.conf`
+    property var _spectrumTokens: []
+    property int _activeBars: 0
+    property bool _stopping: false
+    property bool _failed: false
+    readonly property bool cavaWanted: SettingsData.audioVisualizerEnabled && !SettingsData.reduceMotion && (refCount > 0 || _spectrumTokens.length > 0)
+    readonly property int _desiredBars: cavaWanted && cavaAvailable ? (_spectrumTokens.length > 0 ? 45 : 6) : 0
+
+    onCavaWantedChanged: {
+        _checkCava();
+        if (!cavaWanted)
+            _failed = false;
+    }
+    on_DesiredBarsChanged: {
+        _failed = false;
+        _syncProcess();
+    }
+
+    function acquireSpectrum(token) {
+        _spectrumTokens = Spectrum.addSubscriber(_spectrumTokens, token);
+    }
+
+    function releaseSpectrum(token) {
+        _spectrumTokens = Spectrum.removeSubscriber(_spectrumTokens, token);
+    }
+
+    function _checkCava() {
+        if (!cavaWanted || _cavaChecked || cavaCheck.running)
+            return;
+        cavaCheck.running = true;
+    }
+
+    function _clearValues() {
+        values = Array(6).fill(0);
+        spectrumValues = Array(45).fill(0);
+    }
+
+    function _syncProcess() {
+        if (_stopping)
+            return;
+        if (cavaProcess.running) {
+            if (_activeBars !== _desiredBars) {
+                _stopping = true;
+                cavaProcess.running = false;
+            }
+            return;
+        }
+        if (_desiredBars === 0 || _failed)
+            return;
+        _activeBars = _desiredBars;
+        cavaProcess.running = true;
+    }
 
     Process {
         id: cavaCheck
@@ -29,22 +78,13 @@ Singleton {
         }
     }
 
-    Component.onCompleted: _checkCava()
-
-    function _checkCava() {
-        if (!cavaWanted || _cavaChecked || cavaCheck.running)
-            return;
-        cavaCheck.running = true;
-    }
-
     Process {
         id: cavaProcess
 
-        running: root.cavaAvailable && root.refCount > 0
-        command: ["sh", "-c", `cat <<'CAVACONF' > ${root._confPath}
+        command: ["sh", "-c", `exec cava -p /dev/fd/3 3<<'CAVACONF' < /dev/null
 [general]
 framerate=25
-bars=6
+bars=${root._activeBars}
 autosens=0
 sensitivity=30
 sleep_timer=3
@@ -55,6 +95,7 @@ higher_cutoff_freq=12000
 method=raw
 raw_target=/dev/stdout
 data_format=ascii
+ascii_max_range=1000
 channels=mono
 mono_option=average
 
@@ -64,30 +105,39 @@ integral=90
 gravity=95
 ignore=2
 monstercat=1.5
-CAVACONF
-exec cava -p ${root._confPath} < /dev/null`]
+CAVACONF`]
 
-        onRunningChanged: {
-            if (!running) {
-                root.values = Array(6).fill(0);
+        onExited: (exitCode, exitStatus) => {
+            const stopping = root._stopping;
+            root._stopping = false;
+            root._activeBars = 0;
+            root._clearValues();
+            if (!stopping) {
+                root._failed = true;
+                return;
             }
+            Qt.callLater(root._syncProcess);
         }
 
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: data => {
-                if (root.refCount <= 0 || data.length === 0)
+                if (root._stopping || root._activeBars !== root._desiredBars)
                     return;
-
-                const parts = data.split(";");
-                if (parts.length < 6)
+                const points = Spectrum.parse(data, root._activeBars, 1000);
+                if (points.length === 0)
                     return;
-
-                const points = [parseInt(parts[0], 10), parseInt(parts[1], 10), parseInt(parts[2], 10), parseInt(parts[3], 10), parseInt(parts[4], 10), parseInt(parts[5], 10)];
-                if (points.every((v, i) => v === root.values[i]))
-                    return;
-
-                root.values = points;
+                if (root._activeBars === 45) {
+                    if (!points.every((value, i) => value === root.spectrumValues[i]))
+                        root.spectrumValues = points;
+                    const bands = Spectrum.aggregate(points, 6).map(value => Math.round(value * 1000));
+                    if (!bands.every((value, i) => value === root.values[i]))
+                        root.values = bands;
+                } else {
+                    const bands = points.map(value => Math.round(value * 1000));
+                    if (!bands.every((value, i) => value === root.values[i]))
+                        root.values = bands;
+                }
             }
         }
     }

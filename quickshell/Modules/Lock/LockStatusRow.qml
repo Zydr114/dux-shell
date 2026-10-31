@@ -104,19 +104,13 @@ Row {
                 height: Theme.iconSize
                 anchors.verticalCenter: parent.verticalCenter
                 readonly property bool live: visible && (Window.window?.visible ?? false) && MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing
+                readonly property bool sampling: live && SettingsData.audioVisualizerEnabled && !SettingsData.reduceMotion
 
                 Loader {
-                    active: visualizer.live
+                    active: visualizer.sampling
                     sourceComponent: Ref {
                         service: CavaService
                     }
-                }
-
-                Timer {
-                    running: !CavaService.cavaAvailable && visualizer.live
-                    interval: 256
-                    repeat: true
-                    onTriggered: CavaService.values = [Math.random() * 40 + 10, Math.random() * 60 + 20, Math.random() * 50 + 15, Math.random() * 35 + 20, Math.random() * 45 + 15, Math.random() * 55 + 25]
                 }
 
                 Row {
@@ -130,7 +124,7 @@ Row {
                             required property int index
                             width: Theme.outlineWidthFocused
                             height: {
-                                if (!visualizer.live || CavaService.values.length <= index)
+                                if (!visualizer.sampling || !CavaService.cavaAvailable || CavaService.values.length <= index)
                                     return Theme.spacingXXS;
                                 const rawLevel = CavaService.values[index] || 0;
                                 const scaledLevel = Math.sqrt(Math.min(Math.max(rawLevel, 0), 100) / 100) * 100;
