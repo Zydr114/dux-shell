@@ -6,9 +6,13 @@
 
 该模式显示小封面、居中的当前歌词和五柱频谱，隐藏时间、曲名及歌手。歌词订阅独立于仪表盘媒体页的歌词开关；选择此模式即请求歌词，不改写媒体页配置。普通模式的时间和文字设置保留，切回 **Standard** 后继续使用。
 
-播放开始时自动进入媒体仍由 **Switch to media when playback starts** 控制。也可以从主页媒体槽或紧凑态右键选择媒体。点击歌词或封面展开完整播放器，Esc 收起后回到歌词；临时打开仪表盘、通知或 OSD 不会改掉这个呈现选择。主页媒体槽的中键播放/暂停保持原样，没有增加中键切换动作。
+播放开始时自动进入媒体仍由 **Switch to media when playback starts** 控制。也可以从主页媒体槽或紧凑态右键选择媒体。点击歌词或封面展开完整播放器，Esc 收起后回到歌词；临时打开仪表盘、通知或 OSD 不会改掉这个呈现选择。紧凑媒体区域（含时间和屏幕顶边）的中键在纯歌词与曲名 / 歌手之间切换；宽度随所选内容变化，不会展开播放器或发送播放控制。主页媒体槽的中键仍为播放 / 暂停。
 
-仅实现横向呈现。竖向和 dot 继续使用已有布局。
+紧凑条的中键选择属于当前灵动岛会话，经过展开、主页、通知和 OSD 后仍保留；不改写原来的普通模式文字设置。中键选择元数据时显示曲名 / 歌手，并保留时间入口。修改 **Compact media style** 后重新采用设置值，重载后同样从设置恢复。
+
+展开播放器与独立仪表盘媒体页也可在卡片区域中键切换歌词 / 元数据，复用歌词按钮的开关和记忆；媒体页关闭歌词功能时不提供此手势。音量、设备面板和来源选择器打开时忽略切换，左键与滚轮继续操作原控件。紧凑条和展开播放器各自保留内容选择。
+
+仅实现横向紧凑呈现。竖向和 dot 继续使用已有布局。
 
 本机验收后已为 `default` 主岛启用此呈现，只写入 `islandMediaPresentation`；其余设置保持原值。启用前后的配置备份位于 `~/.local/state/dms/backups/clavis-lyrics-20261031/`。
 
@@ -65,3 +69,21 @@
 ![频谱采样第二帧](evidence/clavis-media-fixes-20261031/spectrum-live-b.png)
 
 对应 [状态记录](evidence/clavis-media-fixes-20261031/spectrum-states.json) 与 [恢复记录](evidence/clavis-media-fixes-20261031/spectrum-restoration.json)。`make lint-qml`、Qt 31、lock 38 与完整 logic 套件、`git diff --check` 通过。本节取代上面初次移植验收中“关闭可视化时零个进程”和六段转换的历史结论。未做真实音源幅值对照或长期性能基准。
+
+## 中键切换验收（2026-10-31）
+
+在现有桌面使用人工 MPRIS 来源、绝对指针和本地 LRC，40 项状态检查通过：紧凑条双向反复切换、顶边与时间区域中键、时间打开仪表盘并返回、主页媒体槽中键播放 / 暂停、展开播放器切换、左键播放与歌词按钮、进度 seek、音量滚轮、面板及来源选择器的交互隔离、关闭返回紧凑选择、附属 / 替换 OSD 与通知恢复、设置重新接管会话选择。普通文字设置为 `title-lyrics` 时，中键元数据仍只显示曲名和歌手，原设置值保持不变。
+
+中键处理复用已有事件与歌词切换，不新增定时器、进程或轮询；紧凑元数据在普通可视化关闭时释放歌词频谱，返回歌词重新订阅；展开 Caelestia 与歌词仍共享一个 Cava。人工来源的调用记录仅包含验收主动触发的播放、音量与 seek，没有由内容切换产生的播放控制。
+
+![中键选择紧凑元数据](evidence/clavis-media-fixes-20261031/middle-compact-metadata.png)
+
+![展开播放器元数据](evidence/clavis-media-fixes-20261031/middle-expanded-metadata.png)
+
+![展开播放器歌词](evidence/clavis-media-fixes-20261031/middle-expanded-lyrics.png)
+
+[状态记录](evidence/clavis-media-fixes-20261031/middle-states.json)、[恢复记录](evidence/clavis-media-fixes-20261031/middle-restoration.json)。最终这轮验收窗口无 WARN / ERROR；配置及缓存文件恢复字节一致，音量与工作区恢复，临时来源和虚拟输入已清理。`make lint-qml`、修改文件的 qmlformat 解析、Qt 31、lock 38 与完整 logic 套件、`git diff --check` 通过；没有增加加载 UI 模块的测试。竖向、dot、多屏、长期性能及其他播放器样式未做本轮实机验收。
+
+独立仪表盘媒体弹窗另有 4 项实机检查通过：以元数据打开、中键进入歌词、再次中键返回、关闭后保留灵动岛选择。见 [弹窗状态](evidence/clavis-media-fixes-20261031/popup-middle-states.json) 与 [弹窗恢复记录](evidence/clavis-media-fixes-20261031/popup-middle-restoration.json)，配置、缓存与音量同样精确恢复，验收窗口无 WARN / ERROR。
+
+![独立仪表盘媒体页歌词](evidence/clavis-media-fixes-20261031/middle-popup-lyrics.png)

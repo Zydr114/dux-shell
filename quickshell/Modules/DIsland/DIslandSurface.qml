@@ -280,8 +280,9 @@ Item {
         root.motionStartBounds = Qt.rect(left, top, right - left, bottom - top);
     }
 
-    // Without a face to swap to, a right-click falls through to the bar's own right-click action.
     function acceptsClick(button) {
+        if (button === Qt.MiddleButton)
+            return root.controller.mediaPresentationToggleAvailable;
         return button !== Qt.RightButton || root.controller.mediaFaceToggleAvailable;
     }
 
@@ -289,6 +290,8 @@ Item {
         SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
         if (button === Qt.RightButton)
             root.controller.toggleMediaFace();
+        else if (button === Qt.MiddleButton)
+            root.controller.toggleMediaPresentation();
         else
             root.controller.requestToggle(true);
     }
@@ -417,7 +420,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
             onPressed: mouse => mouse.accepted = root.acceptsClick(mouse.button)
             enabled: !root.controller.expanded || !root.controller.activityOwnsBlankClicks
             onClicked: mouse => root.handleClick(mouse.button)
@@ -512,7 +515,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
             onPressed: mouse => mouse.accepted = root.acceptsClick(mouse.button)
             onClicked: mouse => root.handleClick(mouse.button)
             onWheel: wheel => {

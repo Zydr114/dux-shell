@@ -69,8 +69,11 @@ QtObject {
     property real compactThickness: 38
     property string batteryStyle: "duo"
     property bool mediaClockVisible: true
-    readonly property bool mediaLyricsPresentation: !isVertical && !dotMode && SettingsData.islandSetting(barConfig, "islandMediaPresentation") === "clavis-lyrics"
-    readonly property string mediaTextMode: SettingsData.islandSetting(barConfig, "islandMediaTextMode") || "title"
+    property string mediaPresentationOverride: ""
+    readonly property string configuredMediaPresentation: SettingsData.islandSetting(barConfig, "islandMediaPresentation") || "standard"
+    readonly property bool mediaLyricsPresentation: !isVertical && !dotMode && (mediaPresentationOverride || configuredMediaPresentation) === "clavis-lyrics"
+    readonly property string mediaTextMode: mediaPresentationOverride === "standard" ? "title" : SettingsData.islandSetting(barConfig, "islandMediaTextMode") || "title"
+    onConfiguredMediaPresentationChanged: mediaPresentationOverride = ""
     readonly property real mediaMaximumWidth: Math.max(360, Math.min(560, Number(SettingsData.islandSetting(barConfig, "islandMediaMaxWidth")) || 560))
     readonly property bool osdAccessoryEnabled: SettingsData.islandSetting(barConfig, "islandOsdPresentation") === "accessory" && !dotMode
     readonly property bool notificationCountdown: SettingsData.islandSetting(barConfig, "islandNotificationCountdown") !== false
@@ -684,6 +687,16 @@ QtObject {
         hoverHeld = true;
         hoverOpenTimer.stop();
         return requestActivity(activeActivity === "media" ? "home" : "media", false, false);
+    }
+
+    readonly property bool mediaPresentationToggleAvailable: !inputSuspended && !isVertical && !dotMode && !expanded && mediaAvailable && activeActivity === "media"
+
+    function toggleMediaPresentation() {
+        if (!mediaPresentationToggleAvailable)
+            return;
+        hoverHeld = true;
+        hoverOpenTimer.stop();
+        mediaPresentationOverride = mediaLyricsPresentation ? "standard" : "clavis-lyrics";
     }
 
     function requestHoverExpand() {

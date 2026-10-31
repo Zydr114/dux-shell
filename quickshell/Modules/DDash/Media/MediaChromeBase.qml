@@ -43,6 +43,12 @@ Item {
 
     implicitHeight: root.baseHeight
 
+    TapHandler {
+        acceptedButtons: Qt.MiddleButton
+        enabled: root.player.live && root.player.lyricsEnabled && !!root.presentation && !root.player.blocksTabNavigation
+        onTapped: root.player.toggleLyrics(root.focusTarget)
+    }
+
     function cycleFocus(backwards) {
         if (panel.opened)
             return panel.cycleFocus(backwards);
