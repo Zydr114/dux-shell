@@ -11,6 +11,7 @@ import (
 	"github.com/duxlabs-dev/dux-go/ipc/params"
 	corelyrics "github.com/duxlabs-dev/dux-go/lyrics"
 	"github.com/duxlabs-dev/dux-shell/core/internal/lowprio"
+	"github.com/duxlabs-dev/dux-shell/core/internal/lyricsproviders"
 	"github.com/duxlabs-dev/dux-shell/core/internal/plugins"
 	"github.com/duxlabs-dev/dux-shell/core/internal/utils"
 )
@@ -26,11 +27,20 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request) {
 
 const pluginPrefix = "plugin_"
 
+var domesticProviders = lyricsproviders.New()
+
 var client = corelyrics.New(corelyrics.Options{
 	CacheDir:  filepath.Join(utils.XDGCacheHome(), "dms", "lyrics"),
 	UserAgent: "DuxShell/1 (+https://github.com/duxlabs-dev/dux-shell)",
-	Resolve:   pluginSource,
+	Resolve:   resolveSource,
 })
+
+func resolveSource(provider corelyrics.Provider) (corelyrics.Source, bool) {
+	if source, ok := domesticProviders.Resolve(provider); ok {
+		return source, true
+	}
+	return pluginSource(provider)
+}
 
 func pluginSource(provider corelyrics.Provider) (corelyrics.Source, bool) {
 	pluginID, ok := strings.CutPrefix(string(provider), pluginPrefix)
@@ -83,6 +93,6 @@ func handleGet(conn *ipc.ConnWriter, req ipc.Request) {
 		return
 	}
 
-	conn.Respond(req.ID, result)
+	conn.Respond(req.ID, postprocess(result))
 	client.Prune()
 }

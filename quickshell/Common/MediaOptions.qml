@@ -4,6 +4,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import "MediaGeometry.js" as MediaGeometry
+import "LyricsProviders.js" as LyricsProviders
 
 Singleton {
     id: root
@@ -76,6 +77,16 @@ Singleton {
 
     readonly property var builtinLyricsProviders: [
         {
+            id: "netease",
+            text: "NetEase Cloud Music",
+            capability: "lyrics.netease"
+        },
+        {
+            id: "qqmusic",
+            text: "QQ Music",
+            capability: "lyrics.qqmusic"
+        },
+        {
             id: "betterlyrics",
             text: "Better Lyrics"
         },
@@ -99,7 +110,7 @@ Singleton {
             id: "youtubemusic",
             text: "YouTube Music"
         }
-    ]
+    ].filter(provider => !provider.capability || DMSService.capabilities.includes(provider.capability))
     readonly property var pluginLyricsProviders: {
         if (!DMSService.capabilities.includes("lyrics.plugins"))
             return [];
@@ -146,16 +157,16 @@ Singleton {
     readonly property string lyricsProviderOrder: lyricsProviders.map(provider => provider.id).join(",")
 
     function setLyricsProviderEnabled(id, enabled) {
-        SettingsData.set("mediaLyricsProviders", lyricsProviders.map(provider => ({
+        SettingsData.set("mediaLyricsProviders", LyricsProviders.mergeSettings(SettingsData.mediaLyricsProviders, lyricsProviders.map(provider => ({
                     id: provider.id,
                     enabled: provider.id === id ? enabled : provider.enabled
-                })));
+                }))));
     }
 
     function reorderLyricsProviders(indices) {
-        SettingsData.set("mediaLyricsProviders", indices.map(index => ({
+        SettingsData.set("mediaLyricsProviders", LyricsProviders.mergeSettings(SettingsData.mediaLyricsProviders, indices.map(index => ({
                     id: lyricsProviders[index].id,
                     enabled: lyricsProviders[index].enabled
-                })));
+                }))));
     }
 }

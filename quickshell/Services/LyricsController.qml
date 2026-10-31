@@ -4,6 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Modules.DDash
+import "../Common/LyricsText.js" as LyricsText
 
 QtObject {
     id: root
@@ -268,7 +269,7 @@ QtObject {
         }
         lines = prepareLines(result.synced ?? [], result.voices ?? {});
         synced = lines.length > 0;
-        plainLines = (result.plain ?? "").trim().split("\n");
+        plainLines = LyricsText.plainLines(result.plain ?? "");
         if (!synced && !plainLines.some(line => line.trim() !== "")) {
             useEmbeddedText("none");
             return;
@@ -370,7 +371,7 @@ QtObject {
             state = fallback;
             return;
         }
-        plainLines = embeddedText.trim().split("\n");
+        plainLines = LyricsText.plainLines(embeddedText);
         synced = false;
         shownSong = requestedSong;
         state = "ready";
@@ -474,15 +475,15 @@ QtObject {
         const nextIndex = indexFor(at, lines);
         const focused = [];
         for (let i = 0; i <= nextIndex; i++) {
-            if (i === nextIndex || lines[i].parts.some(part => part.t <= at && at < part.e))
+            if (lines[i].parts.some(part => part.t <= at && at < part.e))
                 focused.push(i);
         }
         if (focused.join() !== focusedGroups.join())
             focusedGroups = focused;
         activeIndex = nextIndex;
-        const parts = lines[activeIndex]?.parts ?? [];
-        const lead = parts.find(part => !part.background && part.t <= at);
-        const timing = wordTiming(lead ?? lines[activeIndex]?.parts[0], at);
+        const parts = lines[focused[focused.length - 1]]?.parts ?? [];
+        const lead = parts.find(part => !part.background && part.t <= at && at < part.e);
+        const timing = wordTiming(lead ?? parts.find(part => part.t <= at && at < part.e), at);
         wordTime = timing.t;
         wordEnd = timing.e;
         const next = cueTimes[indexFor(at, cueTimes) + 1]?.t ?? Infinity;
@@ -494,6 +495,11 @@ QtObject {
     }
 
     function wordTiming(part, at) {
+        if (!part || at < part.t || at >= part.e)
+            return {
+                t: -1,
+                e: -1
+            };
         const cues = part?.cues ?? [];
         const index = indexFor(at, cues);
         const word = cues[index];

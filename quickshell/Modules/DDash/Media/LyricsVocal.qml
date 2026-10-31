@@ -24,7 +24,7 @@ Item {
     property real leadFontSize: Theme.fontSizeXLarge
 
     readonly property bool current: synced && controller.sampleTime >= part.t && controller.sampleTime < part.e
-    readonly property bool highlighted: synced && controller.sampleTime >= part.t && (current || distance === 0)
+    readonly property bool highlighted: current
     readonly property bool timedWords: synced && part.w.length > 0
     readonly property bool emphasize: synced && following
     readonly property bool lead: current || (distance === 0 && !part.background)

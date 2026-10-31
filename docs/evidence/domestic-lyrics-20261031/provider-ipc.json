@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-10-31T23:37:23+08:00",
+  "proxy": "http://127.0.0.1:7897",
+  "samples": [
+    {
+      "artist": "艾索",
+      "blankLines": 0,
+      "cacheOnlyHit": true,
+      "durationMs": 120000,
+      "lines": 15,
+      "networkMs": 259,
+      "orderedTiming": true,
+      "provider": "netease",
+      "title": "晚安喵",
+      "wordTextMatchesLine": true,
+      "words": 156
+    },
+    {
+      "artist": "买辣椒也用券",
+      "blankLines": 0,
+      "cacheOnlyHit": true,
+      "durationMs": 325868,
+      "lines": 58,
+      "networkMs": 259,
+      "orderedTiming": true,
+      "provider": "netease",
+      "title": "起风了",
+      "wordTextMatchesLine": true,
+      "words": 0
+    },
+    {
+      "artist": "周杰伦",
+      "blankLines": 0,
+      "cacheOnlyHit": true,
+      "durationMs": 269000,
+      "lines": 63,
+      "networkMs": 337,
+      "orderedTiming": true,
+      "provider": "qqmusic",
+      "title": "晴天",
+      "wordTextMatchesLine": true,
+      "words": 602
+    }
+  ],
+  "scope": "real provider search and retrieval through lyrics.get handler and JSON IPC response; temporary cache; no desktop UI"
+}

@@ -1,0 +1,79 @@
+# 网易云音乐、QQ 音乐歌词源
+
+`lyrics.get` 新增 `netease` 和 `qqmusic` 两个原生 Go 来源，沿用现有缓存、并发选择、限流和来源优先级。逐字时间来自上游 YRC / QRC，不会把逐行歌词平均分成逐字时间。
+
+## 启用
+
+更新后端与 QML 后，在媒体歌词来源设置中启用 **NetEase Cloud Music**、**QQ Music**。新配置默认启用两个来源；已有配置会保留原有启用状态和顺序，新来源初始禁用，需要手动开启。
+
+后端能力新增 `lyrics.netease`、`lyrics.qqmusic`。QML 根据能力展示来源，连接旧后端时隐藏不支持的来源；此时修改其他来源仍会保留不可用来源的已保存配置。
+
+IPC 可以显式选择来源：
+
+```json
+{
+  "id": 1,
+  "method": "lyrics.get",
+  "params": {
+    "title": "晚安喵",
+    "artist": "艾索",
+    "providers": ["netease", "qqmusic"],
+    "allowNetwork": true
+  }
+}
+```
+
+`allowNetwork` 默认关闭；关闭时仅查本地文件和已有缓存。`providers: []` 仅查本地歌词文件。省略 `providers` 仍使用依赖库原有的六个默认来源；QML 会显式传入设置中启用的列表。
+
+## 获取与回退
+
+- 网易云使用 cloudsearch 搜索及 eapi 歌词接口，优先解析 YRC，没有有效逐字内容时回退 LRC。夹杂的 JSON 制作信息不作为歌词显示。
+- QQ 使用 MusicU 桌面搜索及 `GetPlayLyricInfo`，QRC 经十六进制解码、QQ 定制 DES、zlib 解压、XML 解析后生成逐字时间；不可用时显式请求 LRC。
+- 搜索先使用曲名和歌手，无匹配候选时使用曲名重试。匹配曲名、明确的歌手名称或别名、版本和时长，专辑参与排序；最多尝试三个候选，同来源优先逐字结果。时长容差为 8 秒，未知时长不据此拒绝。
+- 损坏响应、HTTP 错误、业务错误、缺失字段保留为错误，不冒充正常的“无歌词”结果。空白候选不会抢先获胜。
+
+两个来源声明支持逐字，但每首歌是否有逐字数据取决于上游。当前只接入主歌词，不提供翻译、罗马音、登录或付费内容获取。
+
+## 后处理与时间
+
+所有后端歌词结果在 IPC 输出前清理，包括新旧来源、缓存和本地歌词文件：统一 CRLF / CR，去除行首尾空白及空白行；保留内部空格、重复句、标点、合唱和背景声信息。同步修剪逐字文本，保证逐字拼接仍等于整句。损坏的逐字数据退回逐行显示，不改写缓存中的原始结果。
+
+空白时间 cue 虽不再占显示行，仍用于截断同一声部的前句，保留间奏。QML 高亮尊重结束时间，滚动索引仍停留在最近一句。普通歌词和 MPRIS 内嵌文本也清除多余空行。
+
+## 资源与维护
+
+请求只在现有歌词查询触发时执行，不增加后台进程或轮询。两来源共用有界连接池；单次 HTTP 请求最多 4 秒，单来源最多 10 秒，外层查询沿用 12 秒总预算和 2 秒逐字升级等待。响应及解压内容使用依赖库大小、行数和词数上限。复用现有缓存策略；网络错误不写入未命中缓存。
+
+原生 HTTP 客户端遵循进程的 `HTTP_PROXY` / `HTTPS_PROXY` 环境变量；未在程序中硬编码本机代理。上游接口并非稳定的公开契约，后续接口变化可能需要更新适配器。
+
+QQ 定制 DES 改写自 MIT 授权的 WXRIW/QQMusicDecoder，固定参考提交和完整声明见 [NOTICE](../core/internal/lyricsproviders/NOTICE)。
+
+## 验证记录
+
+2026-10-31，通过本机代理进行真实搜索、取词及 `lyrics.get` handler / JSON IPC 响应验证，使用临时缓存，结果见 [provider-ipc.json](evidence/domestic-lyrics-20261031/provider-ipc.json)。未在仓库保存完整歌曲歌词。
+
+| 来源与歌曲 | 清理后行数 | 逐字时间段 | 禁止联网后的缓存读取 |
+| --- | ---: | ---: | --- |
+| 网易云《晚安喵》／艾索 | 15 | 156 | 通过 |
+| 网易云《起风了》／买辣椒也用券 | 58 | 0，LRC 回退 | 通过 |
+| QQ《晴天》／周杰伦 | 63 | 602 | 通过 |
+
+逐字样本检查了时间顺序、词时间范围及词句文本一致性。自动回归覆盖协议固定向量、解密与解析、坏响应、大小限制、取消、候选筛选、逐行回退、空行和间奏、不可见来源配置保留，以及 IPC 来源选择、联网许可、缓存和本地文件处理。
+
+复测期间有一次 QQ 搜索返回业务或响应结构错误，IPC 按错误返回；当时尚未细分返回码，不能确认原因。随后独立检查返回 HTTP 200、两层业务码均为 0，完整链路再次通过。现已细分顶层码、请求码及字段缺失的错误信息，并有固定响应回归，方便后续定位；这不代表消除了上游偶发失败。
+
+验收命令：
+
+```sh
+cd core
+go test ./internal/lyricsproviders ./internal/server/lyrics ./internal/server -count=1
+go test -race ./internal/lyricsproviders ./internal/server/lyrics ./internal/server -count=1
+go vet ./internal/lyricsproviders ./internal/server/lyrics ./internal/server
+cd ..
+make test-qml
+make lint-qml
+make build
+git diff --check
+```
+
+本次验证范围为源码、自动测试、构建和真实 HTTP 到 IPC handler 的链路，未安装构建产物、重启桌面或进行真实播放器逐帧视觉验收；也未做长时间 CPU / 内存测量。

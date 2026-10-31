@@ -684,6 +684,14 @@ var LOCAL_SPEC = {
     mediaLyricsProviders: {
         def: [
             {
+                id: "netease",
+                enabled: true
+            },
+            {
+                id: "qqmusic",
+                enabled: true
+            },
+            {
                 id: "betterlyrics",
                 enabled: true
             },
