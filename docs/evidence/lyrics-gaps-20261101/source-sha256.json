@@ -1,0 +1,7 @@
+{
+  "quickshell/Common/CompactLyrics.js": "3b9ca4bafc5908f982d6eb98318effdd5e2edb4dce5021169d5e8d477f04b887",
+  "quickshell/Modules/DDash/DashMetrics.qml": "2cc4a5c7699cf44794b121a96392b6194f63b7d3dfb026458f2c09afd5a96024",
+  "quickshell/Modules/DIsland/Activities/ClavisLyricsCompact.qml": "537e57ca7e478959f20f74f4153538d163fd80a3c38c3dfb8c46d50d7fc09c3d",
+  "quickshell/tests/compact-lyrics.test.mjs": "f9c5b3b19606a0e8071000ffc237a01405ed18e0fcd0d0750f54fdd0dc420ec7",
+  "quickshell/tests/lyrics-timing.test.mjs": "ad09a1167118fcd2af0b78924692ce93189ef98a6e15c38cad4a695499e4fafe"
+}

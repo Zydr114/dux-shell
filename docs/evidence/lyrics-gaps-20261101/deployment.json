@@ -1,0 +1,74 @@
+{
+  "verifiedAt": "2026-11-01T01:04:10.781877+08:00",
+  "implementationCommit": "70d5f2c8161645f2b686fd0035808faa3790f12f",
+  "activation": "atomic user binary replacement and systemctl --user restart dms.service",
+  "service": {
+    "ActiveState": "active",
+    "SubState": "running",
+    "ActiveEnterTimestamp": "Sun 2026-11-01 00:59:25 CST",
+    "MainPID": "336739"
+  },
+  "shellDirectory": "/home/zydr/AgentWorkspace/dms-custom/quickshell",
+  "quickshellProcesses": [
+    {
+      "pid": 336757,
+      "argv": [
+        "qs",
+        "-p",
+        "/home/zydr/AgentWorkspace/dms-custom/quickshell"
+      ]
+    }
+  ],
+  "binarySha256": "410159a57c289413c689a065452fc6be874b1a42b1f5be74ff0d2b991d1c37f0",
+  "buildInfo": [
+    "build\t-ldflags=\"-s -w -X main.Version=2.0.0+git5361.70d5f2c8 -X main.buildTime=2026-10-31_16:58:28 -X main.commit=70d5f2c8\"",
+    "build\tvcs.revision=70d5f2c8161645f2b686fd0035808faa3790f12f",
+    "build\tvcs.modified=false"
+  ],
+  "builtBinaryMatchesInstalled": true,
+  "island": {
+    "available": true,
+    "enabled": true,
+    "screen": "HDMI-A-1",
+    "activity": "media",
+    "expanded": false,
+    "mediaAvailable": true,
+    "mediaPresentation": "clavis-lyrics",
+    "idleActivity": "media",
+    "targetWidth": 294,
+    "targetHeight": 44,
+    "launcherAvailable": true,
+    "controlCenterAvailable": true,
+    "wallpaperAvailable": true,
+    "weatherAvailable": true,
+    "notificationCenterAvailable": true,
+    "clipboardAvailable": true,
+    "powerMenuAvailable": true,
+    "launcherInputFocused": false,
+    "launcherResultCount": 0,
+    "compactHeight": 40,
+    "free": false,
+    "idle": false,
+    "x": null,
+    "y": null
+  },
+  "changedComponentWarningsOrBindingLoops": [],
+  "restoration": {
+    "checkedAt": "2026-11-01T01:04:10.781613+08:00",
+    "settingsBytesMatchInitial": true,
+    "cacheBytesMatchedAtFixtureExit": true,
+    "fixtureExited": true,
+    "realPlayerControlsSent": false,
+    "laterPlayerActivity": {
+      "status": "Playing"
+    },
+    "note": "Real player independently changed track and began playing after the initial snapshot. Subsequent cache activity was preserved; no playback or cache rollback was performed during final health checks."
+  },
+  "sourceSha256": {
+    "quickshell/Common/CompactLyrics.js": "3b9ca4bafc5908f982d6eb98318effdd5e2edb4dce5021169d5e8d477f04b887",
+    "quickshell/Modules/DDash/DashMetrics.qml": "2cc4a5c7699cf44794b121a96392b6194f63b7d3dfb026458f2c09afd5a96024",
+    "quickshell/Modules/DIsland/Activities/ClavisLyricsCompact.qml": "537e57ca7e478959f20f74f4153538d163fd80a3c38c3dfb8c46d50d7fc09c3d",
+    "quickshell/tests/compact-lyrics.test.mjs": "f9c5b3b19606a0e8071000ffc237a01405ed18e0fcd0d0750f54fdd0dc420ec7",
+    "quickshell/tests/lyrics-timing.test.mjs": "ad09a1167118fcd2af0b78924692ce93189ef98a6e15c38cad4a695499e4fafe"
+  }
+}

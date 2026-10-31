@@ -1,0 +1,38 @@
+{
+  "startedAt": "2026-11-01T00:59:58.423233+08:00",
+  "finishedAt": "2026-11-01T01:00:10.652188+08:00",
+  "automatedHarnessCompleted": true,
+  "failure": null,
+  "restoration": {
+    "settingsBytesMatch": true,
+    "cacheBytesMatch": true,
+    "fixtureExited": true,
+    "finalIsland": {
+      "available": true,
+      "enabled": true,
+      "screen": "HDMI-A-1",
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "mediaPresentation": "clavis-lyrics",
+      "idleActivity": "media",
+      "targetWidth": 324,
+      "targetHeight": 44,
+      "launcherAvailable": true,
+      "controlCenterAvailable": true,
+      "wallpaperAvailable": true,
+      "weatherAvailable": true,
+      "notificationCenterAvailable": true,
+      "clipboardAvailable": true,
+      "powerMenuAvailable": true,
+      "launcherInputFocused": false,
+      "launcherResultCount": 0,
+      "compactHeight": 40,
+      "free": false,
+      "idle": false,
+      "x": null,
+      "y": null
+    }
+  },
+  "scope": "existing desktop with synthetic MPRIS + local LRC matching real gap structures; screenshots require visual inspection; real players excluded and received no controls"
+}

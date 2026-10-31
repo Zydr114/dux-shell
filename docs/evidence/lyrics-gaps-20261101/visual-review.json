@@ -1,0 +1,20 @@
+{
+  "inspectedAt": "2026-11-01T01:04:10.758369+08:00",
+  "contactSheet": "contact-sheet.png",
+  "allExpectedTextMatches": true,
+  "confirmedCases": [
+    "intro music symbol",
+    "active lyric",
+    "0.58-second gap holds prior text",
+    "next lyric switches",
+    "4-second gap holds prior text",
+    "4.001-second gap music symbol",
+    "long gap music symbol",
+    "last lyric",
+    "outro music symbol",
+    "seek back into gap",
+    "pause during short gap",
+    "return from expanded player"
+  ],
+  "method": "manual visual inspection of cropped screenshots from existing Niri desktop; synthetic MPRIS + local LRC"
+}

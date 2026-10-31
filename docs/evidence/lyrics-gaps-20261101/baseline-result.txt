@@ -1,0 +1,202 @@
+Baseline commit: 6b3cdac7a155f1ca3576a32feabc6a3510eb8688
+Baseline helper: git show 6b3cdac7a155f1ca3576a32feabc6a3510eb8688:quickshell/Common/CompactLyrics.js
+Exit code: 1
+Temporary tests used unchanged assertions and qml-script.mjs loading.
+
+✔ compact lyrics show the active lead voices and flatten multiline text (0.649283ms)
+✔ interludes and seek-before-first-line clear the previous lyric without inventing timestamps (0.091723ms)
+✖ short gaps retain text after removed blank cues and explicit word-timed ends (0.558792ms)
+✖ only known interior gaps no longer than the complete threshold retain text (0.157737ms)
+✖ current vocals take precedence over held text across overlapping groups (0.143961ms)
+✖ held chorus text preserves repeated lead voices and filters background voices (0.123523ms)
+✖ a later part in an earlier group can end the held interval (0.085511ms)
+✖ holding text is independent of seek order and replaced track arrays (0.110899ms)
+✔ compact lyric width grows with headroom and retains the last adopted width (0.125216ms)
+✔ compact lyric width respects changed caps and never holds a width that truncates fitting text (0.113053ms)
+✔ zero threshold tracks exact pixel width without fractional churn (0.087375ms)
+✔ fractional screen budgets remain hard caps when rounding required pixels (0.057057ms)
+✔ compact lyric width normalizes invalid sizes and conflicting bounds (0.11153ms)
+✔ ended lyrics clear focus and word timing while retaining the transcript position (5.474657ms)
+✖ paused short-gap display does not extend focus, word timing, or source intervals (1.302752ms)
+✖ overlapping vocals remain current after a later group ends (0.712742ms)
+✔ word lookup respects the part interval when asked for an ended or future vocal (0.51536ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 9
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 63.894232
+
+✖ failing tests:
+
+test at quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:25:1
+✖ short gaps retain text after removed blank cues and explicit word-timed ends (0.558792ms)
+  AssertionError [ERR_ASSERTION]: gap 52.08–52.66, sampled 52.08
+  
+  '' !== 'previous'
+  
+      at TestContext.<anonymous> (file:///home/zydr/AgentWorkspace/dms-custom/quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:37:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: 'previous',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:43:1
+✖ only known interior gaps no longer than the complete threshold retain text (0.157737ms)
+  AssertionError [ERR_ASSERTION]: gap 4–8 start
+  
+  '' !== 'previous'
+  
+      at TestContext.<anonymous> (file:///home/zydr/AgentWorkspace/dms-custom/quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:55:16)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: 'previous',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:65:1
+✖ current vocals take precedence over held text across overlapping groups (0.143961ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  '' !== 'lead'
+  
+      at TestContext.<anonymous> (file:///home/zydr/AgentWorkspace/dms-custom/quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:72:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: 'lead',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:86:1
+✖ held chorus text preserves repeated lead voices and filters background voices (0.123523ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + ''
+  - 'refrain · refrain'
+  
+      at TestContext.<anonymous> (file:///home/zydr/AgentWorkspace/dms-custom/quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:91:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: 'refrain · refrain',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:94:1
+✖ a later part in an earlier group can end the held interval (0.085511ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  '' !== 'reply'
+  
+      at TestContext.<anonymous> (file:///home/zydr/AgentWorkspace/dms-custom/quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:99:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: 'reply',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:104:1
+✖ holding text is independent of seek order and replaced track arrays (0.110899ms)
+  AssertionError [ERR_ASSERTION]: seek to 4.5
+  
+  '' !== 'first'
+  
+      at TestContext.<anonymous> (file:///home/zydr/AgentWorkspace/dms-custom/quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-compact-lyrics.test.mjs:116:16)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: 'first',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-lyrics-timing.test.mjs:56:1
+✖ paused short-gap display does not extend focus, word timing, or source intervals (1.302752ms)
+  AssertionError [ERR_ASSERTION]: compact display at 31.728
+  
+  '' !== 'before'
+  
+      at TestContext.<anonymous> (file:///home/zydr/AgentWorkspace/dms-custom/quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-lyrics-timing.test.mjs:83:16)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: 'before',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-lyrics-timing.test.mjs:90:1
+✖ overlapping vocals remain current after a later group ends (0.712742ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  '' !== 'lead'
+  
+      at TestContext.<anonymous> (file:///home/zydr/AgentWorkspace/dms-custom/quickshell/tests/.baseline-eb507822bb314e43b51b587f8cc9a240-lyrics-timing.test.mjs:102:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: 'lead',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

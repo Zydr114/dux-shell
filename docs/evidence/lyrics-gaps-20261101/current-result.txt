@@ -1,0 +1,28 @@
+Command: node --test --test-reporter=spec quickshell/tests/compact-lyrics.test.mjs quickshell/tests/lyrics-timing.test.mjs
+Exit code: 0
+
+✔ compact lyrics show the active lead voices and flatten multiline text (1.654686ms)
+✔ interludes and seek-before-first-line clear the previous lyric without inventing timestamps (0.324751ms)
+✔ short gaps retain text after removed blank cues and explicit word-timed ends (0.771282ms)
+✔ only known interior gaps no longer than the complete threshold retain text (0.536571ms)
+✔ current vocals take precedence over held text across overlapping groups (0.337265ms)
+✔ held chorus text preserves repeated lead voices and filters background voices (0.227628ms)
+✔ a later part in an earlier group can end the held interval (1.140777ms)
+✔ holding text is independent of seek order and replaced track arrays (0.372441ms)
+✔ compact lyric width grows with headroom and retains the last adopted width (0.389162ms)
+✔ compact lyric width respects changed caps and never holds a width that truncates fitting text (0.332837ms)
+✔ zero threshold tracks exact pixel width without fractional churn (0.195828ms)
+✔ fractional screen budgets remain hard caps when rounding required pixels (0.15927ms)
+✔ compact lyric width normalizes invalid sizes and conflicting bounds (0.262504ms)
+✔ ended lyrics clear focus and word timing while retaining the transcript position (2.716785ms)
+✔ paused short-gap display does not extend focus, word timing, or source intervals (0.898191ms)
+✔ overlapping vocals remain current after a later group ends (0.611481ms)
+✔ word lookup respects the part interval when asked for an ended or future vocal (0.472339ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 74.864505

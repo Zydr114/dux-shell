@@ -1,0 +1,151 @@
+{
+  "checkedAt": "2026-10-31T16:57:46.289Z",
+  "method": "real HTTP samples from 2026-11-01 and production cache; current Services/Common pure-function replay; paused sampling; no UI component mock",
+  "policySeconds": 4,
+  "sourceSha256": "3b9ca4bafc5908f982d6eb98318effdd5e2edb4dce5021169d5e8d477f04b887",
+  "results": [
+    {
+      "provider": "netease",
+      "title": "Staple Stable",
+      "rawBlankCues": 0,
+      "cleanedRows": 51,
+      "baselineInteriorGaps": 0,
+      "bridgedInteriorGaps": 0,
+      "remainingInteriorGaps": 0,
+      "boundaryIntervalsChecked": 50,
+      "heldIntervalsWithNoFocusOrWords": 0
+    },
+    {
+      "provider": "netease",
+      "title": "愛なんですよ",
+      "rawBlankCues": 13,
+      "cleanedRows": 45,
+      "baselineInteriorGaps": 12,
+      "bridgedInteriorGaps": 9,
+      "remainingInteriorGaps": 3,
+      "boundaryIntervalsChecked": 56,
+      "heldIntervalsWithNoFocusOrWords": 9
+    },
+    {
+      "provider": "netease",
+      "title": "青い栞",
+      "rawBlankCues": 9,
+      "cleanedRows": 54,
+      "baselineInteriorGaps": 9,
+      "bridgedInteriorGaps": 4,
+      "remainingInteriorGaps": 5,
+      "boundaryIntervalsChecked": 62,
+      "heldIntervalsWithNoFocusOrWords": 4
+    },
+    {
+      "provider": "netease",
+      "title": "たいせつなきみのために、ぼくにできるいちばんのこと",
+      "rawBlankCues": 9,
+      "cleanedRows": 41,
+      "baselineInteriorGaps": 8,
+      "bridgedInteriorGaps": 6,
+      "remainingInteriorGaps": 2,
+      "boundaryIntervalsChecked": 48,
+      "heldIntervalsWithNoFocusOrWords": 6
+    },
+    {
+      "provider": "netease",
+      "title": "ニャルニャルサービスメドレー",
+      "rawBlankCues": 19,
+      "cleanedRows": 119,
+      "baselineInteriorGaps": 19,
+      "bridgedInteriorGaps": 13,
+      "remainingInteriorGaps": 6,
+      "boundaryIntervalsChecked": 137,
+      "heldIntervalsWithNoFocusOrWords": 13
+    },
+    {
+      "provider": "netease",
+      "title": "汝、不可逆を倒せ",
+      "rawBlankCues": 16,
+      "cleanedRows": 64,
+      "baselineInteriorGaps": 16,
+      "bridgedInteriorGaps": 15,
+      "remainingInteriorGaps": 1,
+      "boundaryIntervalsChecked": 79,
+      "heldIntervalsWithNoFocusOrWords": 15
+    },
+    {
+      "provider": "netease",
+      "title": "Mind Loop",
+      "rawBlankCues": 0,
+      "cleanedRows": 20,
+      "baselineInteriorGaps": 18,
+      "bridgedInteriorGaps": 15,
+      "remainingInteriorGaps": 3,
+      "boundaryIntervalsChecked": 37,
+      "heldIntervalsWithNoFocusOrWords": 15
+    },
+    {
+      "provider": "netease",
+      "title": "Essence",
+      "rawBlankCues": 0,
+      "cleanedRows": 26,
+      "baselineInteriorGaps": 0,
+      "bridgedInteriorGaps": 0,
+      "remainingInteriorGaps": 0,
+      "boundaryIntervalsChecked": 25,
+      "heldIntervalsWithNoFocusOrWords": 0
+    },
+    {
+      "provider": "netease",
+      "title": "晚安喵",
+      "rawBlankCues": 0,
+      "cleanedRows": 15,
+      "baselineInteriorGaps": 11,
+      "bridgedInteriorGaps": 9,
+      "remainingInteriorGaps": 2,
+      "boundaryIntervalsChecked": 25,
+      "heldIntervalsWithNoFocusOrWords": 9
+    },
+    {
+      "provider": "netease",
+      "title": "起风了",
+      "rawBlankCues": 1,
+      "cleanedRows": 58,
+      "baselineInteriorGaps": 0,
+      "bridgedInteriorGaps": 0,
+      "remainingInteriorGaps": 0,
+      "boundaryIntervalsChecked": 57,
+      "heldIntervalsWithNoFocusOrWords": 0
+    },
+    {
+      "provider": "qqmusic",
+      "title": "Staple Stable",
+      "rawBlankCues": 26,
+      "cleanedRows": 72,
+      "baselineInteriorGaps": 26,
+      "bridgedInteriorGaps": 25,
+      "remainingInteriorGaps": 1,
+      "boundaryIntervalsChecked": 97,
+      "heldIntervalsWithNoFocusOrWords": 25
+    },
+    {
+      "provider": "qqmusic",
+      "title": "晴天",
+      "rawBlankCues": 0,
+      "cleanedRows": 63,
+      "baselineInteriorGaps": 1,
+      "bridgedInteriorGaps": 1,
+      "remainingInteriorGaps": 0,
+      "boundaryIntervalsChecked": 63,
+      "heldIntervalsWithNoFocusOrWords": 1
+    },
+    {
+      "provider": "kugou",
+      "title": "Staple Stable (production cache with configured providers)",
+      "rawBlankCues": 0,
+      "cleanedRows": 69,
+      "baselineInteriorGaps": 64,
+      "bridgedInteriorGaps": 62,
+      "remainingInteriorGaps": 2,
+      "boundaryIntervalsChecked": 132,
+      "heldIntervalsWithNoFocusOrWords": 62
+    }
+  ]
+}
