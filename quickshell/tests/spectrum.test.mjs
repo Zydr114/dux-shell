@@ -38,3 +38,48 @@ test("spectrum subscriptions are idempotent and retain independent consumers", (
     assert.deepEqual(array(tokens), [second]);
     assert.equal(spectrum.removeSubscriber(tokens, second).length, 0);
 });
+
+test("Caelestia peak bins retain isolated frequencies without altering ordinary averaging", () => {
+    const input = Array(45).fill(0);
+    input[7] = 0.9;
+    input[44] = 1;
+    const ring = array(spectrum.peakBins(input, 36));
+    assert.equal(ring.length, 36);
+    assert.equal(ring[6], 0.9);
+    assert.equal(ring[35], 1);
+    assert.equal(ring.filter(value => value > 0).length, 2);
+    assert.ok(spectrum.aggregate(input, 6)[0] < 0.9);
+    assert.deepEqual(array(spectrum.peakBins([-1, NaN, 3, 0.25], 2)), [0, 1]);
+});
+
+test("Caelestia subscriptions request shared sampling independently of ordinary visualizers", () => {
+    const cases = [
+        [0, 0, false, false, 0],
+        [1, 0, false, false, 0],
+        [1, 0, true, false, 6],
+        [0, 1, false, false, 45],
+        [2, 2, false, false, 45],
+        [2, 1, true, false, 45],
+        [2, 0, true, true, 0],
+        [2, 2, true, true, 0],
+        [0, 1, false, true, 0]
+    ];
+    for (const [ordinary, covers, enabled, reduced, expected] of cases)
+        assert.equal(spectrum.requestedBars(ordinary, covers, enabled, reduced), expected);
+
+    const cover = {};
+    let tokens = spectrum.addSubscriber([], cover);
+    assert.equal(spectrum.requestedBars(1, tokens.length, false, false), 45);
+    tokens = spectrum.removeSubscriber(tokens, cover);
+    assert.equal(spectrum.requestedBars(1, tokens.length, true, false), 6);
+    assert.equal(spectrum.requestedBars(1, tokens.length, false, false), 0);
+});
+
+test("automatically gained spectrum frames stay within the ordinary visualizer display range", () => {
+    assert.deepEqual(array(spectrum.ordinaryBins(Array(45).fill(1))), Array(6).fill(45));
+    assert.deepEqual(array(spectrum.ordinaryBins(Array(45).fill(0.5))), Array(6).fill(23));
+    const quiet = Array(45).fill(0);
+    quiet[7] = 1;
+    const bins = array(spectrum.ordinaryBins(quiet));
+    assert.deepEqual(bins, [3, 3, 0, 0, 0, 0]);
+});

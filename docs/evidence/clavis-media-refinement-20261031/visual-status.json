@@ -1,0 +1,42 @@
+[
+  {
+    "case": "caelestia-wave",
+    "active": "DMS Fixture A",
+    "frames": 3,
+    "cavaCount": 1
+  },
+  {
+    "case": "hidden",
+    "cavaCount": 0
+  },
+  {
+    "case": "caelestia-material",
+    "active": "DMS Fixture A",
+    "frames": 3,
+    "cavaCount": 1
+  },
+  {
+    "case": "caelestia-paused",
+    "active": "DMS Fixture A",
+    "frames": 2,
+    "cavaCount": 0
+  },
+  {
+    "case": "caelestia-reduced",
+    "active": "DMS Fixture A",
+    "frames": 2,
+    "cavaCount": 0
+  },
+  {
+    "case": "rounded-wave",
+    "active": "DMS Fixture A",
+    "frames": 1,
+    "cavaCount": 0
+  },
+  {
+    "case": "dashboard",
+    "active": "DMS Fixture A",
+    "frames": 1,
+    "cavaCount": 1
+  }
+]

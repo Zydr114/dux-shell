@@ -1,0 +1,27 @@
+{
+  "source": "DMS Fixture A",
+  "verified": [
+    "Left",
+    "Right"
+  ],
+  "calls": [
+    {
+      "time": "2026-10-31T12:20:53.246165+00:00",
+      "source": "a",
+      "action": "SetPosition",
+      "arguments": [
+        "/org/example/DMSFixture/a/track1",
+        116682000
+      ]
+    },
+    {
+      "time": "2026-10-31T12:20:53.246556+00:00",
+      "source": "a",
+      "action": "SetPosition",
+      "arguments": [
+        "/org/example/DMSFixture/a/track1",
+        121682000
+      ]
+    }
+  ]
+}

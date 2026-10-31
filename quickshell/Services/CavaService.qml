@@ -19,8 +19,10 @@ Singleton {
     property int _activeBars: 0
     property bool _stopping: false
     property bool _failed: false
-    readonly property bool cavaWanted: SettingsData.audioVisualizerEnabled && !SettingsData.reduceMotion && (refCount > 0 || _spectrumTokens.length > 0)
-    readonly property int _desiredBars: cavaWanted && cavaAvailable ? (_spectrumTokens.length > 0 ? 45 : 6) : 0
+    readonly property bool spectrumAvailable: cavaAvailable && !_failed
+    readonly property int _requestedBars: Spectrum.requestedBars(refCount, _spectrumTokens.length, SettingsData.audioVisualizerEnabled, SettingsData.reduceMotion)
+    readonly property bool cavaWanted: _requestedBars > 0
+    readonly property int _desiredBars: cavaAvailable ? _requestedBars : 0
 
     onCavaWantedChanged: {
         _checkCava();
@@ -83,13 +85,13 @@ Singleton {
 
         command: ["sh", "-c", `exec cava -p /dev/fd/3 3<<'CAVACONF' < /dev/null
 [general]
-framerate=25
+framerate=${root._activeBars === 45 ? 45 : 25}
 bars=${root._activeBars}
-autosens=0
-sensitivity=30
+autosens=${root._activeBars === 45 ? 1 : 0}
+sensitivity=${root._activeBars === 45 ? 100 : 30}
 sleep_timer=3
 lower_cutoff_freq=50
-higher_cutoff_freq=12000
+higher_cutoff_freq=${root._activeBars === 45 ? 10000 : 12000}
 
 [output]
 method=raw
@@ -100,11 +102,11 @@ channels=mono
 mono_option=average
 
 [smoothing]
-noise_reduction=35
+noise_reduction=${root._activeBars === 45 ? 85 : 35}
 integral=90
 gravity=95
 ignore=2
-monstercat=1.5
+monstercat=${root._activeBars === 45 ? 1 : 1.5}
 CAVACONF`]
 
         onExited: (exitCode, exitStatus) => {
@@ -130,7 +132,7 @@ CAVACONF`]
                 if (root._activeBars === 45) {
                     if (!points.every((value, i) => value === root.spectrumValues[i]))
                         root.spectrumValues = points;
-                    const bands = Spectrum.aggregate(points, 6).map(value => Math.round(value * 1000));
+                    const bands = Spectrum.ordinaryBins(points);
                     if (!bands.every((value, i) => value === root.values[i]))
                         root.values = bands;
                 } else {

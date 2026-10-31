@@ -16,7 +16,7 @@ MediaChromeBase {
     readonly property bool backgroundCover: coverStyle === "background"
     readonly property real minimumDetailsWidth: Theme.buttonHeightXS * 4 + Theme.buttonHeightM + Theme.spacingS + Theme.spacingS * 6
     readonly property real minimumCoverWidth: Theme.buttonHeightM + (coverStyle === "caelestia" ? (Theme.clavisSpectrumMaxHeight + Theme.clavisSpectrumGap) * 2 : 0)
-    readonly property bool narrow: width - (padding + borderWidth) * 2 < minimumDetailsWidth + Theme.spacingM + minimumCoverWidth
+    readonly property bool narrow: width - (padding + borderWidth) * 2 < minimumDetailsWidth + Theme.clavisContentGap + minimumCoverWidth
     readonly property bool chromeLive: visible && player.live
     readonly property color foreground: MediaOptions.albumArtAccent ? MediaAccentService.onAccentSecondaryContainer : Theme.surfaceText
     readonly property color secondaryForeground: Theme.withAlpha(foreground, Theme.clavisSecondaryAlpha)
@@ -26,7 +26,7 @@ MediaChromeBase {
 
     implicitWidth: coverStyle === "rounded" ? Theme.clavisRoundedWidth : Theme.clavisExpandedWidth
     baseHeight: coverStyle === "rounded" ? Theme.clavisRoundedHeight : Theme.clavisExpandedHeight
-    artSize: coverStyle === "caelestia" ? Theme.clavisSpectrumCoverSize + Theme.clavisSpectrumMaxHeight * 2 : Theme.clavisCoverSize
+    artSize: coverStyle === "caelestia" || backgroundCover ? Theme.clavisSpectrumCoverSize : Theme.clavisCoverSize
     padding: Theme.spacingM
     borderWidth: 0
     backdropRadius: Theme.windowRadius
@@ -69,7 +69,7 @@ MediaChromeBase {
         id: cover
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        width: Math.max(0, Math.min(root.artSize, parent.height, parent.width * (1 - Theme.clavisMetadataWidthRatio), parent.width - Theme.spacingM - root.minimumDetailsWidth))
+        width: Math.max(0, Math.min(root.artSize, parent.height, parent.width * (1 - Theme.clavisMetadataWidthRatio), parent.width - Theme.clavisContentGap - root.minimumDetailsWidth))
         height: width
         visible: !root.backgroundCover && !root.narrow
         player: root.player
@@ -79,7 +79,7 @@ MediaChromeBase {
 
     Item {
         id: details
-        x: root.backgroundCover && !root.narrow ? Math.max(0, Math.min(parent.width * (1 - Theme.clavisMetadataWidthRatio), parent.width - root.minimumDetailsWidth)) : cover.visible ? cover.width + Theme.spacingM : 0
+        x: root.backgroundCover && !root.narrow ? Math.max(0, Math.min(root.artSize + Theme.clavisContentGap, parent.width - root.minimumDetailsWidth)) : cover.visible ? cover.width + Theme.clavisContentGap : 0
         width: Math.max(0, parent.width - x)
         height: parent.height
 

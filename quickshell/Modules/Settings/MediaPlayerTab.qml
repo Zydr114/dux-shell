@@ -67,6 +67,7 @@ Item {
                 settingKey: "mediaVisualizer"
                 tags: ["visualizer", "cava", "spectrum"]
                 text: I18n.tr("Audio visualizer")
+                description: I18n.tr("Enable other media visualizers. Caelestia covers include their own spectrum; reduced motion keeps them still.")
                 checked: SettingsData.audioVisualizerEnabled
                 onToggled: checked => SettingsData.set("audioVisualizerEnabled", checked)
             }

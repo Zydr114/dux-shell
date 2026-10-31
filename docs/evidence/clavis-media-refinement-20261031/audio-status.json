@@ -1,0 +1,28 @@
+[
+  {
+    "case": "audio-reactive",
+    "active": "DMS Fixture A",
+    "frames": 10,
+    "cavaCount": 1
+  },
+  {
+    "case": "concurrent-visualizers",
+    "active": "DMS Fixture A",
+    "frames": 1,
+    "cavaCount": 1
+  },
+  {
+    "case": "ordinary-after-cover-hidden",
+    "cavaCount": 1
+  },
+  {
+    "case": "ordinary-only",
+    "active": "DMS Fixture A",
+    "frames": 1,
+    "cavaCount": 1
+  },
+  {
+    "case": "all-visualizers-hidden",
+    "cavaCount": 0
+  }
+]

@@ -13,7 +13,7 @@ ClippingRectangle {
     property bool live: false
     property color spectrumColor: Theme.primary
 
-    readonly property bool sampling: live && playing && visible && (Window.window?.visible ?? false) && !SettingsData.reduceMotion
+    readonly property bool sampling: live && playing && visible && (Window.window?.visible ?? false) && SettingsData.audioVisualizerEnabled && !SettingsData.reduceMotion
     readonly property list<int> bands: sampling ? CavaService.values : []
     readonly property int barCount: 32
     readonly property real fullScale: 45

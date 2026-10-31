@@ -47,3 +47,30 @@ function aggregate(values, count) {
     }
     return result;
 }
+
+function peakBins(values, count) {
+    if (!values.length || count <= 0)
+        return [];
+    const result = [];
+    for (let i = 0; i < count; i++) {
+        const end = Math.floor((i + 1) * values.length / count);
+        let peak = 0;
+        for (let j = Math.floor(i * values.length / count); j < end; j++)
+            peak = Math.max(peak, Math.max(0, Math.min(1, Number(values[j]) || 0)));
+        result.push(peak);
+    }
+    return result;
+}
+
+function requestedBars(ordinaryRefs, spectrumRefs, ordinaryEnabled, reduceMotion) {
+    if (reduceMotion)
+        return 0;
+    if (spectrumRefs > 0)
+        return 45;
+    return ordinaryEnabled && ordinaryRefs > 0 ? 6 : 0;
+}
+
+function ordinaryBins(spectrum) {
+    // Existing blob/backdrop consumers use 45 as their display full scale.
+    return aggregate(spectrum, 6).map(value => Math.round(value * 45));
+}

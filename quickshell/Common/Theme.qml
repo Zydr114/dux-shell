@@ -31,22 +31,39 @@ Singleton {
     readonly property real clavisExpandedWidth: 640
     readonly property real clavisRoundedHeight: 210
     readonly property real clavisExpandedHeight: 240
-    readonly property real clavisCoverSize: 170
-    readonly property real clavisSpectrumCoverSize: 190
+    readonly property real clavisCoverSize: 120
+    readonly property real clavisSpectrumCoverSize: 180
+    readonly property real clavisCaelestiaArtRatio: 0.8
+    readonly property real clavisContentGap: 24
     readonly property real clavisBackgroundArtWidthRatio: 0.53
     readonly property real clavisMetadataWidthRatio: 0.56
-    readonly property int clavisCoverRotationDuration: 24000
+    readonly property int clavisCoverRotationDuration: 23500
     readonly property int clavisSpectrumCount: 36
+    readonly property int clavisContourSamples: 360
     readonly property int clavisSpectrumSourceCount: 45
     readonly property real clavisSpectrumMinHeight: 2
-    readonly property real clavisSpectrumMaxHeight: 18
-    readonly property real clavisSpectrumBarWidth: 3
+    readonly property real clavisSpectrumMaxHeight: 20
+    readonly property real clavisSpectrumBarWidth: 4
     readonly property real clavisSpectrumGap: 6
-    readonly property real clavisProgressHeight: 24
-    readonly property real clavisProgressStrokeWidth: 3
-    readonly property real clavisProgressAmplitude: 3
-    readonly property real clavisProgressWavelength: 24
-    readonly property real clavisProgressSpeed: 1.2
+    readonly property real clavisSpectrumRestOpacity: 0.35
+    readonly property real clavisProgressHeight: 36
+    readonly property real clavisProgressStrokeWidth: 6
+    readonly property real clavisProgressWaveAmplitude: 6
+    readonly property real clavisProgressWaveWavelength: 2 * Math.PI / 0.05
+    readonly property real clavisProgressWaveGap: 10
+    readonly property real clavisProgressWaveFadeLength: 30
+    readonly property real clavisProgressWaveHarmonicRatio: 1.5
+    readonly property real clavisProgressWaveHarmonicAmplitude: 0.3
+    readonly property real clavisProgressWaveBias: 1.3
+    readonly property real clavisProgressMaterialAmplitude: 2.5
+    readonly property real clavisProgressMaterialWavelength: 2 * Math.PI / 0.12
+    readonly property real clavisProgressMaterialGap: 4
+    readonly property real clavisProgressEndDotSize: 3.3
+    readonly property int clavisProgressPhaseDuration: 1200
+    readonly property int clavisProgressWaveSmoothingDuration: 400
+    readonly property real clavisProgressWaveSmoothingVelocity: 500
+    readonly property int clavisProgressMaterialSmoothingDuration: 1500
+    readonly property real clavisProgressMaterialSmoothingVelocity: 200
     readonly property real clavisSecondaryAlpha: 0.72
 
     readonly property real popupDistance: {

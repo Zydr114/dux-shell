@@ -9,6 +9,7 @@ import qs.Services
 import qs.DCommon.Widgets
 import "../../../DCommon/Widgets/MaterialShapes.js" as Shapes
 import "../../../Common/Spectrum.js" as Spectrum
+import "../../../Common/ClavisCoverGeometry.js" as CoverGeometry
 
 Item {
     id: root
@@ -20,15 +21,17 @@ Item {
     property real rotationAngle: 0
     property bool spectrumHeld: false
 
-    readonly property bool live: visible && player.live
+    readonly property bool live: visible && player.live && (Window.window?.visible ?? false)
     readonly property bool moving: live && !!player.presentation?.playing && !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
-    readonly property bool spectrumWanted: caelestia && moving && SettingsData.audioVisualizerEnabled
-    readonly property real spectrumInset: caelestia ? Theme.clavisSpectrumMaxHeight + Theme.clavisSpectrumGap : 0
-    readonly property list<real> contour: Shapes.polarProfile("cookie9", Theme.clavisSpectrumCount)
-    readonly property list<real> spectrum: spectrumHeld ? Spectrum.aggregate(CavaService.spectrumValues, Theme.clavisSpectrumCount) : Array(Theme.clavisSpectrumCount).fill(0)
+    readonly property bool spectrumWanted: caelestia && moving
+    readonly property real artworkSize: Math.min(width, height) * (caelestia ? Theme.clavisCaelestiaArtRatio : 1)
+    readonly property real spectrumScale: Math.min(1, Math.min(width, height) / Theme.clavisSpectrumCoverSize)
+    readonly property list<real> contour: Shapes.polarProfile("cookie9", Theme.clavisContourSamples)
+    readonly property list<real> spectrum: spectrumHeld ? Spectrum.peakBins(CavaService.spectrumValues, Theme.clavisSpectrumCount) : Array(Theme.clavisSpectrumCount).fill(0)
 
     onSpectrumWantedChanged: syncSpectrum()
     onSpectrumChanged: ring.requestPaint()
+    onRotationAngleChanged: ring.requestPaint()
     onAccentChanged: ring.requestPaint()
     Component.onCompleted: syncSpectrum()
     Component.onDestruction: {
@@ -48,15 +51,16 @@ Item {
     }
 
     FrameAnimation {
-        running: root.spectrumWanted
-        onTriggered: root.rotationAngle = (root.rotationAngle + frameTime * 360 * 1000 / Theme.clavisCoverRotationDuration) % 360
+        running: root.caelestia && root.moving
+        onTriggered: root.rotationAngle = (root.rotationAngle - frameTime * 360 * 1000 / Theme.clavisCoverRotationDuration) % 360
     }
 
     Canvas {
         id: ring
         anchors.fill: parent
-        visible: root.caelestia && SettingsData.audioVisualizerEnabled && CavaService.cavaAvailable
-        rotation: root.rotationAngle
+        anchors.margins: -Theme.clavisSpectrumMaxHeight * root.spectrumScale
+        visible: root.caelestia
+        opacity: root.spectrumWanted && CavaService.spectrumAvailable ? 1 : Theme.clavisSpectrumRestOpacity
         onWidthChanged: requestPaint()
         onHeightChanged: requestPaint()
         onVisibleChanged: {
@@ -67,14 +71,14 @@ Item {
             const ctx = getContext("2d");
             ctx.reset();
             ctx.lineCap = "round";
-            ctx.lineWidth = Theme.clavisSpectrumBarWidth;
+            ctx.lineWidth = Theme.clavisSpectrumBarWidth * root.spectrumScale;
             ctx.strokeStyle = root.accent;
             const count = Theme.clavisSpectrumCount;
-            const size = Math.max(0, Math.min(width, height) - root.spectrumInset * 2);
             for (let i = 0; i < count; i++) {
-                const angle = -Math.PI + Math.PI * 2 * i / count;
-                const radius = (root.contour[i] ?? 0.5) * size + Theme.clavisSpectrumGap;
-                const bar = Theme.clavisSpectrumMinHeight + (root.spectrum[i] ?? 0) * Theme.clavisSpectrumMaxHeight;
+                const degrees = 360 * i / count;
+                const angle = degrees * Math.PI / 180;
+                const radius = CoverGeometry.radiusAtAngle(root.contour, degrees - root.rotationAngle) * root.artworkSize + Theme.clavisSpectrumGap * root.spectrumScale;
+                const bar = (Theme.clavisSpectrumMinHeight + (root.spectrum[i] ?? 0) * (Theme.clavisSpectrumMaxHeight - Theme.clavisSpectrumMinHeight)) * root.spectrumScale;
                 const dx = Math.cos(angle);
                 const dy = Math.sin(angle);
                 ctx.beginPath();
@@ -88,7 +92,7 @@ Item {
     ClippingRectangle {
         id: artwork
         anchors.centerIn: parent
-        width: Math.max(0, Math.min(parent.width, parent.height) - root.spectrumInset * 2)
+        width: Math.max(0, root.artworkSize)
         height: width
         radius: root.caelestia ? 0 : Theme.cornerRadius
         color: MediaAccentService.accentSecondaryContainer

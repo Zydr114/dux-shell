@@ -62,7 +62,7 @@ FocusScope {
                 tab: "dank_dash"
                 tags: ["clavis", "media", "spectrum", "visualizer", "caelestia"]
                 text: I18n.tr("Audio visualizer")
-                description: I18n.tr("Enable the Caelestia spectrum and cover motion; reduced motion keeps the cover still")
+                description: I18n.tr("Enable other media visualizers. Caelestia covers include their own spectrum; reduced motion keeps them still.")
                 checked: SettingsData.audioVisualizerEnabled
                 onToggled: checked => SettingsData.set("audioVisualizerEnabled", checked)
             }
