@@ -1,0 +1,167 @@
+[
+  {
+    "case": "visit-0-before",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 282,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "visit-0-clock-click",
+    "state": {
+      "activity": "home",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 736,
+      "targetHeight": 548
+    }
+  },
+  {
+    "case": "visit-0-escape",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 282,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "visit-1-before",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 282,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "visit-1-clock-click",
+    "state": {
+      "activity": "home",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 736,
+      "targetHeight": 548
+    }
+  },
+  {
+    "case": "visit-1-escape",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 282,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "visit-2-before",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 282,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "visit-2-clock-click",
+    "state": {
+      "activity": "home",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 736,
+      "targetHeight": 548
+    }
+  },
+  {
+    "case": "visit-2-escape",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 282,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "right-click-select-home",
+    "state": {
+      "activity": "home",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "home",
+      "targetWidth": 192,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "home-cover-select-media",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 282,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "media-body-open-player",
+    "state": {
+      "activity": "media",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 640,
+      "targetHeight": 264
+    }
+  },
+  {
+    "case": "player-escape",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 282,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "hover-open-after-leaving",
+    "state": {
+      "activity": "media",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 640,
+      "targetHeight": 264
+    }
+  },
+  {
+    "case": "hover-leave-collapse",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 282,
+      "targetHeight": 44
+    }
+  }
+]

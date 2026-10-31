@@ -1,0 +1,189 @@
+[
+  {
+    "case": "all-fixtures-stopped",
+    "state": {
+      "activity": "home",
+      "expanded": false,
+      "mediaAvailable": false,
+      "idleActivity": "home",
+      "targetWidth": 192,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "dashboard-before-playback",
+    "state": {
+      "activity": "home",
+      "expanded": true,
+      "mediaAvailable": false,
+      "idleActivity": "home",
+      "targetWidth": 736,
+      "targetHeight": 548
+    }
+  },
+  {
+    "case": "playback-start-during-dashboard",
+    "state": {
+      "activity": "home",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 736,
+      "targetHeight": 548
+    }
+  },
+  {
+    "case": "dashboard-close-to-media",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "fixture-clock-0",
+    "state": {
+      "activity": "home",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 736,
+      "targetHeight": 548
+    }
+  },
+  {
+    "case": "fixture-clock-return-0",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "fixture-clock-1",
+    "state": {
+      "activity": "home",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 736,
+      "targetHeight": 548
+    }
+  },
+  {
+    "case": "fixture-clock-return-1",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "fixture-home-choice",
+    "state": {
+      "activity": "home",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "home",
+      "targetWidth": 192,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "fixture-cover-choice",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "fixture-player-open",
+    "state": {
+      "activity": "media",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 640,
+      "targetHeight": 264
+    }
+  },
+  {
+    "case": "fixture-player-close",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "notification-shown",
+    "state": {
+      "activity": "notification",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 270,
+      "targetHeight": 62
+    }
+  },
+  {
+    "case": "notification-return",
+    "state": {
+      "activity": "media",
+      "expanded": false,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 440,
+      "targetHeight": 44
+    }
+  },
+  {
+    "case": "clock-before-source-ends",
+    "state": {
+      "activity": "home",
+      "expanded": true,
+      "mediaAvailable": true,
+      "idleActivity": "media",
+      "targetWidth": 736,
+      "targetHeight": 548
+    }
+  },
+  {
+    "case": "source-ended-during-clock",
+    "state": {
+      "activity": "home",
+      "expanded": true,
+      "mediaAvailable": false,
+      "idleActivity": "home",
+      "targetWidth": 736,
+      "targetHeight": 548
+    }
+  },
+  {
+    "case": "source-ended-clock-close",
+    "state": {
+      "activity": "home",
+      "expanded": false,
+      "mediaAvailable": false,
+      "idleActivity": "home",
+      "targetWidth": 211,
+      "targetHeight": 44
+    }
+  }
+]

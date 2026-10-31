@@ -13,6 +13,7 @@ Item {
 
     required property var controller
     required property var systemModel
+    required property var mediaModel
 
     readonly property bool tight: root.controller.homeCompactTight
     readonly property real slotSize: root.tight ? Theme.iconSize : Theme.iconSizeLarge
@@ -238,7 +239,7 @@ Item {
         switch (groupId) {
         case "media":
             if (root.controller.mediaAvailable) {
-                root.controller.requestActivity("media", true, true);
+                root.controller.activateCompact("media");
                 return;
             }
             root.controller.requestLauncher("", "", false);
@@ -547,11 +548,10 @@ Item {
                 }
             }
 
-            AudioVisualization {
+            MediaArtwork {
                 width: root.iconSize + Theme.spacingXS
                 height: width
-                maxBarHeight: Math.max(3, height - 2)
-                idleIconName: "graphic_eq"
+                artUrl: root.mediaModel.artUrl
                 visible: group.isMedia && root.controller.mediaAvailable
             }
 

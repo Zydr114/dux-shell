@@ -7,6 +7,7 @@ import qs.Modals.DLauncherV2.Components
 import qs.Modules.ControlCenter
 import qs.Modules.DBar
 import qs.Modules.DDash
+import "../../Common/IslandInteraction.js" as IslandInteraction
 import "../../Common/TransientExpiry.js" as TransientExpiry
 
 QtObject {
@@ -17,7 +18,7 @@ QtObject {
     property bool inputSuspended: false
     property bool expanded: false
     property bool pointerInside: false
-    // A right-click face swap resizes the island under the pointer; hover stays off until it leaves.
+    // A compact selection resizes under the pointer; hover stays off until it leaves.
     property bool hoverHeld: false
     property int slotHoverCount: 0
     readonly property bool slotHovered: slotHoverCount > 0
@@ -635,15 +636,11 @@ QtObject {
 
     // Set directly: requestActivity would drop a destination open still waiting for its visuals.
     function autoSwitchToMedia() {
-        if (activeActivity === "home" && !expanded && !(pointerInside && hoverExpandEnabled))
-            activeActivity = "media";
-        else if (systemActivityActive && transientReturnActivity === "home")
-            transientReturnActivity = "media";
-        else if ((notificationActive || notificationHeldForSystem) && suspendedActivity === "home" && !suspendedExpanded)
-            suspendedActivity = "media";
-        else
-            return;
-        mediaPreferred = true;
+        const next = IslandInteraction.autoSwitchToMedia(root);
+        mediaPreferred = next.mediaPreferred;
+        activeActivity = next.activeActivity;
+        transientReturnActivity = next.transientReturnActivity;
+        suspendedActivity = next.suspendedActivity;
     }
 
     onInputSuspendedChanged: {
@@ -662,9 +659,19 @@ QtObject {
             activeActivity = idleActivity();
     }
 
-    // The face a closed sheet lands on: media only when the user picked the media face.
     function idleActivity() {
-        return mediaAvailable && mediaPreferred ? "media" : "home";
+        return IslandInteraction.idleActivity(mediaAvailable, mediaPreferred);
+    }
+
+    function activateCompact(target) {
+        const action = IslandInteraction.compactActivation(target, mediaAvailable);
+        if (!action || !requestActivity(action.activity, action.expanded, action.expanded))
+            return false;
+        if (!action.expanded) {
+            hoverHeld = true;
+            hoverOpenTimer.stop();
+        }
+        return true;
     }
 
     // A dot draws the same face for home and media, so a toggle would only change what the next click opens.
@@ -731,6 +738,7 @@ QtObject {
 
     function requestCollapse() {
         hoverExpanded = false;
+        hoverHeld = pointerInside;
         hoverOpenTimer.stop();
         transientTimer.stop();
         stopNotificationTimeout();
@@ -806,8 +814,7 @@ QtObject {
         keyboardDismissRequested = shouldExpand === true && requestKeyboardFocus === true;
         expanded = shouldExpand === true;
         activeActivity = activityId;
-        if ((activityId === "media" || activityId === "home") && shouldExpand !== true)
-            mediaPreferred = activityId === "media";
+        mediaPreferred = IslandInteraction.preferredAfterRequest(mediaPreferred, activityId, expanded);
         launcherSessionActive = activityId === "launcher" && expanded;
         if (destination && expanded)
             sessionStarted(activityId);

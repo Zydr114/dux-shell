@@ -18,7 +18,7 @@ MediaActivityFace {
     onImplicitHeightChanged: updateLength()
     onIsVerticalChanged: updateLength()
     Component.onCompleted: updateLength()
-    onClockClicked: controller.requestActivity("home", false, false)
+    onClockClicked: controller.activateCompact("clock")
     property bool hoverCounted: false
     onClockHoveredChanged: {
         if (hoverCounted === clockHovered)

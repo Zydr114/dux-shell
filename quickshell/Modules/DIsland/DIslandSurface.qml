@@ -630,6 +630,7 @@ Item {
         HomeCompact {
             controller: root.controller
             systemModel: root.systemModel
+            mediaModel: root.mediaModel
         }
     }
 
