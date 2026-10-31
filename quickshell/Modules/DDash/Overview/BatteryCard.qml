@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
@@ -21,7 +22,6 @@ Card {
 
     entryId: "battery"
     tone: options.tone ?? ""
-    clipContent: clavis
 
     function syncBatteryRef(wanted) {
         if (wanted === batteryRefHeld)
@@ -133,9 +133,11 @@ Card {
         anchors.fill: parent
         anchors.margins: -root.pad
         active: root.clavis
-        sourceComponent: Item {
+        sourceComponent: ClippingRectangle {
             id: clavisBody
 
+            radius: root.bodyRadius
+            color: "transparent"
             readonly property real fillTop: liquid.y
             function foregroundAt(y) {
                 return y >= fillTop ? root.onAccentColor : root.contentColor;

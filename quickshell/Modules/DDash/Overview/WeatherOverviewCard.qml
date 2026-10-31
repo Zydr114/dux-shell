@@ -55,7 +55,6 @@ Card {
     entryId: "weather"
     tone: options.tone ?? ""
     clickable: true
-    clipContent: clavis
     pad: compact ? Theme.spacingS : Theme.spacingM
 
     function syncWeatherRef(wanted) {
@@ -302,6 +301,7 @@ Card {
         sourceComponent: ClavisWeather {
             showCity: root.showCity
             available: root.available
+            clipRadius: root.bodyRadius
         }
     }
 }

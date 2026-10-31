@@ -1,8 +1,9 @@
 import QtQuick
+import Quickshell.Widgets
 import qs.Common
 import qs.DCommon.Widgets
 
-Item {
+ClippingRectangle {
     id: root
     property string metricId: ""
     property string label: ""
@@ -15,14 +16,15 @@ Item {
     property bool trendVisible: false
     property color accent: Theme.primary
     property color foreground: Theme.onPrimary
+    property real clipRadius: Theme.cornerRadiusL
     readonly property bool split: metricId === "network" || metricId === "disk"
     readonly property bool memory: metricId === "memory"
-    clip: true
+    radius: clipRadius
+    color: "transparent"
 
     Rectangle {
         anchors.fill: parent
         color: root.accent
-        radius: Theme.cornerRadiusL
     }
     Rectangle {
         anchors.right: parent.right

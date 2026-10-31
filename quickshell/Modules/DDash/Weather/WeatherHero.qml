@@ -171,6 +171,7 @@ Rectangle {
         sourceComponent: ClavisWeather {
             showCity: root.showCity
             available: root.weather.available
+            clipRadius: root.radius
         }
     }
 }

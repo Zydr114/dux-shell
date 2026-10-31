@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Widgets
 import qs.Common
 import qs.DCommon.Widgets
 import qs.Modules.DDash
@@ -17,7 +18,6 @@ Card {
 
     entryId: "date"
     tone: options.tone ?? ""
-    clipContent: true
     pad: Theme.spacingM
     clickable: true
     blocksTabNavigation: calendarSheet.shown
@@ -78,20 +78,19 @@ Card {
         }
     }
 
-    Rectangle {
+    ClippingRectangle {
         anchors.fill: parent
         anchors.margins: -root.pad
+        radius: root.bodyRadius
         color: root.accentColor
-    }
-    Rectangle {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.leftMargin: -root.pad
-        anchors.rightMargin: -root.pad
-        anchors.bottomMargin: -root.pad
-        height: day.height + root.pad
-        color: Theme.secondaryContainer
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: day.height + root.pad
+            color: Theme.secondaryContainer
+        }
     }
     Column {
         anchors.left: parent.left

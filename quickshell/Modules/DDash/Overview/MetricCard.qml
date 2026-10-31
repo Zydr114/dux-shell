@@ -7,7 +7,7 @@ import qs.Modules.DDash
 Card {
     id: root
 
-    clipContent: true
+    clipContent: !clavis
 
     property bool live: Window.window?.visible ?? false
     property var dgopModules: []
@@ -213,6 +213,7 @@ Card {
             trendVisible: root.trendVisible
             accent: root.accentColor
             foreground: root.onAccentColor
+            clipRadius: root.bodyRadius
         }
     }
 }

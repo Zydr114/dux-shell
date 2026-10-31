@@ -1,21 +1,23 @@
 import QtQuick
+import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.DCommon.Widgets
 
-Item {
+ClippingRectangle {
     id: root
     property bool showCity: false
     property bool available: false
+    property real clipRadius: Theme.cornerRadiusXL
     readonly property var weather: WeatherService.weather
     readonly property var today: weather.forecast?.[0] ?? null
     readonly property bool compact: height < Theme.buttonHeightM * 2
-    clip: true
+    radius: clipRadius
+    color: "transparent"
 
     Rectangle {
         anchors.fill: parent
         color: Theme.primaryContainer
-        radius: Theme.cornerRadiusL
     }
     Rectangle {
         width: parent.width * 1.4
