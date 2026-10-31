@@ -1,0 +1,72 @@
+{
+  "escaped_to_compact": true,
+  "calls": [
+    {
+      "time": "2026-10-31T09:02:48.743692+00:00",
+      "source": "a",
+      "action": "set",
+      "property": "Shuffle",
+      "value": true
+    },
+    {
+      "time": "2026-10-31T09:02:49.191484+00:00",
+      "source": "a",
+      "action": "SetPosition",
+      "arguments": [
+        "/org/example/DMSFixture/a/track1",
+        100000
+      ]
+    },
+    {
+      "time": "2026-10-31T09:02:49.640936+00:00",
+      "source": "a",
+      "action": "Next",
+      "arguments": []
+    },
+    {
+      "time": "2026-10-31T09:02:50.090120+00:00",
+      "source": "a",
+      "action": "set",
+      "property": "LoopStatus",
+      "value": "Playlist"
+    },
+    {
+      "time": "2026-10-31T09:02:50.314180+00:00",
+      "source": "a",
+      "action": "set",
+      "property": "LoopStatus",
+      "value": "Track"
+    },
+    {
+      "time": "2026-10-31T09:02:50.538979+00:00",
+      "source": "a",
+      "action": "set",
+      "property": "LoopStatus",
+      "value": "None"
+    },
+    {
+      "time": "2026-10-31T09:02:50.986881+00:00",
+      "source": "a",
+      "action": "SetPosition",
+      "arguments": [
+        "/org/example/DMSFixture/a/track2",
+        100000
+      ]
+    },
+    {
+      "time": "2026-10-31T09:02:50.987237+00:00",
+      "source": "a",
+      "action": "SetPosition",
+      "arguments": [
+        "/org/example/DMSFixture/a/track2",
+        5100000
+      ]
+    },
+    {
+      "time": "2026-10-31T09:02:52.516341+00:00",
+      "source": "a",
+      "action": "Pause",
+      "arguments": []
+    }
+  ]
+}

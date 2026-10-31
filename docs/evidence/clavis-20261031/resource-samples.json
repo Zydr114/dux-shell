@@ -1,0 +1,44 @@
+[
+  {
+    "phase": "expanded_visualizer_off",
+    "qs_cpu_one_core_percent": 18.0,
+    "qs_rss_mib": 757.11,
+    "cava_before": 0,
+    "cava_after": 0
+  },
+  {
+    "phase": "expanded_visualizer_on",
+    "qs_cpu_one_core_percent": 24.5,
+    "qs_rss_mib": 759.23,
+    "cava_before": 1,
+    "cava_after": 1
+  },
+  {
+    "phase": "compact_legacy_visualizer",
+    "qs_cpu_one_core_percent": 5.0,
+    "qs_rss_mib": 759.76,
+    "cava_before": 1,
+    "cava_after": 1
+  },
+  {
+    "phase": "compact_reduced_motion",
+    "qs_cpu_one_core_percent": 2.5,
+    "qs_rss_mib": 754.95,
+    "cava_before": 0,
+    "cava_after": 0
+  },
+  {
+    "phase": "compact_visualizer_off",
+    "qs_cpu_one_core_percent": 3.5,
+    "qs_rss_mib": 754.29,
+    "cava_before": 0,
+    "cava_after": 0
+  },
+  {
+    "phase": "all_players_paused",
+    "qs_cpu_one_core_percent": 2.0,
+    "qs_rss_mib": 754.52,
+    "cava_before": 0,
+    "cava_after": 0
+  }
+]
